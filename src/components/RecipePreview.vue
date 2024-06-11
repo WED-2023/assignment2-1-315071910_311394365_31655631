@@ -11,8 +11,14 @@
         {{ recipe.title }}
       </div>
       <ul class="recipe-overview">
-        <li>{{ recipe.readyInMinutes }} minutes</li>
-        <li>{{ recipe.aggregateLikes }} likes</li>
+        <li>
+          <img src="https://banner2.cleanpng.com/20180604/kwx/kisspng-computer-icons-time-attendance-clocks-font-aweso-clock-icon-5b14c6364f6622.2216713915280881183252.jpg" alt="Time" class="icon" />
+          {{ recipe.readyInMinutes }} minutes
+        </li>
+        <li>
+          {{ recipe.aggregateLikes }} likes
+          <img src="/Users/odedatias/Documents/GitHub/assignment2-1-315071910_311394365_31655631/photos/Like-icon-design-on-transparent-PNG.png" alt="Likes" class="icon" />
+        </li>
       </ul>
     </div>
   </router-link>
@@ -63,7 +69,8 @@ export default {
 };
 </script>
 
-<style scoped>
+
+<!-- <style scoped>
 .recipe-preview {
   display: inline-block;
   width: 90%;
@@ -138,4 +145,100 @@ export default {
   display: table-cell;
   text-align: center;
 }
+</style> -->
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+
+.recipe-preview {
+  display: inline-block;
+  width: 300px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 20px;
+  text-decoration: none;
+  color: inherit;
+  background-color: #fff;
+}
+
+.recipe-preview:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-body {
+  width: 100%;
+  height: 200px;
+  position: relative;
+}
+
+.recipe-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.recipe-footer {
+  padding: 15px;
+  background-color: #fafafa;
+  border-top: 1px solid #eee;
+}
+
+.recipe-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recipe-overview {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.recipe-overview li {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-overview li .icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
+.recipe-overview li:last-child .icon {
+  margin-left: 5px;
+}
+
+@media (max-width: 600px) {
+  .recipe-preview {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .recipe-title {
+    font-size: 1rem;
+  }
+
+  .recipe-overview {
+    font-size: 0.8rem;
+  }
+}
 </style>
+
+
