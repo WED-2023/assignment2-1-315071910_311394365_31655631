@@ -1,11 +1,10 @@
 <template>
   <div id="app" class="background">
     <b-navbar toggleable="lg" type="dark" class="navbar-custom">
-      <b-navbar-brand href="#">Vue Recipes</b-navbar-brand>
+      <b-navbar-brand :to="{ name: 'main' }">Vue Recipes</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item :to="{ name: 'main' }" exact>Home</b-nav-item>
           <b-nav-item :to="{ name: 'search' }" exact>Search</b-nav-item>
           <b-nav-item :to="{ name: 'about' }" exact>About</b-nav-item>
         </b-navbar-nav>
@@ -20,14 +19,26 @@
           <template v-else>
             <div class="user-box d-flex align-items-center">
               <span class="mr-2">Hello, {{ $root.store.username }}:</span>
-              <b-dropdown id="dropdown-1" text="Personal Area" right class="personal-dropdown">
-                <b-dropdown-item :to="{ name: 'favorites' }">My Favorites</b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'my-recipes' }">My Recipes</b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'family-recipes' }">My Family Recipes</b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'createRecipe' }">Create New Recipe</b-dropdown-item>
+              <b-dropdown id="dropdown-1" right class="personal-dropdown">
+                <template #button-content>
+                  <i class="fas fa-user mr-2"></i> Personal Area
+                </template>
+                <b-dropdown-item :to="{ name: 'favorites' }">
+                  My Favorites <i class="fas fa-heart ml-2"></i>
+                </b-dropdown-item>
+                <b-dropdown-item :to="{ name: 'my-recipes' }">
+                  My Recipes <i class="fas fa-book ml-2"></i>
+                </b-dropdown-item>
+                <b-dropdown-item :to="{ name: 'family-recipes' }">
+                  My Family Recipes <i class="fas fa-home ml-2"></i>
+                </b-dropdown-item>
+                <b-dropdown-item :to="{ name: 'createRecipe' }">
+                  Create New Recipe <i class="fas fa-plus-circle ml-2"></i>
+                </b-dropdown-item>
                 <b-dropdown-divider></b-dropdown-divider>
                 <b-dropdown-item @click="logout" class="logout-item">
-                  <b-icon icon="box-arrow-right" class="mr-2"></b-icon>Logout
+                  <span class="logout-text">Logout</span>
+                  <i class="fas fa-sign-out-alt logout-icon"></i>
                 </b-dropdown-item>
               </b-dropdown>
             </div>
@@ -119,7 +130,7 @@ b-nav-item.router-link-exact-active::before {
 
 /* Dropdown Item Styles */
 .b-dropdown-item {
-  color: #2c3e50; /* Set the dropdown item color */
+  color: #ffffff !important; /* Set the dropdown item color to white */
   transition: background-color 0.3s; /* Smooth transition for background color */
 }
 
@@ -169,7 +180,7 @@ b-nav-item.router-link-exact-active::before {
     transition: background-color 0.3s, border-color 0.3s;
   }
 
-  .dropdown-toggle:hover {
+    .dropdown-toggle:hover {
     background-color: rgba(255, 255, 255, 0.1) !important; /* Slight background change on hover */
   }
 
@@ -183,20 +194,59 @@ b-nav-item.router-link-exact-active::before {
   .dropdown-item {
     color: #ffffff !important; /* Set dropdown item text color to white */
     font-weight: 600; /* Make dropdown item text bold */
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition for background color and transform */
+    position: relative;
+    overflow: hidden;
+    padding: 10px 20px; /* Increase padding for better spacing */
+  }
+
+  .dropdown-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #1e3a8a, #3b82f6); /* Gradient background: dark blue to light blue */
+    transition: left 0.3s ease;
+    z-index: -1;
+  }
+
+  .dropdown-item:hover::before {
+    left: 0;
   }
 
   .dropdown-item:hover {
-    background-color: #42b983 !important; /* Change background color on hover */
+    background-color: transparent !important; /* Make background transparent to show gradient */
+    color: #ffffff !important; /* Ensure text color remains white */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    transform: scale(1.05); /* Slightly increase size on hover */
   }
 
+
   .logout-item {
-    color: #ff4d4d !important; /* Set logout item text color to red */
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s; /* Smooth transition for background color */
+  }
+
+  .logout-item .logout-text {
+    color: #ff4d4d !important; /* Set the logout text color to red */
+  }
+
+  .logout-icon {
+    color: #ff4d4d !important; /* Set the logout text color to red */
   }
 
   .logout-item:hover {
     background-color: rgba(255, 77, 77, 0.1) !important; /* Light red background on hover */
   }
+}
+
+.logout-icon {
+  width: 16px; /* Set the width of the icon */
+  height: 16px; /* Set the height of the icon */
+  margin-left: 8px; /* Add margin to the left of the icon */
 }
 
 /* Custom styles for user box */
