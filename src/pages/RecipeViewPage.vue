@@ -1,3 +1,92 @@
+<template>
+  <div class="container">
+    <div v-if="recipe">
+      <div class="recipe-header mt-3 mb-4">
+        <h1>{{ recipe.title }}</h1>
+        <img :src="recipe.image" class="center" />
+      </div>
+      <div class="recipe-body">
+        <div class="wrapper">
+          <div class="wrapped">
+            <div class="info mb-3">
+              <div class="time-likes">
+                <div class="time">Ready in {{ recipe.readyInMinutes }} minutes</div>
+                <div class="likes">Likes: {{ recipe.aggregateLikes }} likes</div>
+              </div>
+            </div>
+            <h3>Ingredients:</h3>
+            <ul class="ingredients-list">
+              <li
+                v-for="(r, index) in recipe.extendedIngredients"
+                :key="index + '_' + r.id"
+              >
+                {{ r.original }}
+              </li>
+            </ul>
+          </div>
+          <div class="wrapped">
+            <h3>Instructions:</h3>
+            <ol class="instructions-list">
+              <li v-for="s in recipe._instructions" :key="s.number">
+                {{ s.step }}
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mockGetRecipeFullDetails } from "../services/recipes.js";
+export default {
+  data() {
+    return {
+      recipe: null
+    };
+  },
+  async created() {
+    try {
+      let response;
+      response = mockGetRecipeFullDetails(this.$route.params.recipeId);
+
+      let {
+        analyzedInstructions,
+        instructions,
+        extendedIngredients,
+        aggregateLikes,
+        readyInMinutes,
+        image,
+        title
+      } = response.data.recipe;
+
+      let _instructions = analyzedInstructions
+        .map((fstep) => {
+          fstep.steps[0].step = fstep.name + fstep.steps[0].step;
+          return fstep.steps;
+        })
+        .reduce((a, b) => [...a, ...b], []);
+
+      let _recipe = {
+        instructions,
+        _instructions,
+        analyzedInstructions,
+        extendedIngredients,
+        aggregateLikes,
+        readyInMinutes,
+        image,
+        title
+      };
+
+      this.recipe = _recipe;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
+</script>
+
 <style scoped>
 .container {
   max-width: 1200px;
