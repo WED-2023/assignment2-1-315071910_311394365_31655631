@@ -1,12 +1,123 @@
 {
-    "id": 716429,
-    "image": "https://img.spoonacular.com/recipes/716429-556x370.jpg",
-    "title": "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-    "readyInMinutes": 45,
-    "aggregateLikes": 209,
-    "vegetarian": false,
-    "vegan": false,
-    "glutenFree": false,
-    "summary": "You can never have too many main course recipes, so give Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs a try. One serving contains <b>543 calories</b>, <b>17g of protein</b>, and <b>16g of fat</b>. For <b>$1.57 per serving</b>, this recipe <b>covers 22%</b> of your daily requirements of vitamins and minerals. This recipe serves 2. A mixture of butter, white wine, pasta, and a handful of other ingredients are all it takes to make this recipe so yummy. 209 people have tried and liked this recipe. It is brought to you by fullbellysisters.blogspot.com. From preparation to the plate, this recipe takes approximately <b>45 minutes</b>. Taking all factors into account, this recipe <b>earns a spoonacular score of 83%</b>, which is tremendous. If you like this recipe, take a look at these similar recipes: <a href=\"https://spoonacular.com/recipes/pasta-with-garlic-scallions-cauliflower-breadcrumbs-1230187\">Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs</a>, <a href=\"https://spoonacular.com/recipes/pasta-with-garlic-scallions-cauliflower-breadcrumbs-1229807\">Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs</a>, and <a href=\"https://spoonacular.com/recipes/pasta-with-garlic-scallions-cauliflower-breadcrumbs-1229669\">Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs</a>."
-
-}
+    "11111": {
+      "id": 11111,
+      "image": "https://img.spoonacular.com/recipes/716429-556x370.jpg",
+      "title": "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
+      "readyInMinutes": 11,
+      "aggregateLikes": 209,
+      "vegetarian": true,
+      "vegan": true,
+      "glutenFree": false,
+      "summary": "You can never have too many main course recipes, so give Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs a try. One serving contains <b>543 calories</b>, <b>17g of protein</b>, and <b>16g of fat</b>. For <b>$1.57 per serving</b>, this recipe <b>covers 22%</b> of your daily requirements of vitamins and minerals. This recipe serves 2. A mixture of butter, white wine, pasta, and a handful of other ingredients are all it takes to make this recipe so yummy. 209 people have tried and liked this recipe. It is brought to you by fullbellysisters.blogspot.com. From preparation to the plate, this recipe takes approximately <b>45 minutes</b>. Taking all factors into account, this recipe <b>earns a spoonacular score of 83%</b>, which is tremendous. If you like this recipe, take a look at these similar recipes: <a href=\"https://spoonacular.com/recipes/pasta-with-garlic-scallions-cauliflower-breadcrumbs-1230187\">Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs</a>, <a href=\"https://spoonacular.com/recipes/pasta-with-garlic-scallions-cauliflower-breadcrumbs-1229807\">Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs</a>, and <a href=\"https://spoonacular.com/recipes/pasta-with-garlic-scallions-cauliflower-breadcrumbs-1229669\">Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs</a>."
+    },
+    "11341": {
+        "id": 11111,
+        "image": "https://uk.ooni.com/cdn/shop/articles/20220211142645-margherita-9920.jpg?crop=center&height=915&v=1660843558&width=1200",
+        "title": "Margherita Pizza",
+        "readyInMinutes": 30,
+        "aggregateLikes": 120,
+        "vegetarian": true,
+        "vegan": false,
+        "glutenFree": false,
+        "summary": "Margherita Pizza is a classic Italian dish made with tomatoes, mozzarella, fresh basil, salt, and extra-virgin olive oil. Perfect for a quick dinner."
+      },
+      "22222": {
+        "id": 22222,
+        "image": "https://marleyspoon.com/media/recipes/95462/main_photos/large/our-089c2d1ac120d12886fe743c0018342c.jpeg",
+        "title": "Cheeseburger",
+        "readyInMinutes": 25,
+        "aggregateLikes": 150,
+        "vegetarian": false,
+        "vegan": false,
+        "glutenFree": false,
+        "summary": "A delicious cheeseburger made with a juicy beef patty, cheddar cheese, lettuce, tomato, and a special burger sauce."
+      },
+      "33333": {
+        "id": 33333,
+        "image": "https://www.justonecookbook.com/wp-content/uploads/2020/06/Dragon-Roll-0286-I-500x375.jpg",
+        "title": "Sushi Rolls",
+        "readyInMinutes": 45,
+        "aggregateLikes": 200,
+        "vegetarian": true,
+        "vegan": true,
+        "glutenFree": true,
+        "summary": "A variety of sushi rolls made with fresh vegetables, seaweed, and perfectly cooked sushi rice. A healthy and satisfying meal."
+      },
+      "44444": {
+        "id": 44444,
+        "image": "https://www.seriouseats.com/thmb/Fi_FEyVa3_-_uzfXh6OdLrzal2M=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/the-best-caesar-salad-recipe-06-40e70f549ba2489db09355abd62f79a9.jpg",
+        "title": "Caesar Salad",
+        "readyInMinutes": 20,
+        "aggregateLikes": 100,
+        "vegetarian": true,
+        "vegan": false,
+        "glutenFree": false,
+        "summary": "Crispy romaine lettuce, Parmesan cheese, croutons, and Caesar dressing make this classic Caesar Salad a favorite starter or side dish."
+      },
+      "55555": {
+        "id": 55555,
+        "image": "https://www.vickery.tv/wp-content/uploads/2020/12/SMGD-Spaghetti-Bolognese.jpg",
+        "title": "Spaghetti Bolognese",
+        "readyInMinutes": 60,
+        "aggregateLikes": 250,
+        "vegetarian": false,
+        "vegan": false,
+        "glutenFree": false,
+        "summary": "Spaghetti Bolognese is a hearty Italian pasta dish made with ground beef, tomatoes, and a blend of spices. A family favorite!"
+      },
+      "66666": {
+        "id": 66666,
+        "image": "https://www.allrecipes.com/thmb/FL-xnyAllLyHcKdkjUZkotVlHR8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/46822-indian-chicken-curry-ii-DDMFS-4x3-39160aaa95674ee395b9d4609e3b0988.jpg",
+        "title": "Chicken Curry",
+        "readyInMinutes": 40,
+        "aggregateLikes": 180,
+        "vegetarian": false,
+        "vegan": false,
+        "glutenFree": true,
+        "summary": "A flavorful chicken curry made with tender chicken pieces, aromatic spices, and creamy coconut milk. Serve with rice for a complete meal."
+      },
+      "77777": {
+        "id": 77777,
+        "image": "https://www.thespruceeats.com/thmb/vequ4du_9ahBCvjuNErPtixsHsY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vegetarian-bean-and-rice-burrito-recipe-3378550-hero-01-40ecbc08fcc84e80b8be853c1b779a13.jpg",
+        "title": "Veggie Burrito",
+        "readyInMinutes": 35,
+        "aggregateLikes": 140,
+        "vegetarian": true,
+        "vegan": true,
+        "glutenFree": false,
+        "summary": "A hearty veggie burrito filled with beans, rice, avocado, and fresh salsa. A perfect meal for vegetarians and vegans alike."
+      },
+      "88888": {
+        "id": 88888,
+        "image": "https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2023/09/Beef-Stew-main.jpg",
+        "title": "Beef Stew",
+        "readyInMinutes": 120,
+        "aggregateLikes": 220,
+        "vegetarian": false,
+        "vegan": false,
+        "glutenFree": true,
+        "summary": "A rich and comforting beef stew made with tender beef, carrots, potatoes, and a savory broth. Perfect for a cold day."
+      },
+      "99999": {
+        "id": 99999,
+        "image": "https://www.thecookierookie.com/wp-content/uploads/2023/05/featured-grilled-salmon-recipe.jpg",
+        "title": "Grilled Salmon",
+        "readyInMinutes": 25,
+        "aggregateLikes": 160,
+        "vegetarian": false,
+        "vegan": false,
+        "glutenFree": true,
+        "summary": "Grilled salmon seasoned with herbs and lemon. Serve with a side of vegetables for a healthy and delicious meal."
+      },
+      "101010": {
+        "id": 101010,
+        "image": "https://scientificallysweet.com/wp-content/uploads/2020/09/IMG_4087-feature-2-500x500.jpg",
+        "title": "Chocolate Cake",
+        "readyInMinutes": 90,
+        "aggregateLikes": 300,
+        "vegetarian": true,
+        "vegan": false,
+        "glutenFree": false,
+        "summary": "A rich and moist chocolate cake topped with a creamy chocolate ganache. A perfect dessert for any chocolate lover."
+      }
+  }

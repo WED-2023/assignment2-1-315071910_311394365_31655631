@@ -1,73 +1,158 @@
-
 <template>
   <div class="container">
-    <h1 class="title">My Favorite Recipes</h1>
-    <div v-if="favoriteRecipes.length" class="favorites-list">
-      <recipe-preview
-        v-for="recipe in favoriteRecipes"
-        :key="recipe.id"
-        :recipe="recipe"
-      />
-    </div>
-    <div v-else>
-      <p>No favorite recipes found.</p>
+    <h1 class="title">Favorites Page</h1>
+    <div class="left-section">
+      <b-row v-for="r in recipes" :key="r.id">
+        <RecipePreview class="recipePreview" :recipe="r" />
+      </b-row>
     </div>
   </div>
 </template>
 
 <script>
-import RecipePreview from "../components/RecipePreview.vue";
+import RecipePreview from "../components/RecipePreview";
+import { mockGetFavoriteRecipes } from "../services/user";
 
 export default {
+  name: "RecipePreviewList",
   components: {
     RecipePreview,
   },
+
   data() {
     return {
-      favoriteRecipes: [],
+      recipes: [],
     };
   },
   mounted() {
-    this.fetchFavoriteRecipes();
+    this.updateRecipes();
   },
   methods: {
-    fetchFavoriteRecipes() {
-      const favoriteIds = this.$root.store.favorites;
-      if (favoriteIds.length > 0) {
-        this.axios
-          .get(`${this.$root.store.server_domain}/recipes`, {
-            params: { ids: favoriteIds.join(",") },
-          })
-          .then((response) => {
-            this.favoriteRecipes = response.data;
-          })
-          .catch((error) => {
-            console.error("Failed to fetch favorite recipes", error);
-          });
+    async updateRecipes() {
+      try {
+
+          const response = mockGetFavoriteRecipes();
+
+          console.log(response);
+          const recipes = response.data.recipes;
+          console.log(recipes);
+          this.recipes = [];
+          this.recipes.push(...recipes);
+        } catch (error) {
+          console.log(error);
+        }
       }
-    },
   },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.container {
+  min-height: 400px;
+}
+</style>
+
+<!-- <style scoped>
 .container {
   padding: 20px;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 2em;
   margin-bottom: 20px;
 }
 
-.favorites-list {
+.left-section {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
 }
 
-p {
-  font-size: 1.2rem;
-  color: #777;
+.recipePreview {
+  margin: 10px;
+}
+</style> -->
+<style lang="scss" scoped>
+/* Define color variables */
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$background-color: #f4f4f4;
+$text-color: #333;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$hover-shadow-color: rgba(0, 0, 0, 0.2);
+
+/* Global styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: $background-color;
+  color: $text-color;
+}
+
+.container {
+  padding: 20px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px $shadow-color;
+  transition: box-shadow 0.3s ease;
+}
+
+.container:hover {
+  box-shadow: 0 6px 12px $hover-shadow-color;
+}
+
+.title {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: $primary-color;
+}
+
+.left-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.recipePreview {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px $shadow-color;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recipePreview:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px $hover-shadow-color;
+}
+
+/* Button styles */
+button {
+  background-color: $primary-color;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+  background-color: darken($primary-color, 10%);
+  transform: translateY(-2px);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2em;
+  }
+
+  .left-section {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -11,11 +11,12 @@
         @load="onImageLoad"
         @error="onImageError"
       />
-      <i
-        v-if="$root.store.username"
-        :class="favorite ? 'fas fa-heart favorite-icon' : 'far fa-heart favorite-icon'"
-        @click.stop="toggleFavorite"
-      ></i>
+      <div class="favorite-icon-container" v-if="$root.store.username">
+        <i
+          :class="favorite ? 'fas fa-heart favorite-icon active' : 'far fa-heart favorite-icon'"
+          @click.stop.prevent="toggleFavorite"
+        ></i>
+      </div>
     </div>
     <div class="recipe-footer">
       <div :title="recipe.title" class="recipe-title">
@@ -44,6 +45,8 @@
 </template>
 
 <script>
+import { mockAddFavorite, mockRemoveFavorite, mockIsRecipeMarkAsFavorite } from "@/services/user";
+
 export default {
   data() {
     return {
@@ -57,20 +60,34 @@ export default {
       required: true,
     },
   },
-  mounted() {
-    const img = new Image();
-    img.src = this.recipe.image;
-    img.onload = () => {
-      this.image_load = true;
-    };
-    img.onerror = () => {
-      this.image_load = false;
-      console.error("Image failed to load: " + this.recipe.image);
-    };
-    this.favorite = this.$root.store.favorites.includes(this.recipe.id);
-    console.log("Logged in user:", this.$root.store.username);
+  async mounted() {
+    await this.isRecipeMarkAsFavorite();
+    await this.loadRecipeImage();
   },
   methods: {
+    async loadRecipeImage() {
+      try {
+        await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = this.recipe.image;
+          img.onload = () => {
+            this.image_load = true;
+            resolve();
+          };
+          img.onerror = () => {
+            this.image_load = false;
+            console.error("Image failed to load: " + this.recipe.image);
+            reject();
+          };
+        });
+      } catch (error) {
+        console.error("Error loading image:", error);
+      }
+    },
+    async isRecipeMarkAsFavorite() {
+      const response = mockIsRecipeMarkAsFavorite(this.recipe.id);
+      this.favorite = response.data.favorite;
+    },
     onImageLoad() {
       this.image_load = true;
     },
@@ -79,19 +96,12 @@ export default {
       this.image_load = false;
     },
     toggleFavorite() {
-      if (!this.$root.store.username) {
-        this.$root.toast("Error", "You need to log in to favorite recipes", "danger");
-        return;
-      }
       this.favorite = !this.favorite;
       if (this.favorite) {
-        this.$root.store.favorites.push(this.recipe.id);
+        mockAddFavorite(this.recipe.id);
       } else {
-        this.$root.store.favorites = this.$root.store.favorites.filter(
-          (id) => id !== this.recipe.id
-        );
+        mockRemoveFavorite(this.recipe.id);
       }
-      localStorage.setItem("favorites", JSON.stringify(this.$root.store.favorites));
     },
   },
 };
@@ -132,13 +142,51 @@ export default {
   display: block;
 }
 
-.favorite-icon {
+.favorite-icon-container {
   position: absolute;
   top: 10px;
   right: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.favorite-icon-container:hover {
+  box-shadow: 0 0 25px rgba(231, 76, 60, 0.7);
+}
+
+.favorite-icon {
   color: #e74c3c;
   font-size: 24px;
   cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.favorite-icon.active {
+  animation: pulse 0.3s;
+}
+
+.favorite-icon:hover {
+  color: #c0392b;
+  transform: scale(1.2);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .recipe-footer {
