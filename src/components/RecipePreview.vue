@@ -4,7 +4,18 @@
     class="recipe-preview"
   >
     <div class="recipe-body">
-      <img v-if="image_load" :src="recipe.image" class="recipe-image" @load="onImageLoad" @error="onImageError" />
+      <img
+        v-if="image_load"
+        :src="recipe.image"
+        class="recipe-image"
+        @load="onImageLoad"
+        @error="onImageError"
+      />
+      <i
+        v-if="$root.store.username"
+        :class="favorite ? 'fas fa-heart favorite-icon' : 'far fa-heart favorite-icon'"
+        @click.stop="toggleFavorite"
+      ></i>
     </div>
     <div class="recipe-footer">
       <div :title="recipe.title" class="recipe-title">
@@ -12,11 +23,19 @@
       </div>
       <ul class="recipe-overview">
         <li>
-          <img src="https://banner2.cleanpng.com/20180604/kwx/kisspng-computer-icons-time-attendance-clocks-font-aweso-clock-icon-5b14c6364f6622.2216713915280881183252.jpg" alt="Time" class="icon" />
+          <img
+            src="https://banner2.cleanpng.com/20180604/kwx/kisspng-computer-icons-time-attendance-clocks-font-aweso-clock-icon-5b14c6364f6622.2216713915280881183252.jpg"
+            alt="Time"
+            class="icon"
+          />
           {{ recipe.readyInMinutes }} minutes
         </li>
         <li>
-          <img src="https://w7.pngwing.com/pngs/116/409/png-transparent-social-media-computer-icons-like-button-thumb-signal-social-networking-service-like-rectangle-social-media-marketing-black-thumbnail.png" alt="Likes" class="icon_like" />
+          <img
+            src="https://w7.pngwing.com/pngs/116/409/png-transparent-social-media-computer-icons-like-button-thumb-signal-social-networking-service-like-rectangle-social-media-marketing-black-thumbnail.png"
+            alt="Likes"
+            class="icon_like"
+          />
           {{ recipe.aggregateLikes }} likes
         </li>
       </ul>
@@ -28,17 +47,17 @@
 export default {
   data() {
     return {
-      image_load: false
+      image_load: false,
+      favorite: false,
     };
   },
   props: {
     recipe: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   mounted() {
-    // Attempt to pre-load the image to handle the display logic
     const img = new Image();
     img.src = this.recipe.image;
     img.onload = () => {
@@ -48,6 +67,8 @@ export default {
       this.image_load = false;
       console.error("Image failed to load: " + this.recipe.image);
     };
+    this.favorite = this.$root.store.favorites.includes(this.recipe.id);
+    console.log("Logged in user:", this.$root.store.username);
   },
   methods: {
     onImageLoad() {
@@ -56,8 +77,23 @@ export default {
     onImageError() {
       console.error("Image failed to load: " + this.recipe.image);
       this.image_load = false;
-    }
-  }
+    },
+    toggleFavorite() {
+      if (!this.$root.store.username) {
+        this.$root.toast("Error", "You need to log in to favorite recipes", "danger");
+        return;
+      }
+      this.favorite = !this.favorite;
+      if (this.favorite) {
+        this.$root.store.favorites.push(this.recipe.id);
+      } else {
+        this.$root.store.favorites = this.$root.store.favorites.filter(
+          (id) => id !== this.recipe.id
+        );
+      }
+      localStorage.setItem("favorites", JSON.stringify(this.$root.store.favorites));
+    },
+  },
 };
 </script>
 
@@ -94,6 +130,15 @@ export default {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.favorite-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #e74c3c;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 .recipe-footer {
@@ -160,4 +205,3 @@ export default {
   }
 }
 </style>
-
