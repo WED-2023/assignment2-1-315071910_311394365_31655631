@@ -1,6 +1,6 @@
 <template>
   <div class="main-container">
-    <!-- Title with animated gradient text -->
+    <!-- Title with solid color text -->
     <div class="wrapper">
       <h1>Main Page</h1>
     </div>
@@ -74,27 +74,38 @@ a {
   text-align: center;
 }
 
+// .wrapper h1 {
+//   font-size: 70px;
+//   text-transform: uppercase;
+//   font-weight: 700;
+//   font-family: 'Josefin Sans', sans-serif;
+//   color: #e74c3c; /* Bright red */
+//   text-shadow: 2px 2px #ecf0f1; /* Light shadow for depth */
+// }
+
+// .wrapper h1 {
+//   font-size: 70px;
+//   text-transform: uppercase;
+//   font-weight: 700;
+//   font-family: 'Josefin Sans', sans-serif;
+//   color: #333; /* Dark gray */
+//   border: 2px solid #333; /* Border around the text */
+//   padding: 10px 20px;
+//   display: inline-block;
+// }
+
 .wrapper h1 {
-  font-size: 92px;
+  font-size: 72px;
   text-transform: uppercase;
   font-weight: 700;
-  font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(to right, #095fab 10%, #25abe8 50%, #57d75b 60%);
-  background-size: 200% auto;
-  color: #fff;
-  background-clip: text;
-  text-fill-color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: textclip 1.5s linear infinite;
-  display: inline-block;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #2c3e50; /* Dark blue */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 128, 255, 0.7); /* Shadow and glow */
 }
 
-@keyframes textclip {
-  to {
-    background-position: 200% center;
-  }
-}
+
+
+
 
 .recipes-section {
   width: 100%;

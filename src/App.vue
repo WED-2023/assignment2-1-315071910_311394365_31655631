@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="background">
-    <b-navbar toggleable="lg" type="dark" class="navbar-custom">
+    <b-navbar toggleable="lg" type="dark" class="navbar-custom navbar-fixed-top">
       <b-navbar-brand :to="{ name: 'main' }">Vue Recipes</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
@@ -10,11 +10,15 @@
         </b-navbar-nav>
         <b-navbar-nav class="ml-auto">
           <template v-if="!$root.store.username">
-            <span class="d-flex align-items-center">
-              <span class="mr-2">Hello guest:</span>
-              <b-button variant="outline-light" :to="{ name: 'register' }" class="mr-2">Register</b-button>
-              <b-button variant="outline-light" :to="{ name: 'login' }">Login</b-button>
-            </span>
+            <div class="user-box-before d-flex align-items-center">
+              <span class="d-flex align-items-center">
+                <span class="mr-2 text-light">Hello guest:</span>
+                <b-button variant="outline-light" :to="{ name: 'register' }" class="mr-2">Register</b-button>
+                <b-button variant="outline-light" :to="{ name: 'login' }">
+                  <i class="fas fa-sign-in-alt mr-2"></i> Login
+                </b-button>
+              </span>
+            </div>
           </template>
           <template v-else>
             <div class="user-box d-flex align-items-center">
@@ -66,64 +70,98 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/scss/form-style.scss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); // Import Roboto font
+
+html, body {
+  height: 100%; /* Ensure the html and body elements cover the entire viewport */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-image: url('https://raw.githubusercontent.com/WED-2023/assignment2-1-315071910_311394365_31655631/main/photos/different-spices-herbs-stone-table-top-view-ingredients-cooking-food-background-different-spices-herbs-black-120232209-transformed.webp');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding-top: 60px; /* Adjust this value according to the height of your navbar */
+}
 
 #app {
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  min-height: 100vh;
-  background-image: url('https://thumbs.dreamstime.com/b/different-spices-herbs-stone-table-top-view-ingredients-cooking-food-background-different-spices-herbs-black-120232209.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  min-height: 100%;
 }
 
 /* Navbar Custom Styles */
-.navbar-custom {
-  background-color: transparent !important; /* Make navbar background transparent */
-  box-shadow: none; /* Remove any shadow from the navbar */
+.navbar-custom.navbar-fixed-top {
+  position: fixed; /* Fix the navbar at the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Ensure it stays on top of other content */
+  background-color: rgba(55, 50, 50, 0.8) !important; /* Darker background */
+  backdrop-filter: blur(5px); /* Blur effect */
+  box-shadow: 0 4px 12px rgba(88, 84, 84, 0.1); /* Subtle shadow for depth */
+  padding: 10px 20px; /* Extra padding for more space */
+  font-family: 'Roboto', sans-serif; /* Use the new font */
+}
+
+/* Ensure content does not hide under the fixed navbar */
+body {
+  padding-top: 60px; /* Adjust this value according to the height of your navbar */
 }
 
 /* Brand Name Styles */
-b-navbar-brand {
+.b-navbar-brand {
   font-weight: 700; /* Make the brand name bold */
   color: #ffffff !important; /* Set the brand name color to white */
-  font-size: 1.5rem; /* Increase the font size */
+  font-size: 1.75rem; /* Increase the font size */
+  transition: color 0.3s; /* Smooth transition for color */
+}
+
+.b-navbar-brand:hover {
+  color: #f8cdda !important; /* Change color on hover */
 }
 
 /* Navbar Item Styles */
-b-nav-item {
+.b-nav-item {
   font-weight: 600; /* Make the navbar items bold */
   color: #ffffff !important; /* Set the navbar items color to white */
   position: relative;
-  margin: 0 10px; /* Add margin between the navbar items */
+  margin: 0 15px; /* Add margin between the navbar items */
   transition: color 0.3s, transform 0.3s; /* Smooth transition for color and transform */
+  background: linear-gradient(45deg, #3b82f6, #1e3a8a); /* Gradient background */
+  border-radius: 4px; /* Rounded corners */
+  padding: 8px 15px; /* Add padding for spacing */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  overflow: hidden;
 }
 
-b-nav-item:hover,
-b-nav-item:focus,
-b-nav-item.router-link-exact-active {
-  color: #f8cdda !important; /* Change color on hover, focus, and when active */
+.b-nav-item:hover,
+.b-nav-item:focus,
+.b-nav-item.router-link-exact-active {
+  color: #ffffff !important; /* Ensure text color remains white on hover, focus, and when active */
   transform: scale(1.1); /* Slightly increase size on hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Slightly larger shadow on hover */
 }
 
-b-nav-item::before {
+.b-nav-item::before {
   content: '';
   position: absolute;
-  bottom: -3px;
+  bottom: 0;
   left: 50%;
   width: 0;
   height: 3px;
-  background: linear-gradient(45deg, #42b983, #42b983); /* Gradient color */
+  background: #ffffff; /* White underline */
   transition: all 0.3s ease; /* Smooth transition for width */
   border-radius: 2px; /* Rounded corners */
 }
 
-b-nav-item:hover::before,
-b-nav-item:focus::before,
-b-nav-item.router-link-exact-active::before {
+.b-nav-item:hover::before,
+.b-nav-item:focus::before,
+.b-nav-item.router-link-exact-active::before {
   width: 100%; /* Full width on hover, focus, and when active */
   left: 0;
 }
@@ -131,11 +169,12 @@ b-nav-item.router-link-exact-active::before {
 /* Dropdown Item Styles */
 .b-dropdown-item {
   color: #ffffff !important; /* Set the dropdown item color to white */
-  transition: background-color 0.3s; /* Smooth transition for background color */
+  transition: background-color 0.3s, transform 0.3s; /* Smooth transition for background color and transform */
 }
 
 .b-dropdown-item:hover {
-  background-color: #42b983 !important; /* Change background color on hover */
+  background-color: #f8cdda !important; /* Change background color on hover */
+  transform: scale(1.05); /* Slightly increase size on hover */
 }
 
 /* Button Styles */
@@ -157,7 +196,7 @@ b-nav-item.router-link-exact-active::before {
 /* Create Recipe Button Styles */
 .btn-create-recipe {
   color: #ffffff !important;
-  background-color: #42b983 !important;
+  background-color: #f8cdda !important;
   border-radius: 4px;
   padding: 5px 10px;
   transition: background-color 0.3s;
@@ -180,7 +219,7 @@ b-nav-item.router-link-exact-active::before {
     transition: background-color 0.3s, border-color 0.3s;
   }
 
-    .dropdown-toggle:hover {
+  .dropdown-toggle:hover {
     background-color: rgba(255, 255, 255, 0.1) !important; /* Slight background change on hover */
   }
 
@@ -223,7 +262,6 @@ b-nav-item.router-link-exact-active::before {
     transform: scale(1.05); /* Slightly increase size on hover */
   }
 
-
   .logout-item {
     display: flex;
     align-items: center;
@@ -250,10 +288,19 @@ b-nav-item.router-link-exact-active::before {
 }
 
 /* Custom styles for user box */
-.user-box {
+.user-box-before {
   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
   border-radius: 8px; /* Rounded corners */
-  padding: 8px 12px; /* Add padding */
+  padding: 3.5px 12px; /* Add padding */
+  display: flex;
+  align-items: center;
+  color: #ffffff; /* Set text color to white */
+}
+
+.user-box {
+  background-color: rgba(11, 172, 73, 0.5); /* Semi-transparent background */
+  border-radius: 8px; /* Rounded corners */
+  padding: 3.5px 12px; /* Add padding */
   display: flex;
   align-items: center;
   color: #ffffff; /* Set text color to white */

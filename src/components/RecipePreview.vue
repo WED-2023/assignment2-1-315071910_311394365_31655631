@@ -21,6 +21,29 @@
           @click.stop.prevent="toggleFavorite"
         ></i>
       </div>
+      <div class="dietary-tabs" v-if="glutenFree || vegetarian || vegan">
+        <div v-if="glutenFree" class="dietary-icon-container">
+          <img
+            src="https://findvectorlogo.com/wp-content/uploads/2018/06/gluten-free-vector-logo.png"
+            alt="Gluten-Free"
+            class="dietary-icon-gluten"
+          />
+        </div>
+        <div v-if="vegetarian" class="dietary-icon-container">
+          <img
+            src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/pngwing.com.png?raw=true"
+            alt="Vegetarian"
+            class="dietary-icon-vegetarian"
+          />
+        </div>
+        <div v-if="vegan" class="dietary-icon-container">
+          <img
+            src="https://uxwing.com/wp-content/themes/uxwing/download/food-and-drinks/vegan-icon.png"
+            alt="Vegan"
+            class="dietary-icon-vegan"
+          />
+        </div>
+      </div>
     </div>
     <div class="recipe-footer">
       <div :title="recipe.title" class="recipe-title">
@@ -50,12 +73,16 @@
 
 <script>
 import { mockAddFavorite, mockRemoveFavorite, mockIsRecipeMarkAsFavorite } from "@/services/user";
+import { mockIsRecipeVegan, mockIsRecipeGlutenFree, mockIsRecipeVegetarian } from "@/services/recipes.js";
 
 export default {
   data() {
     return {
       image_load: false,
       favorite: false,
+      glutenFree: false,
+      vegetarian: false,
+      vegan: false,
     };
   },
   props: {
@@ -67,6 +94,7 @@ export default {
   async mounted() {
     await this.isRecipeMarkAsFavorite();
     await this.loadRecipeImage();
+    await this.loadDietaryInfo();
   },
   methods: {
     async loadRecipeImage() {
@@ -91,6 +119,15 @@ export default {
     async isRecipeMarkAsFavorite() {
       const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
       this.favorite = response.data.favorite;
+    },
+    async loadDietaryInfo() {
+      const glutenFreeResponse = await mockIsRecipeGlutenFree(this.recipe.id);
+      const vegetarianResponse = await mockIsRecipeVegetarian(this.recipe.id);
+      const veganResponse = await mockIsRecipeVegan(this.recipe.id);
+
+      this.glutenFree = glutenFreeResponse.data.glutenFree;
+      this.vegetarian = vegetarianResponse.data.vegetarian;
+      this.vegan = veganResponse.data.vegan;
     },
     onImageLoad() {
       this.image_load = true;
@@ -198,6 +235,50 @@ body {
 .favorite-icon:hover {
   color: #c0392b;
   transform: scale(1.2);
+}
+
+.dietary-tabs {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dietary-icon-container {
+  width: 54px;
+  height: 54px;
+  border-radius: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background-color: rgba(118, 75, 25, 0.588); */
+  transition: transform 0.3s ease;
+}
+
+.dietary-icon-container:hover {
+  transform: scale(1.3);
+}
+
+.dietary-icon-gluten {
+  width: 180%; /* Adjust these values to control the size of the icon */
+  height: 180%;
+  object-fit: contain;
+}
+
+.dietary-icon-vegan {
+  width: 100%; /* Adjust these values to control the size of the icon */
+  height: 100%;
+  object-fit: contain;
+}
+
+
+.dietary-icon-vegetarian {
+  width: 120%; /* Adjust these values to control the size of the icon */
+  height: 120%;
+  object-fit: contain;
 }
 
 @keyframes fadeIn {

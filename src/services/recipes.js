@@ -53,6 +53,29 @@ export function mockGetRecipesPreview(amount = 1) {
 
 
 export function mockGetRecipeFullDetails(recipeId) {
-    return { data: { recipe: recipe_full_view } } ;
+    return { data: { recipe: recipe_full_view[recipeId] } } ;
   }
   
+// Function to check if a recipe is vegan
+export function mockIsRecipeVegan(recipeId) {
+  if (recipe_preview[recipeId]) {
+    return { data: { vegan: recipe_preview[recipeId].vegan } };
+  }
+  return { data: { vegan: false } }; // Default to false if recipe not found
+}
+
+// Function to check if a recipe is gluten-free
+export function mockIsRecipeGlutenFree(recipeId) {
+  if (recipe_preview[recipeId]) {
+    return { data: { glutenFree: recipe_preview[recipeId].glutenFree } };
+  }
+  return { data: { glutenFree: false } }; // Default to false if recipe not found
+}
+
+// Function to check if a recipe is vegetarian
+export function mockIsRecipeVegetarian(recipeId) {
+  if (recipe_preview[recipeId]) {
+    return { data: { vegetarian: recipe_preview[recipeId].vegetarian } };
+  }
+  return { data: { vegetarian: false } }; // Default to false if recipe not found
+}
