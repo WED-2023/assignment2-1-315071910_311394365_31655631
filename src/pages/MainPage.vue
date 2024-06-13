@@ -11,7 +11,7 @@
       <router-link v-if="!$root.store.username" to="/login" tag="button" class="login-button">
         You need to Login to view this
       </router-link>
-      {{ !$root.store.username }}
+      <!-- {{ !$root.store.username }} -->
       <RecipePreviewList
         title="Last Viewed Recipes"
         :class="{

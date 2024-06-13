@@ -1,159 +1,123 @@
 <template>
-    <div class="container">
-      <h1 class="title">My Recipes</h1>
-      <div class="left-section">
-        <b-row v-for="r in recipes" :key="r.id">
-          <RecipePreview class="recipePreview" :recipe="r" />
-        </b-row>
-      </div>
+  <div class="recipes-container">
+    <h1 class="title">My Recipes</h1>
+    <div class="recipes-grid">
+      <RecipePreview v-for="r in recipes" :key="r.id" :recipe="r" />
     </div>
-  </template>
-  
-  <script>
-  import RecipePreview from "../components/RecipePreview";
-  import { mockGetUserRecipes } from "../services/user";
-  
-  export default {
-    name: "RecipePreviewList",
-    components: {
-      RecipePreview,
+  </div>
+</template>
+
+<script>
+import RecipePreview from "../components/RecipePreview";
+import { mockGetUserRecipes } from "../services/user";
+
+export default {
+  name: "RecipePreviewList",
+  components: {
+    RecipePreview,
+  },
+  data() {
+    return {
+      recipes: [],
+    };
+  },
+  mounted() {
+    this.updateRecipes();
+  },
+  methods: {
+    async updateRecipes() {
+      try {
+        const response = await mockGetUserRecipes();
+        this.recipes = response.data.recipes;
+      } catch (error) {
+        console.error("Error fetching user recipes:", error);
+      }
     },
-  
-    data() {
-      return {
-        recipes: [],
-      };
-    },
-    mounted() {
-      this.updateRecipes();
-    },
-    methods: {
-      async updateRecipes() {
-        try {
-  
-            const response = mockGetUserRecipes();
-  
-            console.log(response);
-            const recipes = response.data.recipes;
-            console.log(recipes);
-            this.recipes = [];
-            this.recipes.push(...recipes);
-          } catch (error) {
-            console.log(error);
-          }
-        }
-    },
-  };
-  </script>
-  
-  <style lang="scss" scoped>
-  .container {
-    min-height: 400px;
-  }
-  </style>
-  
-  <!-- <style scoped>
-  .container {
-    padding: 20px;
-  }
-  
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.recipes-container {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.title {
+  font-size: 2.5em;
+  margin-bottom: 30px;
+  color: #343a40;
+  text-align: center;
+  font-weight: 700;
+}
+
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+.recipe-preview {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+}
+
+.recipe-preview img {
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid #eee;
+}
+
+.recipe-preview:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-preview .recipe-info {
+  padding: 15px;
+}
+
+.recipe-preview .recipe-info h3 {
+  font-size: 1.5em;
+  margin: 0;
+  color: #343a40;
+}
+
+.recipe-preview .recipe-info .details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.recipe-preview .recipe-info .details span {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  color: #777;
+}
+
+.recipe-preview .recipe-info .details span i {
+  margin-right: 5px;
+}
+
+@media (max-width: 768px) {
   .title {
     font-size: 2em;
-    margin-bottom: 20px;
   }
-  
-  .left-section {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .recipePreview {
+
+  .recipe-preview {
     margin: 10px;
   }
-  </style> -->
-  <style lang="scss" scoped>
-  /* Define color variables */
-  $primary-color: #3498db;
-  $secondary-color: #2ecc71;
-  $background-color: #f4f4f4;
-  $text-color: #333;
-  $shadow-color: rgba(0, 0, 0, 0.1);
-  $hover-shadow-color: rgba(0, 0, 0, 0.2);
-  
-  /* Global styles */
-  body {
-    font-family: 'Roboto', sans-serif;
-    background-color: $background-color;
-    color: $text-color;
-  }
-  
-  .container {
-    padding: 20px;
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px $shadow-color;
-    transition: box-shadow 0.3s ease;
-  }
-  
-  .container:hover {
-    box-shadow: 0 6px 12px $hover-shadow-color;
-  }
-  
-  .title {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    color: $primary-color;
-  }
-  
-  .left-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    width: 100%;
-  }
-  
-  .recipePreview {
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px $shadow-color;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .recipePreview:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px $hover-shadow-color;
-  }
-  
-  /* Button styles */
-  button {
-    background-color: $primary-color;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: darken($primary-color, 10%);
-    transform: translateY(-2px);
-  }
-  
-  /* Responsive Typography */
-  @media (max-width: 768px) {
-    .title {
-      font-size: 2em;
-    }
-  
-    .left-section {
-      grid-template-columns: 1fr;
-    }
-  }
-  </style>
-  
+}
+</style>
