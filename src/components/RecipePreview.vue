@@ -10,7 +10,11 @@
         class="recipe-image"
         @load="onImageLoad"
         @error="onImageError"
+        alt="Recipe Image"
       />
+      <div v-else class="image-placeholder">
+        <i class="fas fa-spinner fa-pulse placeholder-icon"></i>
+      </div>
       <div class="favorite-icon-container" v-if="$root.store.username">
         <i
           :class="favorite ? 'fas fa-heart favorite-icon active' : 'far fa-heart favorite-icon'"
@@ -85,7 +89,7 @@ export default {
       }
     },
     async isRecipeMarkAsFavorite() {
-      const response = mockIsRecipeMarkAsFavorite(this.recipe.id);
+      const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
       this.favorite = response.data.favorite;
     },
     onImageLoad() {
@@ -108,24 +112,29 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 .recipe-preview {
-  display: inline-block;
-  width: 450px;
-  border-radius: 10px;
+  display: block;
+  max-width: 600px;
+  height: 300px;
+  margin: 20px auto;
+  border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin: 20px;
   text-decoration: none;
   color: inherit;
   background-color: #fff;
 }
 
 .recipe-preview:hover {
-  transform: translateY(-10px);
+  transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -140,6 +149,20 @@ export default {
   height: 100%;
   object-fit: cover;
   display: block;
+  animation: fadeIn 0.5s;
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #f0f0f0;
+}
+
+.placeholder-icon {
+  font-size: 2rem;
+  color: #ccc;
 }
 
 .favorite-icon-container {
@@ -177,6 +200,15 @@ export default {
   transform: scale(1.2);
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -190,18 +222,24 @@ export default {
 }
 
 .recipe-footer {
-  padding: 15px;
+  padding: 10px 15px;
   background-color: #fafafa;
   border-top: 1px solid #eee;
+  text-align: center;
 }
 
 .recipe-title {
+  font-family: 'Lora', serif;
   font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  height: 3.4rem;
 }
 
 .recipe-overview {
@@ -220,6 +258,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 5px;
 }
 
 .recipe-overview li .icon {
@@ -234,13 +273,8 @@ export default {
   margin-right: 5px;
 }
 
-.recipe-overview li:last-child .icon {
-  margin-left: 5px;
-}
-
 @media (max-width: 600px) {
   .recipe-preview {
-    width: 100%;
     margin: 10px 0;
   }
 

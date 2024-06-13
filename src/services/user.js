@@ -1,4 +1,5 @@
 // src/services/user.js
+// import { all } from "core-js/fn/promise";
 import recipe_full_view from "../assets/mocks/recipe_full_view.json";
 import recipe_preview from "../assets/mocks/recipe_preview.json";
 let favorite_recipes = {};
@@ -88,6 +89,11 @@ let user_full_recipes_view = {};
     const userRecipeIds = Object.values(user_recipes_preview);
     return { data: { recipes: userRecipeIds } };
   }
+
+export function mockGetAllRecipies() {
+  let all_recipes = { ...recipe_preview, ...user_recipes_preview };
+  return { data: { recipes: all_recipes } };
+}
 
   // export function mockPrintUserFullRecipesView() {
   //   console.log(user_recipes_preview);
