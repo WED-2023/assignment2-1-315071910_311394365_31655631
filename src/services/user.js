@@ -12,8 +12,12 @@ let user_full_recipes_view = {};
   // }
 
   export function mockAddFavorite(recipeId) {
-    favorite_recipes[recipeId] = recipe_preview[recipeId];
-    
+    if(recipe_preview[recipeId]){
+      favorite_recipes[recipeId] = recipe_preview[recipeId];
+    }
+    else{
+      favorite_recipes[recipeId] = user_recipes_preview[recipeId];
+    }
     // if (!favorite_recipes[recipeId]) {
     //   favorite_recipes[recipeId] = recipe_preview[recipeId];
     //   return { status: 200, response: { data: { message: "The Recipe successfully saved as favorite", success: true}} };
