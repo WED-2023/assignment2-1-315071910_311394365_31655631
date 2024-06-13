@@ -25,7 +25,8 @@
 <script>
 import RecipePreview from "@/components/RecipePreview.vue"; 
 import recipe_preview from "@/assets/mocks/recipe_preview.json";
-
+import { mockGetAllRecipies } from "@/services/user.js"
+// not work with user recipes right now.
 export default {
   components: {
     RecipePreview,
