@@ -1,7 +1,7 @@
 <template>
     <div class="add-recipe">
       <h1>Create a New Recipe</h1>
-      <form @submit.prevent="submitRecipe">
+      <form @submit.prevent.stop="submitRecipe">
         <div class="form-group">
           <label for="title">Recipe Title</label>
           <input type="text" v-model="recipe.title" id="title" required />
@@ -48,49 +48,48 @@
             </label>
           </div>
         </div>
-          
+  
         <div class="form-group">
           <label for="ingredients">Ingredients</label>
-          <div v-for="(ingredient, index) in recipe.extendedIngredients" :key="index" class="ingredient">
+          <div v-for="(ingredient, index) in full_recipe.extendedIngredients" :key="index" class="ingredient">
             <input type="text" v-model="ingredient.name" placeholder="Ingredient Name" required />
             <button @click="removeIngredient(index)" type="button" class="remove-btn">X</button>
           </div>
           <button @click="addIngredient" type="button" class="add-btn">Add Ingredient</button>
         </div>
-          
+  
         <div class="form-group">
           <label for="instructions">Instructions</label>
-          <textarea v-model="recipe.instructions" id="instructions" required></textarea>
+          <textarea v-model="full_recipe.instructions" id="instructions" required></textarea>
         </div>
   
         <div class="form-group">
           <label for="summary">Summary</label>
           <textarea v-model="recipe.summary" id="summary" required></textarea>
         </div>
-
-        <button type="submit" class="submit-btn">Create Recipe</button>
+  
+        <div v-if="submitted" class="success-message">
+          <h2>Recipe Created Successfully!</h2>
+          <p>Your recipe has been created and saved successfully.</p>
+          <br>
+        </div>
+  
+        <div class="form-actions">
+          <button type="submit" class="submit-btn">Create Recipe</button>
+          <button @click="resetForm" type="button" class="reset-btn">Reset Form</button>
+        </div>
       </form>
-      <div v-if="submitted" class="submission-result">
-        <h2>Recipe Submitted</h2>
-        <pre>{{ recipe }}</pre>
-      </div>
     </div>
   </template>
   
   <script>
+  import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList, mockAddRecipeFullViewToUserList } from "@/services/user";
+  
   export default {
     data() {
       return {
-        recipe: {
-          id: null,
-          image: '',
-          title: '',
-          readyInMinutes: 0,
-          aggregateLikes: 0,
-          vegetarian: false,
-          vegan: false,
-          glutenFree: false,
-          summary: '',
+        recipe: this.getInitialRecipe(),
+        full_recipe: {
           instructions: '',
           extendedIngredients: [
             {
@@ -103,11 +102,24 @@
       }
     },
     methods: {
+      getInitialRecipe() {
+        return {
+          id: null,
+          image: '',
+          title: '',
+          readyInMinutes: 0,
+          aggregateLikes: 0,
+          vegetarian: false,
+          vegan: false,
+          glutenFree: false,
+          summary: ''
+        };
+      },
       addIngredient() {
-        this.recipe.extendedIngredients.push({ name: '' });
+        this.full_recipe.extendedIngredients.push({ name: '' });
       },
       removeIngredient(index) {
-        this.recipe.extendedIngredients.splice(index, 1);
+        this.full_recipe.extendedIngredients.splice(index, 1);
       },
       onImageUpload(event) {
         const file = event.target.files[0];
@@ -119,10 +131,32 @@
           reader.readAsDataURL(file);
         }
       },
-      submitRecipe() {
+      getRandomId() {
+        let random;
+        random = Math.floor(10000 + Math.random() * 90000);
+        while(mockCheckIfIdNumberExist(random)){
+            random = Math.floor(10000 + Math.random() * 90000);
+        }
+        this.recipe.id = random;
+      },
+      async submitRecipe() {
+        await this.getRandomId();
+        const viewResponse = mockAddRecipeViewToUserList(this.recipe);
+        const fullResponse = mockAddRecipeFullViewToUserList(this.recipe.id, this.full_recipe);
         this.submitted = true;
-        console.log(this.recipe);
-        // Handle form submission, e.g., send to API or store in Vuex
+      },
+      resetForm() {
+        this.recipe = this.getInitialRecipe();
+        this.full_recipe = {
+          instructions: '',
+          extendedIngredients: [
+            {
+              name: ''
+            }
+          ]
+        };
+        this.imageOption = 'url';
+        this.submitted = false;
       }
     }
   }
@@ -269,39 +303,53 @@
     background: #0056b3;
   }
   
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
   .submit-btn {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background: #28a745;
+    padding: 10px 40px;
     border: none;
     color: #fff;
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    text-align: center;
+    background: #28a745;
+    margin-right: 10px;
   }
   
   .submit-btn:hover {
     background: #218838;
   }
   
-  .submission-result {
+  .reset-btn {
+    padding: 10px 20px;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #dc3545;
+  }
+  
+  .reset-btn:hover {
+    background: #c82333;
+  }
+  
+  .success-message {
+    text-align: center;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 15px;
+    border-radius: 4px;
     margin-top: 20px;
-    background: #e9ecef;
-    padding: 10px;
-    border-radius: 4px;
   }
   
-  .submission-result h2 {
-    margin-top: 0;
-  }
-  
-  .submission-result pre {
-    background: #f8f9fa;
-    padding: 10px;
-    border-radius: 4px;
-    overflow: auto;
+  .success-message h2 {
+    margin: 0 0 10px;
   }
   </style>
   

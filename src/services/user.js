@@ -2,6 +2,9 @@
 import recipe_full_view from "../assets/mocks/recipe_full_view.json";
 import recipe_preview from "../assets/mocks/recipe_preview.json";
 let favorite_recipes = {};
+let user_recipes_preview = {};
+let user_full_recipes_view = {};
+
 
 
   // export function mockAddFavorite(recipeId) {
@@ -62,3 +65,27 @@ let favorite_recipes = {};
     return { status: 200, response: { data: { message: "The Recipe successfully added to My Recipes", success: true}} };
 
   }
+
+  export function mockCheckIfIdNumberExist(recipeId) {
+    return recipe_preview.hasOwnProperty(recipeId);
+  }
+
+  export function mockAddRecipeViewToUserList(recipe) {
+    user_recipes_preview[recipe.id] = recipe;
+    return { status: 200, message: "Recipe view successfully added" };
+  }
+  
+  export function mockAddRecipeFullViewToUserList(recipeId, fullRecipe) {
+    user_full_recipes_view[recipeId] = fullRecipe;
+    return { status: 200, message: "Full recipe successfully added" };
+  }
+
+  export function mockGetUserRecipes() {
+    const userRecipeIds = Object.values(user_recipes_preview);
+    return { data: { recipes: userRecipeIds } };
+  }
+
+  // export function mockPrintUserFullRecipesView() {
+  //   console.log(user_recipes_preview);
+  // }
+  

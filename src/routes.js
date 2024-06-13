@@ -47,6 +47,11 @@ const routes = [
     name: "createRecipe",
     component: () => import("./pages/CreateNewRecipePage"),
   },
+  {
+    path: "/my-recipes",
+    name: "my-recipes",
+    component: () => import("./pages/MyRecipesPage.vue"),
+  },
 
 ];
 
