@@ -1,23 +1,74 @@
 <template>
   <div class="container">
     <h1 class="title">Search Recipes</h1>
-    <input 
-      type="text" 
-      v-model="searchQuery" 
-      @input="handleSearch" 
-      placeholder="Search for recipes..."
-      class="search-input"
-    />
-    <div v-if="filteredRecipes.length" class="recipe-list">
-      <RecipePreview 
-        v-for="recipe in filteredRecipes" 
-        :key="recipe.id" 
-        :recipe="recipe"
-        class="recipe-preview"
-      />
-    </div>
-    <div v-else class="no-results">
-      <p>No recipes found.</p>
+    <div class="content">
+      <div class="filters">
+        <input 
+          type="text" 
+          v-model="searchQuery" 
+          @input="handleSearch" 
+          placeholder="Search for recipes..."
+          class="search-input"
+        />
+
+        <h3 class="filter-title">Number of Results</h3>
+        <div id="number-of-results" class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="limit5" value="5" v-model="resultLimit">
+            <label for="limit5">5</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="limit10" value="10" v-model="resultLimit">
+            <label for="limit10">10</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="limit15" value="15" v-model="resultLimit">
+            <label for="limit15">15</label>
+          </div>
+        </div>
+
+        <h3 class="filter-title">Diet</h3>
+        <div class="checkbox-group">
+          <div v-for="type in types" :key="type" class="checkbox-item">
+            <input 
+              type="checkbox" 
+              :id="type" 
+              :value="type" 
+              v-model="selectedTypes"
+              @change="handleSearch"
+            />
+            <label :for="type">{{ type }}</label>
+          </div>
+        </div>
+
+        <h3 class="filter-title">Intolerances</h3>
+        <div class="checkbox-group">
+          <div v-for="intolerance in intolerances" :key="intolerance" class="checkbox-item">
+            <input 
+              type="checkbox" 
+              :id="intolerance" 
+              :value="intolerance" 
+              v-model="selectedIntolerances"
+              @change="handleSearch"
+            />
+            <label :for="intolerance">{{ intolerance }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="results">
+        <div v-if="filteredRecipes.length" class="recipe-list">
+          <RecipePreview 
+            v-for="recipe in limitedRecipes" 
+            :key="recipe.id" 
+            :recipe="recipe"
+            class="recipe-preview"
+          />
+        </div>
+        <div v-else class="no-results">
+          <p>No recipes found.</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -25,8 +76,7 @@
 <script>
 import RecipePreview from "@/components/RecipePreview.vue"; 
 import recipe_preview from "@/assets/mocks/recipe_preview.json";
-import { mockGetAllRecipies } from "@/services/user.js"
-// not work with user recipes right now.
+
 export default {
   components: {
     RecipePreview,
@@ -36,19 +86,35 @@ export default {
       searchQuery: '',
       recipes: Object.values(recipe_preview),
       filteredRecipes: [],
+      resultLimit: '10', // Default result limit
+      types: ['glutenFree', 'vegetarian', 'vegan'],
+      selectedTypes: [], // Selected types
+      intolerances: ['Dairy', 'Egg', 'Gluten', 'Grain', 'Peanut', 'Seafood', 'Sesame', 'Shellfish', 'Soy', 'Sulfite', 'Tree Nut', 'Wheat'],
+      selectedIntolerances: [], // Selected intolerances
     };
+  },
+  computed: {
+    limitedRecipes() {
+      return this.filteredRecipes.slice(0, Number(this.resultLimit));
+    }
   },
   methods: {
     handleSearch() {
-      if (this.searchQuery) {
-        this.filteredRecipes = this.recipes.filter(recipe =>
-          recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      this.filteredRecipes = this.recipes.filter(recipe => {
+        const matchesQuery = recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase());
+        const matchesType = this.selectedTypes.length 
+          ? this.selectedTypes.every(type => recipe[type])
+          : true;
+        const matchesIntolerances = this.selectedIntolerances.every(intolerance => 
+          !recipe.extendedIngredients.some(ingredient => ingredient.original.includes(intolerance))
         );
-      } else {
-        this.filteredRecipes = [];
-      }
+        return matchesQuery && matchesType && matchesIntolerances;
+      });
     },
   },
+  mounted() {
+    this.handleSearch();
+  }
 };
 </script>
 
@@ -70,23 +136,113 @@ export default {
   color: #333;
 }
 
+.content {
+  display: flex;
+}
+
+.filters {
+  width: 300px;
+  margin-right: 20px;
+}
+
 .search-input {
   padding: 15px;
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto 30px;
   font-size: 1.2em;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: block;
   transition: border-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 20px;
 }
 
 .search-input:focus {
   border-color: #007BFF;
   outline: none;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.filter-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+  margin-top: 20px;
+}
+
+.radio-group {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.radio-item {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.radio-item:last-child {
+  margin-right: 0;
+}
+
+.radio-item input[type="radio"] {
+  display: none;
+}
+
+.radio-item label {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  text-align: center;
+}
+
+.radio-item input[type="radio"]:checked + label {
+  background-color: #ccc;
+}
+
+.checkbox-group {
+  margin-bottom: 20px;
+}
+
+.checkbox-item {
+  display: inline-block;
+  width: 32%;
+  margin-bottom: 10px;
+}
+
+.checkbox-item:nth-child(3n+2) {
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+.checkbox-item input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-group label {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  text-align: center;
+}
+
+.checkbox-group input[type="checkbox"]:checked + label {
+  background-color: #ccc;
+}
+
+.results {
+  flex: 1;
 }
 
 .recipe-list {
@@ -106,7 +262,7 @@ export default {
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
   width: 100%;
-  height: auto; /* Make sure the preview takes the full height of the container */
+  height: auto;
 }
 
 .recipe-preview:hover {
@@ -116,8 +272,8 @@ export default {
 
 .recipe-preview img {
   width: 100%;
-  height: 250px; /* Adjust the height to ensure images fill the preview window */
-  object-fit: cover; /* Ensures the image covers the specified height while maintaining aspect ratio */
+  height: 250px;
+  object-fit: cover;
   border-bottom: 1px solid #eee;
 }
 
