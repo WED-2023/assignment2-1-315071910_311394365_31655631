@@ -79,3 +79,7 @@ export function mockIsRecipeVegetarian(recipeId) {
   }
   return { data: { vegetarian: false } }; // Default to false if recipe not found
 }
+
+export function mockGetFamilyRecipes() {
+  return mockGetRecipesPreview(3);
+}
