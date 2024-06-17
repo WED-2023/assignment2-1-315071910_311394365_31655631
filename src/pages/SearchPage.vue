@@ -3,6 +3,7 @@
     <h1 class="title">Search Recipes</h1>
     <div class="content">
       <div class="filters">
+        <br>
         <input 
           type="text" 
           v-model="searchQuery" 
@@ -334,4 +335,16 @@ export default {
   color: #888;
   text-align: center;
 }
+
+.title {
+  font-size: 72px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #374d37; /* Dark Grey-Green */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(50, 205, 50, 0.7); /* Shadow and green glow */
+}
+
+
+
 </style>

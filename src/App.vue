@@ -36,7 +36,7 @@
                 <b-dropdown-item :to="{ name: 'family-recipes' }">
                   My Family Recipes <i class="fas fa-home ml-2"></i>
                 </b-dropdown-item>
-                <b-dropdown-item :to="{ name: 'createRecipe' }">
+                <b-dropdown-item @click="$bvModal.show('create-recipe-modal')">
                   Create New Recipe <i class="fas fa-plus-circle ml-2"></i>
                 </b-dropdown-item>
                 <b-dropdown-divider></b-dropdown-divider>
@@ -51,12 +51,18 @@
       </b-collapse>
     </b-navbar>
     <router-view />
+    <CreateRecipeModal />
   </div>
 </template>
 
 <script>
+import CreateRecipeModal from "./pages/CreateRecipeModal";
+
 export default {
   name: "App",
+  components: {
+    CreateRecipeModal
+  },
   methods: {
     logout() {
       this.$root.store.logout();

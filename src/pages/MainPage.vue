@@ -5,13 +5,12 @@
       <h1>Main Page</h1>
     </div>
 
-    <!-- Recipe Lists and Login Button -->
+    <!-- Recipe Lists, Login Button, and New Recipe Button -->
     <div class="recipes-section">
       <RecipePreviewList title="Random Recipes" class="recipe-card" />
       <router-link v-if="!$root.store.username" to="/login" tag="button" class="login-button">
         You need to Login to view this
       </router-link>
-      <!-- {{ !$root.store.username }} -->
       <RecipePreviewList
         title="Last Viewed Recipes"
         :class="{
@@ -21,19 +20,18 @@
         disabled
       />
     </div>
-    <!-- <div
-      style="position: absolute;top: 70%;left: 50%;transform: translate(-50%, -50%);"
-    >
-      Centeredasdasdad
-    </div>-->
+    <!-- <CreateRecipeModal class="recipe-modal"/> -->
   </div>
 </template>
 
 <script>
 import RecipePreviewList from "../components/RecipePreviewList";
+// import CreateRecipeModal from "../pages/CreateRecipeModal"; 
+
 export default {
   components: {
-    RecipePreviewList
+    RecipePreviewList,
+    // CreateRecipeModal
   }
 };
 </script>
@@ -67,32 +65,11 @@ a {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  // background: #e0f7fa; /* Light blue background for freshness */
 }
 
 .wrapper {
   text-align: center;
 }
-
-// .wrapper h1 {
-//   font-size: 70px;
-//   text-transform: uppercase;
-//   font-weight: 700;
-//   font-family: 'Josefin Sans', sans-serif;
-//   color: #e74c3c; /* Bright red */
-//   text-shadow: 2px 2px #ecf0f1; /* Light shadow for depth */
-// }
-
-// .wrapper h1 {
-//   font-size: 70px;
-//   text-transform: uppercase;
-//   font-weight: 700;
-//   font-family: 'Josefin Sans', sans-serif;
-//   color: #333; /* Dark gray */
-//   border: 2px solid #333; /* Border around the text */
-//   padding: 10px 20px;
-//   display: inline-block;
-// }
 
 .wrapper h1 {
   font-size: 72px;
@@ -102,10 +79,6 @@ a {
   color: #2c3e50; /* Dark blue */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 128, 255, 0.7); /* Shadow and glow */
 }
-
-
-
-
 
 .recipes-section {
   width: 100%;
@@ -125,11 +98,6 @@ a {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-// .recipe-card:hover {
-//   transform: translateY(-5px);
-//   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-// }
-
 .login-button {
   background-color: #00796b;
   color: #fff;
@@ -146,6 +114,25 @@ a {
 
 .login-button:hover {
   background-color: #004d40;
+  transform: translateY(-3px);
+}
+
+.create-recipe-button {
+  background-color: #28a745;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1rem;
+  margin-top: 20px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.create-recipe-button:hover {
+  background-color: #218838;
   transform: translateY(-3px);
 }
 

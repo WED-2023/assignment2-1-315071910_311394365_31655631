@@ -1,12 +1,10 @@
 <template>
   <div class="about">
     <br>
-    <br>
-    <br>
+    <h1 class="title">About</h1>
     <b-container class="narrow-container">
       <b-row class="my-4">
         <b-col>
-          <h1>About</h1>
           <p>
           We are third-year Software and Information Systems Engineering students at Ben-Gurion University of the Negev.
           </p>
@@ -98,4 +96,16 @@ p.lead {
 .team-member p {
   color: #6c757d;
 }
+
+.title {
+  font-size: 72px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #4e433c; /* dark Brown */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(139, 69, 19, 0.7); /* Shadow and red glow */
+  margin-bottom: 30px;
+  text-align: center;
+}
+
 </style>

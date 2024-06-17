@@ -1,10 +1,13 @@
 <template>
-  <div class="favorites-container">
+  <div>
+    <br>
     <h1 class="title">Favorites Page</h1>
+  <div class="favorites-container">
     <div class="favorites-grid">
       <RecipePreview v-for="r in recipes" :key="r.id" :recipe="r" />
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -49,12 +52,16 @@ export default {
 }
 
 .title {
-  font-size: 2.5em;
-  margin-bottom: 30px;
-  color: #343a40;
-  text-align: center;
+  font-size: 72px;
+  text-transform: uppercase;
   font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #542c2c; /* Stone-like grey with light red */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 0, 0, 0.7); /* Shadow and red glow */
+  margin-bottom: 30px;
+  text-align: center;
 }
+
 
 .favorites-grid {
   display: grid;

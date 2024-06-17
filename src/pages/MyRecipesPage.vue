@@ -1,9 +1,12 @@
 <template>
-  <div class="recipes-container">
+  <div>
+    <br>
     <h1 class="title">My Recipes</h1>
+  <div class="recipes-container">
     <div class="recipes-grid">
       <RecipePreview v-for="r in recipes" :key="r.id" :recipe="r" />
     </div>
+  </div>
   </div>
 </template>
 
@@ -49,11 +52,14 @@ export default {
 }
 
 .title {
-  font-size: 2.5em;
-  margin-bottom: 30px;
-  color: #343a40;
-  text-align: center;
+  font-size: 72px;
+  text-transform: uppercase;
   font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #54472e; /* Stone-like grey with light orange */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(224, 149, 9, 0.7); /* Shadow and orange glow */
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .recipes-grid {

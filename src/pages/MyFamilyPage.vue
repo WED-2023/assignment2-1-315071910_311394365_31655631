@@ -1,10 +1,13 @@
 <template>
+  <div>
+    <br>
+    <h1 class="title">My Family Recipes</h1>
     <div class="container">
-      <h1 class="title">Family Recipes Page</h1>
       <div class="recipes-grid">
         <RecipePreview v-for="r in recipes" :key="r.id" :recipe="r" class="recipePreview" />
       </div>
     </div>
+  </div>
   </template>
   
   <script>
@@ -125,5 +128,16 @@
       margin: 10px;
     }
   }
+
+  .title {
+  font-size: 72px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #345758; /* Stone-like grey with light turquoise */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(77, 248, 222, 0.7); /* Shadow and turquoise glow */
+  margin-bottom: 30px;
+  text-align: center;
+}
   </style>
   

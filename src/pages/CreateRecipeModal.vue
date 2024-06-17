@@ -1,96 +1,95 @@
 <template>
-  <div>
-    <br>
-    <h1 class="title">Create a New Recipe</h1>
-    <div class="add-recipe">
-      <form @submit.prevent.stop="submitRecipe">
-        <div class="form-group">
-          <label for="title">Recipe Title</label>
-          <input type="text" v-model="recipe.title" id="title" required />
-        </div>
+    <b-modal id="create-recipe-modal" title-class="modal-title-custom" title="Create a New Recipe" hide-footer size="lg" class="wide-modal">
+      <div>
+        <!-- <h1 class="title">Create a New Recipe</h1> -->
+        <div class="add-recipe">
+          <form @submit.prevent.stop="submitRecipe">
+            <div class="form-group">
+              <label for="title">Recipe Title</label>
+              <input type="text" v-model="recipe.title" id="title" required />
+            </div>
   
-        <div class="form-group">
-          <label>Recipe Image</label>
-          <div class="toggle-switch">
-            <input type="radio" id="url" value="url" v-model="imageOption" class="toggle-input" />
-            <label for="url" class="toggle-label url">URL</label>
-            <input type="radio" id="upload" value="upload" v-model="imageOption" class="toggle-input" />
-            <label for="upload" class="toggle-label upload">Upload</label>
-            <span class="toggle-slider" :class="{'toggle-slider-right': imageOption === 'upload'}"></span>
-          </div>
-          <div v-if="imageOption === 'url'" class="image-input">
-            <input type="url" v-model="recipe.image" placeholder="Image URL" required />
-          </div>
-          <div v-if="imageOption === 'upload'" class="image-input">
-            <input type="file" @change="onImageUpload" accept="image/*" />
-          </div>
-        </div>
+            <div class="form-group">
+              <label>Recipe Image</label>
+              <div class="toggle-switch">
+                <input type="radio" id="url" value="url" v-model="imageOption" class="toggle-input" />
+                <label for="url" class="toggle-label url">URL</label>
+                <input type="radio" id="upload" value="upload" v-model="imageOption" class="toggle-input" />
+                <label for="upload" class="toggle-label upload">Upload</label>
+                <span class="toggle-slider" :class="{'toggle-slider-right': imageOption === 'upload'}"></span>
+              </div>
+              <div v-if="imageOption === 'url'" class="image-input">
+                <input type="url" v-model="recipe.image" placeholder="Image URL" required />
+              </div>
+              <div v-if="imageOption === 'upload'" class="image-input">
+                <input type="file" @change="onImageUpload" accept="image/*" />
+              </div>
+            </div>
   
-        <div class="form-group">
-          <label for="readyInMinutes">Ready Time In Minutes</label>
-          <input type="number" v-model="recipe.readyInMinutes" id="readyInMinutes" required />
-        </div>
+            <div class="form-group">
+              <label for="readyInMinutes">Ready Time In Minutes</label>
+              <input type="number" v-model="recipe.readyInMinutes" id="readyInMinutes" required />
+            </div>
   
-        <div class="form-group">
-          <label for="aggregateLikes">Aggregate Likes</label>
-          <input type="number" v-model="recipe.aggregateLikes" id="aggregateLikes" required />
-        </div>
+            <div class="form-group">
+              <label for="aggregateLikes">Aggregate Likes</label>
+              <input type="number" v-model="recipe.aggregateLikes" id="aggregateLikes" required />
+            </div>
   
-        <div class="form-group">
-          <label>Dietary Options</label>
-          <div class="checkbox-group">
-            <label>
-              <input type="checkbox" v-model="recipe.vegetarian" /> Vegetarian
-            </label>
-            <label>
-              <input type="checkbox" v-model="recipe.vegan" /> Vegan
-            </label>
-            <label>
-              <input type="checkbox" v-model="recipe.glutenFree" /> Gluten Free
-            </label>
-          </div>
-        </div>
+            <div class="form-group">
+              <label>Dietary Options</label>
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" v-model="recipe.vegetarian" /> Vegetarian
+                </label>
+                <label>
+                  <input type="checkbox" v-model="recipe.vegan" /> Vegan
+                </label>
+                <label>
+                  <input type="checkbox" v-model="recipe.glutenFree" /> Gluten Free
+                </label>
+              </div>
+            </div>
   
-        <div class="form-group">
-          <label for="ingredients">Ingredients</label>
-          <div v-for="(ingredient, index) in full_recipe.extendedIngredients" :key="index" class="ingredient">
-            <input type="text" v-model="ingredient.name" placeholder="Ingredient Name" required />
-            <button @click="removeIngredient(index)" type="button" class="remove-btn">X</button>
-          </div>
-          <button @click="addIngredient" type="button" class="add-btn">Add Ingredient</button>
-        </div>
+            <div class="form-group">
+              <label for="ingredients">Ingredients</label>
+              <div v-for="(ingredient, index) in full_recipe.extendedIngredients" :key="index" class="ingredient">
+                <input type="text" v-model="ingredient.name" placeholder="Ingredient Name" required />
+                <button @click="removeIngredient(index)" type="button" class="remove-btn">X</button>
+              </div>
+              <button @click="addIngredient" type="button" class="add-btn">Add Ingredient</button>
+            </div>
   
-        <div class="form-group">
-          <label for="instructions">Instructions</label>
-          <textarea v-model="full_recipe.instructions" id="instructions" required></textarea>
-        </div>
+            <div class="form-group">
+              <label for="instructions">Instructions</label>
+              <textarea v-model="full_recipe.instructions" id="instructions" required></textarea>
+            </div>
   
-        <div class="form-group">
-          <label for="summary">Summary</label>
-          <textarea v-model="recipe.summary" id="summary" required></textarea>
-        </div>
+            <div class="form-group">
+              <label for="summary">Summary</label>
+              <textarea v-model="recipe.summary" id="summary" required></textarea>
+            </div>
   
-        <div v-if="submitted" class="success-message">
-          <h2>Recipe Created Successfully!</h2>
-          <p>Your recipe has been created and saved successfully.</p>
-          <br>
-        </div>
+            <div v-if="submitted" class="success-message">
+              <h2>Recipe Created Successfully!</h2>
+              <p>Your recipe has been created and saved successfully.</p>
+            </div>
   
-        <div class="form-actions">
-          <button type="submit" class="submit-btn">Create Recipe</button>
-          <button @click="resetForm" type="button" class="reset-btn">Reset Form</button>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn">Create Recipe</button>
+              <button @click="resetForm" type="button" class="reset-btn">Reset Form</button>
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
-    <br>
-    <br>
-  </div>
+      </div>
+    </b-modal>
   </template>
   
   <script>
   import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList, mockAddRecipeFullViewToUserList } from "@/services/user";
   
   export default {
+    name: 'CreateRecipeModal',
     data() {
       return {
         recipe: this.getInitialRecipe(),
@@ -168,8 +167,12 @@
   </script>
   
   <style scoped>
+  .wide-modal .modal-dialog {
+    max-width: 90% !important; /* Ensure the maximum width is large */
+    width: 90%; /* Apply the width to make it wider */
+  }
+  
   .add-recipe {
-    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     background: #f9f9f9;
@@ -196,7 +199,7 @@
   .form-group input[type="url"],
   .form-group input[type="number"],
   .form-group textarea {
-    width: calc(100% - 22px);
+    width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -356,16 +359,21 @@
   .success-message h2 {
     margin: 0 0 10px;
   }
-
-  .title {
-  font-size: 72px;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-family: 'Josefin Sans', sans-serif;
-  color: #462f4d; /* Stone-like grey with light purple */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(184, 78, 237, 0.7); /* Shadow and purple glow */
-  margin-bottom: 30px;
-  text-align: center;
-}
+  
+  ::v-deep .modal-title-custom {
+    font-size: 30px;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-family: 'Josefin Sans', sans-serif;
+    color: #462f4d; /* Stone-like grey with light purple */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(184, 78, 237, 0.7); /* Shadow and purple glow */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Make sure the title takes the full width */
+    margin: 0; /* Remove any default margins */
+  }
   </style>
+  
   
