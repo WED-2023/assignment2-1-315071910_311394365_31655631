@@ -73,6 +73,7 @@
             <div v-if="submitted" class="success-message">
               <h2>Recipe Created Successfully!</h2>
               <p>Your recipe has been created and saved successfully.</p>
+              <p>Now you can close this window.</p>
             </div>
   
             <div class="form-actions">
@@ -147,6 +148,7 @@
         await this.getRandomId();
         const viewResponse = mockAddRecipeViewToUserList(this.recipe);
         const fullResponse = mockAddRecipeFullViewToUserList(this.recipe.id, this.full_recipe);
+        this.resetForm(); // Reset the form after submission
         this.submitted = true;
       },
       resetForm() {

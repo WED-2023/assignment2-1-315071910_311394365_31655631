@@ -56,7 +56,22 @@ const routes = [
     path: "/family-recipes",
     name: "family-recipes",
     component: () => import("./pages/MyFamilyPage.vue"),
-  },
+  },  
+  // {
+  //   path: "/recipeId",
+  //   name: "recipe",
+  //   component: () => import("./pages/RecipeViewPage"),
+  // },
+  // {
+  //   path: "/preparation",
+  //   name: "RecipePreparation",
+  //   component: () => import("./pages/RecipePreparation.vue"),
+  // },
+  // {
+  //   path: "/mealplanning",
+  //   name: "MealPlanning",
+  //   component: () => import("../pages/MealPlanning.vue"),
+  // },
 
 ];
 
