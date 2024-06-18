@@ -30,6 +30,10 @@
                 <i class="fas fa-thumbs-up"></i>
                 {{ recipe.aggregateLikes }} likes
               </div>
+              <div class="item servings">
+                <i class="fas fa-utensils"></i>
+                {{ recipe.servings }} servings
+              </div>
             </div>
             <button @click.stop.prevent="toggleFavorite" class="favorite-btn" aria-label="Toggle favorite">
               <i :class="favorite ? 'fas fa-heart active' : 'far fa-heart'"></i>
@@ -106,6 +110,7 @@ export default {
         extendedIngredients,
         aggregateLikes,
         readyInMinutes,
+        servings,
         image,
         title,
         id
@@ -125,6 +130,7 @@ export default {
         extendedIngredients,
         aggregateLikes,
         readyInMinutes,
+        servings,
         image,
         title,
         id
@@ -298,8 +304,6 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-
-
 .gluten-free-icon {
   color: #76c7c0;
 }
@@ -347,15 +351,6 @@ body {
 
 .time-likes .item:hover i {
   animation: spin 0.5s ease;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .recipe-details {
