@@ -5,6 +5,8 @@ import recipe_preview from "../assets/mocks/recipe_preview.json";
 let favorite_recipes = {};
 let user_recipes_preview = {};
 let user_full_recipes_view = {};
+let recipe_preperation_progress = {};
+let user_meal_recipes = {};
 
 
 
@@ -98,4 +100,22 @@ export function mockGetAllRecipies() {
   // export function mockPrintUserFullRecipesView() {
   //   console.log(user_recipes_preview);
   // }
+
+  export function mockAddRecipeToMealList(recipeId) {
+    user_meal_recipes[recipeId] = recipe_preview[recipeId];
+    return { status: 200, message: "Recipe view successfully added" };
+  }
+
+  export function mockGetMealRecipes() {
+    const mealRecipeIds = Object.values(user_meal_recipes);
+    return { data: { meals: mealRecipeIds } };
+  }
+  
+  export function mockRemoveRecipeFromMeal(recipeId) {
+    delete user_meal_recipes[recipeId];
+  }
+
+  export function mockIsRecipeInMyMeal(recipeId) {
+    return { data: { meal: recipeId in user_meal_recipes}}
+  }
   

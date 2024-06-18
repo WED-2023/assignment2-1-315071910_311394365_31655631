@@ -9,7 +9,7 @@
   </template>
   
   <script>
-  import { mockGetRecipePreparationDetails } from "../services/recipes.js";
+  import { mockGetRecipeFullDetails } from "../services/recipes.js";
   
   export default {
     data() {
@@ -19,7 +19,7 @@
     },
     async created() {
       try {
-        const response = await mockGetRecipePreparationDetails(this.$route.params.recipeId);
+        const response = await mockGetRecipeFullDetails(this.$route.params.recipeId);
         this.recipe = response.data.recipe;
       } catch (error) {
         console.log(error);

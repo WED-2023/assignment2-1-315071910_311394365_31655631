@@ -9,15 +9,15 @@
           <div class="recipe-meta">
             <div class="dietary-buttons">
               <div v-if="glutenFree" class="dietary-item">
-                <i class="fas fa-seedling gluten-free-icon"></i>
+                <img src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/gluten-free2.png?raw=true" alt="Gluten-Free" class="dietary-icon" />
                 <span>Gluten-Free</span>
               </div>
               <div v-if="vegetarian" class="dietary-item">
-                <i class="fas fa-carrot vegetarian-icon"></i>
+                <img src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/vegetable.png?raw=true" alt="Vegetarian" class="dietary-icon" />
                 <span>Vegetarian</span>
               </div>
               <div v-if="vegan" class="dietary-item">
-                <i class="fas fa-leaf vegan-icon"></i>
+                <img src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/vegan.png?raw=true" alt="Vegan" class="dietary-icon" />
                 <span>Vegan</span>
               </div>
             </div>
@@ -65,22 +65,25 @@
         </div>
       </div>
       <div class="recipe-actions">
-        <button class="add-to-meal" @click="addToMeal">
-          <i class="fas fa-plus-circle"></i> Add to Meal Plan
+        <button :class="['add-to-meal', { 'added': addedToMeal }]" @click="addToMeal">
+          <i :class="[addedToMeal ? 'fas fa-check' : 'fas fa-plus-circle']"></i>
+          {{ addedToMeal ? 'Added to Meal Plan' : 'Add to Meal Plan' }}
         </button>
-        <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
+        <!-- <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
           <i class="fas fa-play-circle"></i> Start Preparation
-        </router-link>
+        </router-link> -->
       </div>
     </div>
   </div>
 </template>
-
 <script>
 import {
   mockIsRecipeMarkAsFavorite,
   mockAddFavorite,
-  mockRemoveFavorite
+  mockRemoveFavorite,
+  mockAddRecipeToMealList,
+  mockRemoveRecipeFromMeal,
+  mockIsRecipeInMyMeal
 } from "../services/user.js";
 
 import {
@@ -97,7 +100,8 @@ export default {
       favorite: false,
       glutenFree: false,
       vegetarian: false,
-      vegan: false
+      vegan: false,
+      addedToMeal: false // New state variable
     };
   },
   async created() {
@@ -139,6 +143,7 @@ export default {
       this.recipe = _recipe;
       await this.loadDietaryInfo();
       await this.isRecipeMarkAsFavorite();
+      await this.checkIfRecipeInMeal();
     } catch (error) {
       console.log(error);
     }
@@ -159,6 +164,10 @@ export default {
       const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
       this.favorite = response.data.favorite;
     },
+    async checkIfRecipeInMeal() {
+      const response = await mockIsRecipeInMyMeal(this.recipe.id);
+      this.addedToMeal = response.data.meal;
+    },
     toggleFavorite() {
       this.favorite = !this.favorite;
       if (this.favorite) {
@@ -168,13 +177,16 @@ export default {
       }
     },
     addToMeal() {
-      // Add recipe to meal plan logic
-      console.log(`Recipe ${this.recipe.title} added to meal plan`);
+      this.addedToMeal = !this.addedToMeal; // Toggle addedToMeal state
+      if (this.addedToMeal) {
+        mockAddRecipeToMealList(this.recipe.id);
+      } else {
+        mockRemoveRecipeFromMeal(this.recipe.id);
+      }
     }
   }
 };
 </script>
-
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
@@ -212,8 +224,10 @@ body {
 }
 
 .recipe-image {
-  width: 48%;
-  height: auto;
+  width: 100%;
+  max-width: 558px; /* Adjust the max width as needed */
+  height: 400px; /* Fixed height */
+  object-fit: cover; /* Maintain aspect ratio, cover the area */
   border-radius: 8px;
   margin-right: 20px;
 }
@@ -245,6 +259,17 @@ body {
   align-items: center;
   gap: 20px;
   margin-bottom: 20px;
+}
+
+.dietary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dietary-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .favorite-btn {
@@ -282,7 +307,7 @@ body {
 
 .favorite-btn i {
   font-size: 1.2rem;
-  margin-right: 8px; /* Add margin to create space between the icon and text */
+  margin-right: 8px;
 }
 
 .favorite-btn .active {
@@ -302,18 +327,6 @@ body {
 
 .dietary-item:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.gluten-free-icon {
-  color: #76c7c0;
-}
-
-.vegetarian-icon {
-  color: #f39c12;
-}
-
-.vegan-icon {
-  color: #27ae60;
 }
 
 .time-likes {
@@ -397,25 +410,68 @@ body {
   border-top: 1px solid #eee;
 }
 
-.add-to-meal,
-.start-preparation {
-  padding: 12px 20px;
-  background-color: #76c7c0;
+.add-to-meal {
+  padding: 12px 24px;
+  background-color: #76c7c0; /* Teal */
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 24px;
   font-size: 1em;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
 }
 
-.add-to-meal:hover,
-.start-preparation:hover {
+.add-to-meal i {
+  margin-right: 8px;
+}
+
+.add-to-meal:hover {
   background-color: #5ca3a0;
+  transform: translateY(-3px);
 }
 
-.add-to-meal i,
+.add-to-meal:active {
+  background-color: #4a9081;
+  transform: translateY(0);
+}
+
+.add-to-meal.added {
+  background-color: #4CAF50; /* Green */
+}
+
+.add-to-meal.added:hover {
+  background-color: #45A049;
+}
+
+.start-preparation {
+  padding: 12px 24px;
+  background-color: #0e9a5b; /* Green */
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  text-decoration: none; /* Remove underline */
+  display: flex;
+  align-items: center;
+}
+
 .start-preparation i {
   margin-right: 8px;
+}
+
+.start-preparation:hover {
+  background-color: #109b3c;
+  transform: translateY(-3px);
+}
+
+.start-preparation:active {
+  background-color: #0d7a3a;
+  transform: translateY(0);
 }
 </style>

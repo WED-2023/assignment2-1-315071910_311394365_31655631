@@ -62,16 +62,16 @@ const routes = [
   //   name: "recipe",
   //   component: () => import("./pages/RecipeViewPage"),
   // },
-  // {
-  //   path: "/preparation",
-  //   name: "RecipePreparation",
-  //   component: () => import("./pages/RecipePreparation.vue"),
-  // },
-  // {
-  //   path: "/mealplanning",
-  //   name: "MealPlanning",
-  //   component: () => import("../pages/MealPlanning.vue"),
-  // },
+  {
+    path: "/preparation",
+    name: "RecipePreparation",
+    component: () => import("./pages/RecipePreparation.vue"),
+  },
+  {
+    path: "/meal-plan",
+    name: "meal-plan",
+    component: () => import("./pages/MealPlanning.vue"),
+  },
 
 ];
 

@@ -36,6 +36,9 @@
                 <b-dropdown-item :to="{ name: 'family-recipes' }">
                   My Family Recipes <i class="fas fa-home ml-2"></i>
                 </b-dropdown-item>
+                <b-dropdown-item :to="{ name: 'meal-plan' }">
+                  My Meal Plan <i class="fas fa-utensils ml-2"></i>
+                </b-dropdown-item>
                 <b-dropdown-item @click="$bvModal.show('create-recipe-modal')">
                   Create New Recipe <i class="fas fa-plus-circle ml-2"></i>
                 </b-dropdown-item>

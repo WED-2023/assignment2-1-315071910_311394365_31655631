@@ -1,72 +1,316 @@
 <template>
+  <div>
+    <br>
+    <h1 class="title">Meal Planning</h1>
     <div class="meal-planning-container">
-      <h1 class="title">Meal Planning</h1>
-      <div v-for="recipe in mealRecipes" :key="recipe.id" class="meal-recipe">
-        <span>{{ recipe.title }}</span>
-        <button @click="removeRecipeFromMeal(recipe.id)">Remove</button>
-        <div class="progress-bar-container">
-          <progress-bar :progress="recipe.progress" />
+      <div v-if="mealRecipes.length" class="meal-recipes">
+        <div
+          v-for="(recipe, index) in mealRecipes"
+          :key="recipe.id"
+          class="meal-recipe"
+          :class="{ 'dragging': draggingIndex === index }"
+          draggable="true"
+          @dragstart="onDragStart(index, $event)"
+          @dragover="onDragOver($event)"
+          @drop="onDrop(index)"
+          @dragend="onDragEnd"
+        >
+          <div class="meal-recipe-content">
+            <div class="meal-recipe-image-container">
+              <img :src="recipe.image" alt="Recipe Photo" class="meal-recipe-photo" />
+            </div>
+            <div class="meal-recipe-details">
+              <div class="meal-recipe-header">
+                <span class="meal-recipe-number">{{ index + 1 }}. {{ recipe.title }}</span>
+                <button class="remove-btn" @click="removeRecipeFromMeal(recipe.id)">&times;</button>
+              </div>
+              <span class="meal-recipe-time"><i class="fas fa-clock"></i> {{ recipe.readyInMinutes }} Minutes</span>
+              <div class="meal-recipe-status" :class="getStatusClass(recipe.status)">
+                <span>{{ recipe.status }}</span>
+                <i :class="getStatusIcon(recipe.status)"></i>
+              </div>
+              <div class="progress-bar-container">
+                <progress-bar :progress="recipe.progress" />
+              </div>
+              <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
+                <i class="fas fa-play-circle"></i> Start Preparation
+              </router-link>
+            </div>
+          </div>
         </div>
+        <button class="clear-meal-btn" @click="clearMeal">Clear Meal</button>
       </div>
-      <button @click="clearMeal">Clear Meal</button>
+      <div v-else class="no-recipes">No recipes added to the meal plan yet.</div>
     </div>
-  </template>
-  
-  <script>
-  import ProgressBar from "../components/ProgressBar";
-  
-  export default {
-    name: "MealPlanning",
-    components: {
-      ProgressBar,
+  </div>
+</template>
+<script>
+import ProgressBar from "../components/ProgressBar";
+import { mockGetMealRecipes, mockRemoveRecipeFromMeal } from "../services/user.js";
+
+export default {
+  name: "MealPlanning",
+  components: {
+    ProgressBar
+  },
+  data() {
+    return {
+      mealRecipes: [],
+      draggingIndex: null,
+    };
+  },
+  async mounted() {
+    await this.getRecipes();
+  },
+  methods: {
+    async getRecipes() {
+      try {
+        const response = await mockGetMealRecipes();
+        this.mealRecipes = response.data.meals.map(recipe => ({
+          ...recipe,
+          time: recipe.time || 0, // Add time if not provided
+          status: recipe.status || "wait for processing", // Add default status if not provided
+        }));
+      } catch (error) {
+        console.error("Error fetching meal recipes:", error);
+      }
     },
-    data() {
-      return {
-        mealRecipes: [],
-      };
+    removeRecipeFromMeal(recipeId) {
+      this.mealRecipes = this.mealRecipes.filter(recipe => recipe.id !== recipeId);
+      mockRemoveRecipeFromMeal(recipeId); // Call the service to update backend
     },
-    methods: {
-      removeRecipeFromMeal(recipeId) {
-        this.mealRecipes = this.mealRecipes.filter(recipe => recipe.id !== recipeId);
-      },
-      clearMeal() {
-        this.mealRecipes = [];
-      },
+    clearMeal() {
+      const recipesToRemove = [...this.mealRecipes]; // Create a copy of the current meal recipes
+      for (let i = 0; i < recipesToRemove.length; i++) {
+        this.removeRecipeFromMeal(recipesToRemove[i].id);
+      }
     },
-  };
-  </script>
-  
-  <style scoped>
-  .meal-planning-container {
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: auto;
-  }
-  
-  .title {
-    font-size: 36px;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .meal-recipe {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .meal-recipe span {
-    font-size: 1.2em;
-  }
-  
-  .progress-bar-container {
-    width: 50%;
-    margin-left: 20px;
-  }
-  </style>
-  
+    onDragStart(index, event) {
+      this.draggingIndex = index;
+      event.dataTransfer.effectAllowed = "move";
+    },
+    onDragOver(event) {
+      event.preventDefault();
+    },
+    onDrop(index) {
+      if (index !== this.draggingIndex) {
+        const draggedItem = this.mealRecipes[this.draggingIndex];
+        this.mealRecipes.splice(this.draggingIndex, 1);
+        this.mealRecipes.splice(index, 0, draggedItem);
+        this.draggingIndex = null;
+      }
+    },
+    onDragEnd() {
+      this.draggingIndex = null;
+    },
+    getStatusClass(status) {
+      switch (status) {
+        case "wait for processing":
+          return "status-wait";
+        case "in process":
+          return "status-process";
+        case "Dish is ready":
+          return "status-ready";
+        default:
+          return "";
+      }
+    },
+    getStatusIcon(status) {
+      switch (status) {
+        case "wait for processing":
+          return "fas fa-clock";
+        case "in process":
+          return "fas fa-spinner";
+        case "Dish is ready":
+          return "fas fa-check-circle";
+        default:
+          return "";
+      }
+    },
+  },
+};
+</script>
+<style scoped>
+.meal-planning-container {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+}
+
+.title {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.meal-recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.meal-recipe {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.meal-recipe.dragging {
+  opacity: 0.5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.meal-recipe:hover {
+  transform: translateY(-5px);
+}
+
+.meal-recipe-content {
+  display: flex;
+  width: 100%;
+}
+
+.meal-recipe-image-container {
+  flex-shrink: 0;
+  margin-right: 20px;
+}
+
+.meal-recipe-photo {
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.meal-recipe-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.meal-recipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meal-recipe-number {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.meal-recipe-time {
+  font-size: 1em;
+  color: #555;
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.meal-recipe-time i {
+  margin-right: 5px;
+}
+
+.meal-recipe-status {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+  margin-top: 5px;
+}
+
+.meal-recipe-status i {
+  margin-left: 5px;
+}
+
+.status-wait {
+  color: #f39c12; /* Orange for waiting */
+}
+
+.status-process {
+  color: #3498db; /* Blue for in process */
+}
+
+.status-ready {
+  color: #2ecc71; /* Green for ready */
+}
+
+.progress-bar-container {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.start-preparation {
+  background-color: #3498db;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.start-preparation i {
+  margin-right: 5px;
+}
+
+.start-preparation:hover {
+  background-color: #2980b9;
+}
+
+.remove-btn {
+  padding: 5px 10px;
+  background-color: transparent;
+  color: #e74c3c;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.remove-btn:hover {
+  color: #c0392b;
+}
+
+.clear-meal-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clear-meal-btn:hover {
+  background-color: #2980b9;
+}
+
+.no-recipes {
+  font-size: 1.2em;
+  color: #888;
+  margin-top: 20px;
+}
+
+.title {
+  font-size: 72px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #542c2c; /* Stone-like grey with light red */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 0, 0, 0.7); /* Shadow and red glow */
+  margin-bottom: 30px;
+  text-align: center;
+}
+</style>
