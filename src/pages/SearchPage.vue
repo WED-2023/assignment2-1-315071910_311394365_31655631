@@ -76,7 +76,7 @@
 
 <script>
 import RecipePreview from "@/components/RecipePreview.vue"; 
-import recipe_preview from "@/assets/mocks/recipe_preview.json";
+import recipe_preview from "@/assets/mocks/recipe_preview.json"; // TODO: replace it to mock func.
 
 export default {
   components: {

@@ -1,7 +1,7 @@
 // src/services/user.js
 // import { all } from "core-js/fn/promise";
 import recipe_full_view from "../assets/mocks/recipe_full_view.json";
-import recipe_preview from "../assets/mocks/recipe_preview.json";
+import recipe_preview from "../assets/mocks/recipe_preview.json"; 
 let favorite_recipes = {};
 let user_recipes_preview = {};
 let user_full_recipes_view = {};

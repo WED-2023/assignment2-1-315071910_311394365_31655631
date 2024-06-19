@@ -1,6 +1,7 @@
 // src/services/recipes.js
 import recipe_full_view from "../assets/mocks/recipe_full_view.json";
 import recipe_preview from "../assets/mocks/recipe_preview.json";
+import recipe_information from "../assets/mocks/GetRecipeInformation.json";
 
 
 // export function mockGetRecipesPreview(amount = 1) {
@@ -82,4 +83,8 @@ export function mockIsRecipeVegetarian(recipeId) {
 
 export function mockGetFamilyRecipes() {
   return mockGetRecipesPreview(3);
+}
+
+export function mockGetRecipeInformation(recipeId) {
+  return { data: { recipeInf: recipe_information[recipeId] } };
 }

@@ -308,8 +308,8 @@ export default {
   text-transform: uppercase;
   font-weight: 700;
   font-family: 'Josefin Sans', sans-serif;
-  color: #542c2c; /* Stone-like grey with light red */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 0, 0, 0.7); /* Shadow and red glow */
+  color: #5f5a5a; /* Stone-like grey with light red */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(249, 248, 248, 0.7); /* Shadow and red glow */
   margin-bottom: 30px;
   text-align: center;
 }
