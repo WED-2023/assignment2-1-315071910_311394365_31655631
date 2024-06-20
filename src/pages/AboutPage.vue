@@ -1,19 +1,30 @@
 <template>
   <div class="about">
     <br>
-    <h1 class="title">About</h1>
     <b-container class="narrow-container">
       <b-row class="my-4">
         <b-col>
-          <p>
-          We are third-year Software and Information Systems Engineering students at Ben-Gurion University of the Negev.
-          </p>
-          <p>
-            Our goal is to provide users with an extensive collection of family recipes, preserved and shared in a modern and convenient way. This application allows users to search for recipes, save their favorite recipes, and manage their personal collection of family recipes. Users can view detailed recipes, add new ones, and share their family culinary heritage.
-          </p>
-          <p class="lead">
-            This web application was created by:
-          </p>
+          <p>Welcome to Advanced Recipe Management Website, the ultimate destination for culinary enthusiasts! We are a group of passionate third-year Software and Information Systems Engineering students at Ben-Gurion University of the Negev. Inspired by our love for food and technology, we created this innovative platform to celebrate and preserve the rich tapestry of culinary traditions.</p>
+          <p>Our mission is to revolutionize the way you discover, store, and share recipes. Advanced Recipe Management Website offers an extensive collection of diverse family recipes that you can access with the click of a button. Whether you're looking to recreate nostalgic flavors or explore new dishes, our platform connects you with a global community of food lovers.</p>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <h3 class="subtitle">What We Offer</h3>
+          <ul>
+            <li><strong>Explore Recipes:</strong> Dive into our vast database of recipes. From traditional family classics to modern dishes, find exactly what you’re looking for with our advanced search features.</li>
+            <li><strong>Preserve Your Culinary Heritage:</strong> Don’t let your family's treasured recipes be forgotten. Document them in your digital recipe box to keep them alive for generations.</li>
+            <li><strong>Share and Connect:</strong> Share your culinary creations with a community that celebrates diverse food cultures. Connect with other users to exchange recipes, cooking tips, and personal food stories.</li>
+            <li><strong>Personalize Your Experience:</strong> Save your favorite recipes, create custom collections, and track your culinary journey with personalized recommendations.</li>
+            <li><strong>Interactive Tools:</strong> Make cooking fun and easy with tools that help you adjust portion sizes and and substitute ingredients.</li>
+          </ul>
+        </b-col>
+      </b-row>
+      <b-row class="my-4">
+        <b-col>
+          <p class="lead">Join Our Community</p>
+          <p>At Advanced Recipe Management Website, we believe that every recipe has a story. Join us in creating a vibrant community where those stories are celebrated, shared, and preserved. Whether you’re a home cook or a culinary aficionado, Advanced Recipe Management Website is your go-to platform for all things cooking.</p>
+          <p>Experience the joy of cooking like never before. Start your culinary adventure with us today!</p>
         </b-col>
       </b-row>
       <b-row>
@@ -22,6 +33,7 @@
             <img :src="member.image" class="member-image mb-3" alt="Team member image">
             <h5>{{ member.name }}</h5>
             <p>{{ member.bio }}</p>
+            <a v-if="member.projectLink" :href="member.projectLink" target="_blank">Previous Project</a>
           </div>
         </b-col>
       </b-row>
@@ -38,17 +50,20 @@ export default {
         {
           name: "Oded Atias",
           image: 'https://media.licdn.com/dms/image/C4D03AQFYmgayN6_G9w/profile-displayphoto-shrink_800_800/0/1664228380340?e=1723680000&v=beta&t=rnCZyuOw2QkPkLjAcGi6AsYjiBpoqhCjEi77NXvzq8I',
-          // bio: "Oded is passionate about web development, focusing on front-end technologies. He enjoys creating interactive and user-friendly interfaces."
+          bio: "Oded is passionate about web development, focusing on front-end technologies. He enjoys creating interactive and user-friendly interfaces.",
+          projectLink: "https://github.com/WED-2023/311394365"
         },
         {
           name: "Amit Avraham",
           image: "https://media.licdn.com/dms/image/D4D03AQEPNB1CpHaK8g/profile-displayphoto-shrink_800_800/0/1695924838848?e=1723680000&v=beta&t=Z64WYFPm6qnnPS3ORkS5JwJllrWPxcr2kqF3MjiEzs4",
-          // bio: "Amit specializes in full-stack development and loves creating seamless user experiences. He ensures the integration between front-end and back-end systems runs smoothly."
+          bio: "Amit specializes in full-stack development and loves creating seamless user experiences. He ensures the integration between front-end and back-end systems runs smoothly.",
+          projectLink: "https://github.com/WED-2023/315071910"
         },
         {
           name: "Barak Haziz",
           image: 'https://media.licdn.com/dms/image/D5603AQFoSnq2sdVyoA/profile-displayphoto-shrink_800_800/0/1677411713067?e=1723680000&v=beta&t=n45ph1GBcG97yB8ThcUWJrddIi94XI0x-KrF4k5Y2p8',
-          // bio: "Barak has a knack for backend systems and database management, ensuring smooth and efficient operations. He focuses on optimizing performance and reliability."
+          bio: "Barak has a knack for backend systems and database management, ensuring smooth and efficient operations. He focuses on optimizing performance and reliability.",
+          projectLink: "https://github.com/BarakHaziz"
         }
       ]
     };
@@ -58,20 +73,20 @@ export default {
 
 <style scoped>
 .narrow-container {
-  max-width: 1000px; /* Adjust this value as needed */
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 20px; /* Add padding to create space inside the box */
-  background-color: #ffffff; /* Ensure the background is white */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for better visibility */
-  border-radius: 8px; /* Add border-radius for rounded corners */
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
-h1 {
+h1, .subtitle {
   color: #007bff;
   font-size: 2.5rem;
 }
 
-p.lead {
+p.lead, p {
   font-size: 1.25rem;
   color: #6c757d;
 }
@@ -97,15 +112,12 @@ p.lead {
   color: #6c757d;
 }
 
-.title {
-  font-size: 72px;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-family: 'Josefin Sans', sans-serif;
-  color: #4e433c; /* dark Brown */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(139, 69, 19, 0.7); /* Shadow and red glow */
-  margin-bottom: 30px;
-  text-align: center;
+.team-member a {
+  color: #007bff;
+  text-decoration: none;
 }
 
+.team-member a:hover {
+  text-decoration: underline;
+}
 </style>
