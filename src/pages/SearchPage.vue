@@ -2,65 +2,81 @@
   <div class="container">
     <h1 class="title">Search Recipes</h1>
     <div class="content">
-      <div class="filters">
-        <br>
+      <div class="search-bar-container">
         <input 
           type="text" 
           v-model="searchQuery" 
-          @input="handleSearch" 
           placeholder="Search for recipes..."
           class="search-input"
         />
-
-        <h3 class="filter-title">Number of Results</h3>
-        <div id="number-of-results" class="radio-group">
-          <div class="radio-item">
-            <input type="radio" id="limit5" value="5" v-model="resultLimit">
-            <label for="limit5">5</label>
-          </div>
-          <div class="radio-item">
-            <input type="radio" id="limit10" value="10" v-model="resultLimit">
-            <label for="limit10">10</label>
-          </div>
-          <div class="radio-item">
-            <input type="radio" id="limit15" value="15" v-model="resultLimit">
-            <label for="limit15">15</label>
-          </div>
-        </div>
-
-        <h3 class="filter-title">Diet</h3>
-        <div class="checkbox-group">
-          <div v-for="type in types" :key="type" class="checkbox-item">
-            <input 
-              type="checkbox" 
-              :id="type" 
-              :value="type" 
-              v-model="selectedTypes"
-              @change="handleSearch"
-            />
-            <label :for="type">{{ type }}</label>
+        <button @click="handleSearch" class="search-button">Search</button>
+        <button @click="resetSearch" class="reset-button">Reset</button>
+      </div>
+      
+      <div class="filter-container">
+        <!-- Number of Results Filter -->
+        <div class="filter-group">
+          <label>Number of Results</label>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" id="limit5" value="5" v-model="resultLimit">
+              <label for="limit5">5</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="limit10" value="10" v-model="resultLimit">
+              <label for="limit10">10</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="limit15" value="15" v-model="resultLimit">
+              <label for="limit15">15</label>
+            </div>
           </div>
         </div>
 
-        <h3 class="filter-title">Intolerances</h3>
-        <div class="checkbox-group">
-          <div v-for="intolerance in intolerances" :key="intolerance" class="checkbox-item">
-            <input 
-              type="checkbox" 
-              :id="intolerance" 
-              :value="intolerance" 
-              v-model="selectedIntolerances"
-              @change="handleSearch"
-            />
-            <label :for="intolerance">{{ intolerance }}</label>
-          </div>
+        <!-- Diet Filter Dropdown -->
+        <div class="filter-group">
+          <label for="diet" class="filter-label">Diet</label>
+          <select id="diet" v-model="selectedDiet" class="dropdown">
+            <option value="">All Diets</option>
+            <option v-for="diet in diets" :key="diet" :value="diet">{{ diet }}</option>
+          </select>
+        </div>
+
+        <!-- Cuisine Filter Dropdown -->
+        <div class="filter-group">
+          <label for="cuisine" class="filter-label">Cuisine</label>
+          <select id="cuisine" v-model="selectedCuisine" class="dropdown">
+            <option value="">All Cuisines</option>
+            <option v-for="cuisine in cuisines" :key="cuisine" :value="cuisine">{{ cuisine }}</option>
+          </select>
+        </div>
+
+        <!-- Intolerance Filter Dropdown -->
+        <div class="filter-group">
+          <label for="intolerance" class="filter-label">Intolerance</label>
+          <select id="intolerance" v-model="selectedIntolerance" class="dropdown">
+            <option value="">All Intolerances</option>
+            <option v-for="intolerance in intolerances" :key="intolerance" :value="intolerance">{{ intolerance }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sort-container" v-if="filteredRecipes.length">
+        <!-- Sort By Dropdown -->
+        <div class="filter-group">
+          <label for="sortBy" class="filter-label">Sort By</label>
+          <select id="sortBy" v-model="sortBy" @change="handleSort" class="dropdown sort-dropdown">
+            <option value="">None</option>
+            <option value="readyInMinutes">Ready In Minutes</option>
+            <option value="aggregateLikes">Likes</option>
+          </select>
         </div>
       </div>
 
       <div class="results">
         <div v-if="filteredRecipes.length" class="recipe-list">
           <RecipePreview 
-            v-for="recipe in limitedRecipes" 
+            v-for="recipe in filteredRecipes" 
             :key="recipe.id" 
             :recipe="recipe"
             class="recipe-preview"
@@ -76,7 +92,7 @@
 
 <script>
 import RecipePreview from "@/components/RecipePreview.vue"; 
-import recipe_preview from "@/assets/mocks/recipe_preview.json"; // TODO: replace it to mock func.
+import recipe_preview from "@/assets/mocks/recipe_preview.json"; // TODO: replace it with a mock function.
 
 export default {
   components: {
@@ -86,35 +102,74 @@ export default {
     return {
       searchQuery: '',
       recipes: Object.values(recipe_preview),
-      filteredRecipes: [],
-      resultLimit: '10', // Default result limit
-      types: ['glutenFree', 'vegetarian', 'vegan'],
-      selectedTypes: [], // Selected types
-      intolerances: ['Dairy', 'Egg', 'Gluten', 'Grain', 'Peanut', 'Seafood', 'Sesame', 'Shellfish', 'Soy', 'Sulfite', 'Tree Nut', 'Wheat'],
-      selectedIntolerances: [], // Selected intolerances
+      filteredRecipes: [], // Initial state set to empty
+      resultLimit: '5', // Default result limit
+      diets: [
+        "Ketogenic",
+        "Vegetarian",
+        "Lacto-Vegetarian",
+        "Ovo-Vegetarian",
+        "Vegan",
+        "Pescetarian",
+        "Paleo",
+        "Primal",
+        "Low FODMAP",
+        "Whole30",
+      ],
+      cuisines: ["Mexican", "Italian", "Chinese", "Indian", "Greek", "Latine"],
+      intolerances: [
+        "Dairy", "Egg", "Gluten", "Grain", "Peanut", 
+        "Seafood", "Sesame", "Shellfish", "Soy", 
+        "Sulfite", "Tree Nut", "Wheat", "butter"
+      ],
+      selectedDiet: '',
+      selectedCuisine: '',
+      selectedIntolerance: '',
+      sortBy: ''
     };
-  },
-  computed: {
-    limitedRecipes() {
-      return this.filteredRecipes.slice(0, Number(this.resultLimit));
-    }
   },
   methods: {
     handleSearch() {
+      if (this.searchQuery.trim() === '') {
+        this.filteredRecipes = [];
+        return;
+      }
+      
       this.filteredRecipes = this.recipes.filter(recipe => {
         const matchesQuery = recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase());
-        const matchesType = this.selectedTypes.length 
-          ? this.selectedTypes.every(type => recipe[type])
+        const matchesDiet = this.selectedDiet ? recipe.vegetarian === (this.selectedDiet === "Vegetarian") : true;
+        const matchesCuisine = this.selectedCuisine ? recipe.cuisine === this.selectedCuisine : true;
+        const matchesIntolerance = this.selectedIntolerance 
+          ? !recipe.extendedIngredients.some(ingredient => ingredient.original.includes(this.selectedIntolerance))
           : true;
-        const matchesIntolerances = this.selectedIntolerances.every(intolerance => 
-          !recipe.extendedIngredients.some(ingredient => ingredient.original.includes(intolerance))
-        );
-        return matchesQuery && matchesType && matchesIntolerances;
+        
+        return matchesQuery && matchesDiet && matchesCuisine && matchesIntolerance;
       });
+
+      this.filteredRecipes = this.filteredRecipes.slice(0, Number(this.resultLimit));
+      this.handleSort();
     },
-  },
-  mounted() {
-    this.handleSearch();
+    handleSort() {
+      if (this.filteredRecipes.length && this.sortBy) {
+        this.filteredRecipes.sort((a, b) => {
+          if (this.sortBy === 'readyInMinutes') {
+            return a.readyInMinutes - b.readyInMinutes;
+          } else if (this.sortBy === 'aggregateLikes') {
+            return b.aggregateLikes - a.aggregateLikes;
+          }
+          return 0;
+        });
+      }
+    },
+    resetSearch() {
+      this.searchQuery = '';
+      this.filteredRecipes = [];
+      this.selectedDiet = '';
+      this.selectedCuisine = '';
+      this.selectedIntolerance = '';
+      this.sortBy = '';
+      this.resultLimit = '5';
+    }
   }
 };
 </script>
@@ -139,11 +194,13 @@ export default {
 
 .content {
   display: flex;
+  flex-direction: column;
 }
 
-.filters {
-  width: 300px;
-  margin-right: 20px;
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .search-input {
@@ -155,7 +212,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: block;
   transition: border-color 0.3s, box-shadow 0.3s;
-  margin-bottom: 20px;
+  margin-right: 10px;
 }
 
 .search-input:focus {
@@ -164,14 +221,81 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
-.filter-title {
-  font-size: 1.5em;
+.search-button,
+.reset-button {
+  padding: 10px 15px; /* Shrink the button */
+  font-size: 1.2em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-left: 10px;
+}
+
+.search-button {
+  background-color: #007BFF;
+  color: white;
+}
+
+.search-button:hover {
+  background-color: #0056b3;
+}
+
+.reset-button {
+  background-color: #FF6B6B;
+  color: white;
+}
+
+.reset-button:hover {
+  background-color: #cc5a5a;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
+.sort-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 5px;
   font-weight: bold;
-  color: #fff;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 5px;
-  margin-top: 20px;
+  color: #f8f8ff; /* Light color for filter labels */
+}
+
+.dropdown {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.sort-dropdown {
+  padding: 5px 10px; /* Shrink the padding to make it smaller */
+  width: auto; /* Adjust the width to be smaller */
+  max-width: 150px; /* Set a smaller max-width */
+}
+
+.dropdown:focus {
+  border-color: #007BFF;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 .radio-group {
@@ -205,40 +329,6 @@ export default {
 }
 
 .radio-item input[type="radio"]:checked + label {
-  background-color: #ccc;
-}
-
-.checkbox-group {
-  margin-bottom: 20px;
-}
-
-.checkbox-item {
-  display: inline-block;
-  width: 32%;
-  margin-bottom: 10px;
-}
-
-.checkbox-item:nth-child(3n+2) {
-  margin-left: 2%;
-  margin-right: 2%;
-}
-
-.checkbox-item input[type="checkbox"] {
-  display: none;
-}
-
-.checkbox-group label {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  display: block;
-  text-align: center;
-}
-
-.checkbox-group input[type="checkbox"]:checked + label {
   background-color: #ccc;
 }
 
@@ -344,7 +434,4 @@ export default {
   color: #374d37; /* Dark Grey-Green */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(50, 205, 50, 0.7); /* Shadow and green glow */
 }
-
-
-
 </style>
