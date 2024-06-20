@@ -86,5 +86,5 @@ export function mockGetFamilyRecipes() {
 }
 
 export function mockGetRecipeInformation(recipeId) {
-  return { data: { recipeInf: recipe_information[recipeId] } };
+  return { data: { recipe: recipe_information[recipeId] } };
 }

@@ -1,11 +1,28 @@
 <template>
+  <!-- Main container for the recipe preview list -->
   <b-container>
-    <h3>
-      {{ title }}:
-      <slot></slot>
-    </h3>
+    <div class="header">
+      <!-- Title of the recipe list -->
+      <h3>
+        {{ title }}:
+        <slot></slot>
+      </h3>
+      <!-- Conditionally render the refresh button -->
+      <button v-if="refreshButton" class="refresh-button" @click="updateRecipes">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+    <!-- Row to contain recipe preview columns -->
     <b-row>
-      <b-col v-for="r in recipes" :key="r.id">
+      <!-- Column for each recipe preview, responsive to screen size -->
+      <b-col
+        v-for="r in recipes"
+        :key="r.id"
+        cols="12"    
+        md="6"       
+        lg="4"       
+      >
+        <!-- Recipe preview component for each recipe -->
         <RecipePreview class="recipePreview" :recipe="r" />
       </b-col>
     </b-row>
@@ -15,6 +32,7 @@
 <script>
 import RecipePreview from "./RecipePreview.vue";
 import { mockGetRecipesPreview } from "../services/recipes.js";
+
 export default {
   name: "RecipePreviewList",
   components: {
@@ -24,34 +42,31 @@ export default {
     title: {
       type: String,
       required: true
+    },
+    refreshButton: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
     return {
-      recipes: []
+      recipes: [] // Data property to hold the list of recipes
     };
   },
   mounted() {
-    this.updateRecipes();
+    this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
   },
   methods: {
     async updateRecipes() {
       try {
-        // const response = await this.axios.get(
-        //   this.$root.store.server_domain + "/recipes/random",
-        // );
-
-        const amountToFetch = 3; // Set this to how many recipes you want to fetch
-        const response = mockGetRecipesPreview(amountToFetch);
-
-
+        const amountToFetch = 3; // Set this to the number of recipes to fetch
+        const response = mockGetRecipesPreview(amountToFetch); // Mock API call to fetch recipes
         console.log(response);
-        const recipes = response.data.recipes;
+        const recipes = response.data.recipes; // Extract recipes from the response
         console.log(recipes);
-        this.recipes = [];
-        this.recipes.push(...recipes);
+        this.recipes = recipes; // Assign fetched recipes to the data property
       } catch (error) {
-        console.log(error);
+        console.log(error); // Log any errors that occur during the fetch
       }
     }
   }
@@ -60,6 +75,29 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  min-height: 400px;
+  min-height: 400px; // Minimum height for the container
+}
+
+.header {
+  display: flex; // Use flexbox for layout
+  justify-content: space-between; // Space out items in the header
+  align-items: center; // Center items vertically
+}
+
+.refresh-button {
+  background: none; // Remove default button background
+  border: none; // Remove default button border
+  cursor: pointer; // Change cursor to pointer on hover
+  font-size: 1.5rem; // Set font size
+  color: #007bff; // Set color
+  transition: transform 0.3s ease; // Smooth transition for transform property
+
+  &:hover {
+    transform: rotate(360deg); // Rotate icon on hover
+  }
+}
+
+.recipePreview {
+  margin-bottom: 20px; // Add bottom margin to each recipe preview
 }
 </style>

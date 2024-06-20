@@ -5,20 +5,31 @@
       <h1>Main Page</h1>
     </div>
 
-    <!-- Recipe Lists, Login Button, and New Recipe Button -->
+    <!-- Recipe Lists and Auth Section -->
     <div class="recipes-section">
+      <!-- RecipePreviewList with refresh button shown -->
       <RecipePreviewList title="Random Recipes" class="recipe-card" />
-      <router-link v-if="!$root.store.username" to="/login" tag="button" class="login-button">
-        You need to Login to view this
-      </router-link>
-      <RecipePreviewList
-        title="Last Viewed Recipes"
-        :class="{
-          'recipe-card': true,
-          blur: !$root.store.username
-        }"
-        disabled
-      />
+      
+      <!-- Blurred Section with Login and Register buttons for unauthenticated users -->
+      <div class="blur-container">
+        <RecipePreviewList
+          title="Last Viewed Recipes"
+          :class="{ 'recipe-card': true, blur: !isAuthenticated }"
+          :refreshButton="false"
+          disabled
+        />
+        <div v-if="!isAuthenticated" class="auth-message">
+          <p>You need to Login to view this:</p>
+          <div class="auth-buttons">
+            <router-link to="/login" tag="button" class="login-button">
+              Login
+            </router-link>
+            <router-link to="/register" tag="button" class="register-button">
+              Register
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- <CreateRecipeModal class="recipe-modal"/> -->
   </div>
@@ -26,12 +37,17 @@
 
 <script>
 import RecipePreviewList from "../components/RecipePreviewList";
-// import CreateRecipeModal from "../pages/CreateRecipeModal"; 
+// import CreateRecipeModal from "../pages/CreateRecipeModal";
 
 export default {
   components: {
     RecipePreviewList,
     // CreateRecipeModal
+  },
+  computed: {
+    isAuthenticated() {
+      return !!this.$root.store.username;
+    }
   }
 };
 </script>
@@ -42,6 +58,8 @@ export default {
 
 $avatar-size: 32px;
 $body-background: #f0f4f8;
+$primary-color: #007bff; // Blue color for Login button
+$secondary-color: #28a745; // Green color for Register button
 
 body {
   height: 100vh;
@@ -87,6 +105,7 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 30px;
+  position: relative;
 }
 
 .recipe-card {
@@ -98,48 +117,84 @@ a {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.login-button {
-  background-color: #00796b;
-  color: #fff;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  font-size: 1rem;
-  margin-top: 20px;
-  transition: background-color 0.3s, transform 0.3s;
+.auth-section {
+  position: relative;
+  width: 100%;
 }
 
-.login-button:hover {
-  background-color: #004d40;
-  transform: translateY(-3px);
-}
-
-.create-recipe-button {
-  background-color: #28a745;
-  color: #fff;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  font-size: 1rem;
-  margin-top: 20px;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.create-recipe-button:hover {
-  background-color: #218838;
-  transform: translateY(-3px);
+.blur-container {
+  position: relative;
+  width: 100%;
 }
 
 .blur {
-  filter: blur(5px);
+  filter: blur(7px);
   pointer-events: none;
 }
+
+.auth-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #333;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.auth-message p {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.login-button,
+.register-button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  font-weight: bold;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.login-button {
+  background: rgba(0, 123, 255, 0.4); /* Blue color with transparency */
+}
+
+.login-button:hover {
+  background: rgba(0, 123, 255, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 12px rgba(0, 123, 255, 0.1);
+}
+
+.register-button {
+  background: rgba(40, 167, 69, 0.4); /* Green color with transparency */
+}
+
+.register-button:hover {
+  background: rgba(40, 167, 69, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 12px rgba(40, 167, 69, 0.1);
+}
+
 
 ::v-deep .blur .recipe-preview {
   pointer-events: none;
@@ -159,8 +214,17 @@ a {
     width: 95%;
   }
 
-  .login-button {
+  .login-button,
+  .register-button {
     font-size: 0.9rem;
+  }
+
+  .auth-message {
+    padding: 15px;
+  }
+
+  .auth-message p {
+    font-size: 1.2rem;
   }
 }
 
@@ -177,8 +241,17 @@ a {
     width: 100%;
   }
 
-  .login-button {
+  .login-button,
+  .register-button {
     font-size: 0.8rem;
+  }
+
+  .auth-message {
+    padding: 10px;
+  }
+
+  .auth-message p {
+    font-size: 1rem;
   }
 }
 </style>

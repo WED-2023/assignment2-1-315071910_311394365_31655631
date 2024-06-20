@@ -1,31 +1,49 @@
 <template>
   <div id="app" class="background">
+    <!-- Navbar -->
     <b-navbar toggleable="lg" type="dark" class="navbar-custom navbar-fixed-top">
+      <!-- Brand -->
       <b-navbar-brand :to="{ name: 'main' }">Vue Recipes</b-navbar-brand>
+      <!-- Navbar Toggle Button for small screens -->
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <!-- Navbar Collapsible Content -->
       <b-collapse id="nav-collapse" is-nav>
+        <!-- Navbar Links on the Left -->
         <b-navbar-nav>
+          <!-- About Link -->
           <b-nav-item :to="{ name: 'about' }" exact>About</b-nav-item>
-          <b-nav-item :to="{ name: 'search' }" exact>Search</b-nav-item>
+          <!-- Search Link with Icon -->
+          <b-nav-item :to="{ name: 'search' }" exact>
+            <i class="fas fa-search mr-2"></i> Search
+          </b-nav-item>
         </b-navbar-nav>
+        <!-- Navbar Links on the Right -->
         <b-navbar-nav class="ml-auto">
+          <!-- Conditional Rendering Based on User Authentication -->
           <template v-if="!$root.store.username">
             <div class="user-box-before d-flex align-items-center">
               <span class="d-flex align-items-center">
-                <span class="mr-2 text-light">Hello guest:</span>
-                <b-button variant="outline-light" :to="{ name: 'register' }" class="mr-2">Register</b-button>
-                <b-button variant="outline-light" :to="{ name: 'login' }">
+                <span class="mr-2 text-light">
+                  👋 Hello guest:
+                </span>
+                <!-- Register Button -->
+                <b-button variant="outline-light" :to="{ name: 'register' }" class="mr-2 btn-register">Register</b-button>
+                <!-- Login Button -->
+                <b-button variant="outline-light" :to="{ name: 'login' }" class="btn-login">
                   <i class="fas fa-sign-in-alt mr-2"></i> Login
                 </b-button>
               </span>
             </div>
           </template>
+          <!-- User Dropdown Menu When Logged In -->
           <template v-else>
             <div class="user-box d-flex align-items-center">
-              <span class="mr-2">Hello, {{ $root.store.username }}:</span>
+              <span class="mr-2">
+                👋 Hello:
+              </span>
               <b-dropdown id="dropdown-1" right class="personal-dropdown">
                 <template #button-content>
-                  <i class="fas fa-user mr-2"></i> Personal Area
+                  <i class="fas fa-user mr-2"></i> {{ $root.store.username }}
                 </template>
                 <b-dropdown-item :to="{ name: 'favorites' }">
                   My Favorites <i class="fas fa-heart ml-2"></i>
@@ -53,7 +71,9 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
+    <!-- Router View for Loading Pages -->
     <router-view />
+    <!-- Create Recipe Modal -->
     <CreateRecipeModal />
   </div>
 </template>
@@ -68,8 +88,11 @@ export default {
   },
   methods: {
     logout() {
+      // Call the logout method on the root store
       this.$root.store.logout();
+      // Show a toast notification for successful logout
       this.$root.toast("Logout", "User logged out successfully", "success");
+      // Navigate to the home page
       this.$router.push("/").catch(() => {
         this.$forceUpdate();
       });
@@ -190,12 +213,13 @@ body {
 .b-button {
   color: #ffffff;
   border-color: #ffffff;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
 .b-button:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Slight background change on hover */
+  color: #ffffff;
   border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1); /* Slight background change on hover */
 }
 
 .b-nav-item.router-link-exact-active {
@@ -317,5 +341,28 @@ body {
 
 .user-box span {
   margin-right: 8px; /* Add margin to the right of the greeting text */
+}
+
+/* Add these styles for the login and register buttons */
+.btn-login {
+  border-color: #0300ab !important;
+  color: #ffffff !important;
+}
+
+.btn-login:hover {
+  background-color: blue !important;
+  color: #ffffff !important;
+  border-color: blue !important;
+}
+
+.btn-register {
+  border-color: #018212 !important;
+  color: #ffffff !important;
+}
+
+.btn-register:hover {
+  background-color: green !important;
+  color: #ffffff !important;
+  border-color: green !important;
 }
 </style>

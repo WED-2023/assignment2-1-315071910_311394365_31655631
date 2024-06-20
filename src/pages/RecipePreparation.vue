@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { mockGetRecipeFullDetails } from "../services/recipes.js";
+import { mockGetRecipeFullDetails, mockGetRecipeInformation } from "../services/recipes.js";
 import { mockSetStepInRecipe, mockRecipePreparationComplete, mockGetCurrentStep } from "../services/user.js";
 
 export default {
@@ -95,7 +95,7 @@ export default {
   methods: {
     async fetchRecipe(recipeId) {
       try {
-        const response = await mockGetRecipeFullDetails(recipeId);
+        const response = await mockGetRecipeInformation(recipeId);
         this.recipe = response.data.recipe;
         this.servings = this.recipe.servings;
         this.updateIngredients();
