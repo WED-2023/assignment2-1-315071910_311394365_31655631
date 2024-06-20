@@ -23,7 +23,7 @@ const routes = [
     component: () => import("./pages/SearchPage"),
   },
   {
-    path: "   ",
+    path: "/recipe/:id",
     name: "recipe",
     component: () => import("./pages/RecipeViewPage"),
   },
@@ -42,11 +42,6 @@ const routes = [
     name: "favorites",
     component: () => import("./pages/MyFavoritesPage"),
   },
-  // {
-  //   path: "/createRecipe",
-  //   name: "createRecipe",
-  //   component: () => import("./pages/CreateRecipeModal"),
-  // },
   {
     path: "/my-recipes",
     name: "my-recipes",
@@ -56,14 +51,9 @@ const routes = [
     path: "/family-recipes",
     name: "family-recipes",
     component: () => import("./pages/MyFamilyPage.vue"),
-  },  
-  // {
-  //   path: "/recipeId",
-  //   name: "recipe",
-  //   component: () => import("./pages/RecipeViewPage"),
-  // },
+  },
   {
-    path: "/preparation",
+    path: "/preparation/:recipeId",
     name: "RecipePreparation",
     component: () => import("./pages/RecipePreparation.vue"),
   },
@@ -72,7 +62,6 @@ const routes = [
     name: "meal-plan",
     component: () => import("./pages/MealPlanning.vue"),
   },
-
 ];
 
 export default routes;

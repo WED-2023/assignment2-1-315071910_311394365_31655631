@@ -7,7 +7,39 @@ let user_recipes_preview = {};
 let user_full_recipes_view = {};
 let recipe_preperation_progress = {};
 let user_meal_recipes = {};
+let user_proccess_recipe = {}
+let user_completed_recipe = []
+let user_current_step = {};
 
+export function mockGetProgressInRecipe(recipeId) {
+  return user_proccess_recipe[recipeId] || 0;
+}
+
+export function mockSetStepInRecipe(recipeId, currentStepIndex, totalSteps) {
+  const progress = (currentStepIndex / totalSteps) * 100;
+  user_proccess_recipe[recipeId] = progress;
+  user_current_step[recipeId] = currentStepIndex; // Save the current step index
+}
+
+export function mockRecipePreparationComplete(recipeId) {
+  delete user_proccess_recipe[recipeId];
+  delete user_current_step[recipeId];  // Clear the current step index
+  user_completed_recipe.push(recipeId);
+}
+
+export function mockGetRecipeStatus(recipeId) {
+  if (user_completed_recipe.includes(recipeId)) {
+    return "2"; // "Dish is ready"
+  } else if (user_proccess_recipe[recipeId] !== undefined) {
+    return "1"; // "in process"
+  } else {
+    return "0"; // "wait for processing"
+  }
+}
+
+export function mockGetCurrentStep(recipeId) {
+  return user_current_step[recipeId] || 0; // Return the current step index, default to 0
+}
 
 
   // export function mockAddFavorite(recipeId) {

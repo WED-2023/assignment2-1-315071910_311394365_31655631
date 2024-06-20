@@ -69,13 +69,14 @@
           <i :class="[addedToMeal ? 'fas fa-check' : 'fas fa-plus-circle']"></i>
           {{ addedToMeal ? 'Added to Meal Plan' : 'Add to Meal Plan' }}
         </button>
-        <!-- <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
+        <button @click="startPreparation" class="start-preparation">
           <i class="fas fa-play-circle"></i> Start Preparation
-        </router-link> -->
+        </button>
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import {
   mockIsRecipeMarkAsFavorite,
@@ -183,10 +184,17 @@ export default {
       } else {
         mockRemoveRecipeFromMeal(this.recipe.id);
       }
+    },
+    startPreparation() {
+      if (!this.addedToMeal) {
+        this.addToMeal();
+      }
+      this.$router.push({ name: 'RecipePreparation', params: { recipeId: this.recipe.id } });
     }
   }
 };
 </script>
+
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");

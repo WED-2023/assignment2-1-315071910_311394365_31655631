@@ -30,7 +30,7 @@
                 <i :class="getStatusIcon(recipe.status)"></i>
               </div>
               <div class="progress-bar-container">
-                <progress-bar :progress="recipe.progress" />
+                <progress-bar :progress="Math.floor(recipe.progress)" />
               </div>
               <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
                 <i class="fas fa-play-circle"></i> Start Preparation
@@ -44,9 +44,15 @@
     </div>
   </div>
 </template>
+
 <script>
 import ProgressBar from "../components/ProgressBar";
-import { mockGetMealRecipes, mockRemoveRecipeFromMeal } from "../services/user.js";
+import {
+  mockGetMealRecipes,
+  mockRemoveRecipeFromMeal,
+  mockGetRecipeStatus,
+  mockGetProgressInRecipe,
+} from "../services/user.js";
 
 export default {
   name: "MealPlanning",
@@ -69,7 +75,8 @@ export default {
         this.mealRecipes = response.data.meals.map(recipe => ({
           ...recipe,
           time: recipe.time || 0, // Add time if not provided
-          status: recipe.status || "wait for processing", // Add default status if not provided
+          status: this.getRecipeStatusText(mockGetRecipeStatus(recipe.id)), // Get status
+          progress: mockGetProgressInRecipe(recipe.id) || 0, // Get progress
         }));
       } catch (error) {
         console.error("Error fetching meal recipes:", error);
@@ -105,11 +112,11 @@ export default {
     },
     getStatusClass(status) {
       switch (status) {
-        case "wait for processing":
+        case "Wait For Processing":
           return "status-wait";
-        case "in process":
+        case "In Process":
           return "status-process";
-        case "Dish is ready":
+        case "Complete!":
           return "status-ready";
         default:
           return "";
@@ -117,19 +124,32 @@ export default {
     },
     getStatusIcon(status) {
       switch (status) {
-        case "wait for processing":
+        case "Wait For Processing":
           return "fas fa-clock";
-        case "in process":
+        case "In Process":
           return "fas fa-spinner";
-        case "Dish is ready":
+        case "Complete!":
           return "fas fa-check-circle";
         default:
           return "";
       }
     },
+    getRecipeStatusText(status) {
+      switch (status) {
+        case "0":
+          return "Wait For Processing";
+        case "1":
+          return "In Process";
+        case "2":
+          return "Complete!";
+        default:
+          return "Wait For Processing";
+      }
+    }
   },
 };
 </script>
+
 <style scoped>
 .meal-planning-container {
   padding: 20px;

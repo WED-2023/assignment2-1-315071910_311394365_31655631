@@ -1,11 +1,9 @@
 <template>
   <div>
-    <br>
+    <br />
     <div class="preparation-container" v-if="recipe.title">
       <h1>{{ recipe.title }}</h1>
-      <!-- <img :src="recipe.image" alt="Recipe Image" class="recipe-image" />
-      <p v-html="recipe.summary"></p> -->
-      <br>
+      <br />
       <div class="progress-bar-container">
         <ul class="steps-progress">
           <li
@@ -17,7 +15,10 @@
             }"
             @click="goToStep(index)"
           >
-            <span>{{ index + 1 }}</span>
+            <span>
+              <template v-if="currentStepIndex > index">✓</template>
+              <template v-else>{{ index + 1 }}</template>
+            </span>
             <p :class="{ 'current-step': currentStepIndex === index }">Step {{ index + 1 }}</p>
           </li>
         </ul>
@@ -28,7 +29,7 @@
       </div>
       <div class="content-container">
         <div class="ingredients-equipment">
-          <div class="ingredients">
+          <div class="ingredients" v-if="currentStep.ingredients.length">
             <h3>Ingredients:</h3>
             <ul>
               <li v-for="ingredient in currentStep.ingredients" :key="ingredient.id">
@@ -37,7 +38,7 @@
               </li>
             </ul>
           </div>
-          <div class="equipment">
+          <div class="equipment" v-if="currentStep.equipment.length">
             <h3>Equipment:</h3>
             <ul>
               <li v-for="equipment in currentStep.equipment" :key="equipment.id">
@@ -66,6 +67,7 @@
 
 <script>
 import { mockGetRecipeFullDetails } from "../services/recipes.js";
+import { mockSetStepInRecipe, mockRecipePreparationComplete, mockGetCurrentStep } from "../services/user.js";
 
 export default {
   data() {
@@ -97,6 +99,9 @@ export default {
         this.recipe = response.data.recipe;
         this.servings = this.recipe.servings;
         this.updateIngredients();
+        // Retrieve the current step index when loading the recipe
+        this.currentStepIndex = mockGetCurrentStep(recipeId);
+        this.updateProgress();
       } catch (error) {
         console.log(error);
       }
@@ -105,17 +110,20 @@ export default {
       if (this.currentStepIndex < this.steps.length - 1) {
         this.currentStepIndex += 1;
         this.currentStepCompleted = false;
+        this.updateProgress();
       }
     },
     prevStep() {
       if (this.currentStepIndex > 0) {
         this.currentStepIndex -= 1;
         this.currentStepCompleted = false;
+        this.updateProgress();
       }
     },
     goToStep(index) {
       this.currentStepIndex = index;
       this.currentStepCompleted = false;
+      this.updateProgress();
     },
     updateIngredients() {
       this.recipe.extendedIngredients = this.adjustedIngredients.map(
@@ -130,7 +138,15 @@ export default {
       );
     },
     completePreparation() {
+      mockRecipePreparationComplete(this.recipe.id);
+      this.currentStepIndex += 1;
+      this.currentStepCompleted = true;
+      this.updateProgress();
       alert("Preparation complete!");
+      this.$router.push({ name: 'meal-plan' }); // Navigate to the meal plan page
+    },
+    updateProgress() {
+      mockSetStepInRecipe(this.recipe.id, this.currentStepIndex, this.steps.length);
     },
   },
   computed: {
@@ -156,6 +172,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
@@ -199,6 +217,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  position: relative;
 }
 
 .steps-progress li {
@@ -218,40 +237,46 @@ body {
   left: 50%;
   transform: translateX(50%);
   z-index: -1;
+  transition: background 0.3s ease;
 }
 
 .steps-progress li.completed:not(:last-child)::after {
-  background: #76c7c0;
+  background: linear-gradient(to right, #3498db, #2ecc71);
 }
 
 .steps-progress li span {
   display: inline-block;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
   background: #ddd;
   color: #fff;
   border-radius: 50%;
   margin-bottom: 5px;
+  font-size: 18px;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .steps-progress li.completed span {
-  background: #76c7c0;
+  background: #2ecc71;
+  transform: scale(1.2);
 }
 
 .steps-progress li.active span {
-  background: #76c7c0;
+  background: #3498db;
+  transform: scale(1.2);
 }
 
 .steps-progress li p {
   margin: 0;
-  font-size: 12px;
+  font-size: 14px;
   color: #000;
+  transition: color 0.3s ease;
 }
 
 .steps-progress li .current-step {
   font-weight: bold;
-  color: #76c7c0;
+  color: #3498db;
 }
 
 .servings-selector {
@@ -286,6 +311,7 @@ input[type="number"] {
   background: #f7f7f7;
   padding: 10px;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .ingredients ul,
@@ -307,12 +333,14 @@ input[type="number"] {
   width: 40px;
   height: 40px;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .step-details {
   background: #f9f9f9;
   padding: 10px;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navigation-buttons {
@@ -323,12 +351,12 @@ input[type="number"] {
 
 button {
   padding: 10px 20px;
-  background-color: #76c7c0;
+  background-color: #3498db;
   border: none;
   border-radius: 5px;
   color: white;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
 button:disabled {
@@ -337,6 +365,8 @@ button:disabled {
 }
 
 button:hover:not(:disabled) {
-  background-color: #5ca8a1;
+  background-color: #2980b9;
+  transform: scale(1.05);
 }
+
 </style>
