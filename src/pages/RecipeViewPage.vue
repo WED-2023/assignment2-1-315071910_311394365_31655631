@@ -84,7 +84,8 @@ import {
   mockRemoveFavorite,
   mockAddRecipeToMealList,
   mockRemoveRecipeFromMeal,
-  mockIsRecipeInMyMeal
+  mockIsRecipeInMyMeal,
+  mockAddWatchedRecipe
 } from "../services/user.js";
 
 import {
@@ -106,49 +107,52 @@ export default {
     };
   },
   async created() {
-    try {
-      const response = await mockGetRecipeFullDetails(this.$route.params.recipeId);
+  try {
+    const response = await mockGetRecipeFullDetails(this.$route.params.recipeId);
 
-      const {
-        analyzedInstructions,
-        instructions,
-        extendedIngredients,
-        aggregateLikes,
-        readyInMinutes,
-        servings,
-        image,
-        title,
-        id
-      } = response.data.recipe;
+    const {
+      analyzedInstructions,
+      instructions,
+      extendedIngredients,
+      aggregateLikes,
+      readyInMinutes,
+      servings,
+      image,
+      title,
+      id
+    } = response.data.recipe;
 
-      const _instructions = analyzedInstructions
-        .map((fstep) => {
-          fstep.steps[0].step = fstep.name + fstep.steps[0].step;
-          return fstep.steps;
-        })
-        .reduce((a, b) => [...a, ...b], []);
+    const _instructions = analyzedInstructions
+      .map((fstep) => {
+        fstep.steps[0].step = fstep.name + fstep.steps[0].step;
+        return fstep.steps;
+      })
+      .reduce((a, b) => [...a, ...b], []);
 
-      const _recipe = {
-        instructions,
-        _instructions,
-        analyzedInstructions,
-        extendedIngredients,
-        aggregateLikes,
-        readyInMinutes,
-        servings,
-        image,
-        title,
-        id
-      };
+    const _recipe = {
+      instructions,
+      _instructions,
+      analyzedInstructions,
+      extendedIngredients,
+      aggregateLikes,
+      readyInMinutes,
+      servings,
+      image,
+      title,
+      id
+    };
 
-      this.recipe = _recipe;
-      await this.loadDietaryInfo();
-      await this.isRecipeMarkAsFavorite();
-      await this.checkIfRecipeInMeal();
-    } catch (error) {
-      console.log(error);
-    }
-  },
+    this.recipe = _recipe;
+    await this.loadDietaryInfo();
+    await this.isRecipeMarkAsFavorite();
+    await this.checkIfRecipeInMeal();
+
+    // Mark the recipe as watched
+    mockAddWatchedRecipe(this.recipe.id);
+  } catch (error) {
+    console.log(error);
+  }
+},
   methods: {
     async loadDietaryInfo() {
       const [glutenFreeResponse, vegetarianResponse, veganResponse] = await Promise.all([
