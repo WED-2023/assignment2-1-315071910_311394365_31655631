@@ -2,6 +2,7 @@
   <router-link
     :to="{ name: 'recipe', params: { recipeId: recipe.id } }"
     class="recipe-preview"
+    @click.native="markAsWatched"
   >
     <div class="recipe-body">
       <img
@@ -14,6 +15,9 @@
       />
       <div v-else class="image-placeholder">
         <i class="fas fa-spinner fa-pulse placeholder-icon"></i>
+      </div>
+      <div class="watched-icon-container" v-if="watched">
+        <i class="fas fa-eye watched-icon"></i>
       </div>
       <div class="favorite-icon-container" v-if="$root.store.username">
         <i
@@ -72,7 +76,7 @@
 </template>
 
 <script>
-import { mockAddFavorite, mockRemoveFavorite, mockIsRecipeMarkAsFavorite } from "@/services/user";
+import { mockAddFavorite, mockRemoveFavorite, mockIsRecipeMarkAsFavorite, mockAddWatchedRecipe, mockIsRecipeWatched } from "@/services/user";
 import { mockIsRecipeVegan, mockIsRecipeGlutenFree, mockIsRecipeVegetarian } from "@/services/recipes.js";
 
 export default {
@@ -83,6 +87,7 @@ export default {
       glutenFree: false,
       vegetarian: false,
       vegan: false,
+      watched: false,
     };
   },
   props: {
@@ -92,10 +97,11 @@ export default {
     },
   },
   async mounted() {
-    await this.isRecipeMarkAsFavorite();
-    await this.loadRecipeImage();
-    await this.loadDietaryInfo();
-  },
+  await this.isRecipeMarkAsFavorite();
+  await this.loadRecipeImage();
+  await this.loadDietaryInfo();
+  await this.isRecipeWatched();
+},
   methods: {
     async loadRecipeImage() {
       try {
@@ -120,6 +126,11 @@ export default {
       const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
       this.favorite = response.data.favorite;
     },
+    async isRecipeWatched() {
+    const response = await mockIsRecipeWatched(this.recipe.id);
+    this.watched = response.data.watched;
+    console.log('Is recipe watched:', this.recipe.id, this.watched);
+  },
     async loadDietaryInfo() {
       const glutenFreeResponse = await mockIsRecipeGlutenFree(this.recipe.id);
       const vegetarianResponse = await mockIsRecipeVegetarian(this.recipe.id);
@@ -143,6 +154,11 @@ export default {
       } else {
         mockRemoveFavorite(this.recipe.id);
       }
+    },
+    markAsWatched() {
+      mockAddWatchedRecipe(this.recipe.id);
+      this.watched = true;
+      console.log('Marked as watched:', this.recipe.id);
     },
   },
 };
@@ -237,6 +253,30 @@ body {
   transform: scale(1.2);
 }
 
+.watched-icon-container {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.watched-icon-container:hover {
+  box-shadow: 0 0 25px rgba(52, 152, 219, 0.7);
+}
+
+.watched-icon {
+  color: #3498db;
+  font-size: 24px;
+}
+
 .dietary-tabs {
   position: absolute;
   top: 10px;
@@ -254,7 +294,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* background-color: rgba(118, 75, 25, 0.588); */
   transition: transform 0.3s ease;
 }
 
@@ -263,20 +302,19 @@ body {
 }
 
 .dietary-icon-gluten {
-  width: 180%; /* Adjust these values to control the size of the icon */
+  width: 180%;
   height: 180%;
   object-fit: contain;
 }
 
 .dietary-icon-vegan {
-  width: 100%; /* Adjust these values to control the size of the icon */
+  width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-
 .dietary-icon-vegetarian {
-  width: 120%; /* Adjust these values to control the size of the icon */
+  width: 120%;
   height: 120%;
   object-fit: contain;
 }
