@@ -5,6 +5,10 @@
     @click.native="markAsWatched"
   >
     <div class="recipe-body">
+      <div class="watched-ribbon" v-if="watched">
+        <i class="fas fa-eye watched-icon"></i>
+        <span class="watched-text">Watched</span>
+      </div>
       <img
         v-if="image_load"
         :src="recipe.image"
@@ -15,9 +19,6 @@
       />
       <div v-else class="image-placeholder">
         <i class="fas fa-spinner fa-pulse placeholder-icon"></i>
-      </div>
-      <div class="watched-icon-container" v-if="watched">
-        <i class="fas fa-eye watched-icon"></i>
       </div>
       <div class="favorite-icon-container" v-if="$root.store.username">
         <i
@@ -76,8 +77,18 @@
 </template>
 
 <script>
-import { mockAddFavorite, mockRemoveFavorite, mockIsRecipeMarkAsFavorite, mockAddWatchedRecipe, mockIsRecipeWatched } from "@/services/user";
-import { mockIsRecipeVegan, mockIsRecipeGlutenFree, mockIsRecipeVegetarian } from "@/services/recipes.js";
+import {
+  mockAddFavorite,
+  mockRemoveFavorite,
+  mockIsRecipeMarkAsFavorite,
+  mockAddWatchedRecipe,
+  mockIsRecipeWatched,
+} from "@/services/user";
+import {
+  mockIsRecipeVegan,
+  mockIsRecipeGlutenFree,
+  mockIsRecipeVegetarian,
+} from "@/services/recipes.js";
 
 export default {
   data() {
@@ -127,9 +138,9 @@ export default {
       this.favorite = response.data.favorite;
     },
     async isRecipeWatched() {
-    const response = await mockIsRecipeWatched(this.recipe.id);
-    this.watched = response.data.watched;
-    console.log('Is recipe watched:', this.recipe.id, this.watched);
+      const response = await mockIsRecipeWatched(this.recipe.id);
+      this.watched = response.data.watched;
+      console.log("Is recipe watched:", this.recipe.id, this.watched);
     },
     async loadDietaryInfo() {
       const glutenFreeResponse = await mockIsRecipeGlutenFree(this.recipe.id);
@@ -158,18 +169,18 @@ export default {
     markAsWatched() {
       mockAddWatchedRecipe(this.recipe.id);
       this.watched = true;
-      console.log('Marked as watched:', this.recipe.id);
+      console.log("Marked as watched:", this.recipe.id);
     },
   },
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .recipe-preview {
@@ -253,28 +264,35 @@ body {
   transform: scale(1.2);
 }
 
-.watched-icon-container {
+.recipe-preview {
+  position: relative;
+}
+
+.watched-ribbon {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 40px;
-  height: 40px;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px 10px;
+  border-top-left-radius: 10px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+  font-size: 14px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.3s ease;
 }
 
-.watched-icon-container:hover {
-  box-shadow: 0 0 25px rgba(52, 152, 219, 0.7);
+.watched-ribbon:hover {
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
 }
 
 .watched-icon {
-  color: #3498db;
-  font-size: 24px;
+  margin-right: 5px;
+}
+
+.watched-text {
+  font-weight: bold;
 }
 
 .dietary-tabs {
@@ -314,7 +332,6 @@ body {
   object-fit: contain;
 }
 
-
 .dietary-icon-vegetarian {
   width: 120%; /* Adjust these values to control the size of the icon */
   height: 120%;
@@ -350,7 +367,7 @@ body {
 }
 
 .recipe-title {
-  font-family: 'Lora', serif;
+  font-family: "Lora", serif;
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 5px;
