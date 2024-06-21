@@ -1,5 +1,8 @@
 // src/services/user.js
 // import { all } from "core-js/fn/promise";
+import Vue from 'vue';
+
+export const eventBus = new Vue();
 import recipe_full_view from "../assets/mocks/recipe_full_view.json";
 import recipe_preview from "../assets/mocks/recipe_preview.json"; 
 let favorite_recipes = {};
@@ -158,4 +161,41 @@ export function mockGetAllRecipies() {
   export function mockGetUserFullRecipeView(){
     return { data : { dict: user_full_recipes_view} };
   }
-  
+
+
+let watched_recipes = JSON.parse(localStorage.getItem('watched_recipes')) || {};
+
+export function mockAddWatchedRecipe(recipeId) {
+  if (recipe_preview[recipeId]) {
+    watched_recipes[recipeId] = recipe_preview[recipeId];
+  } else {
+    watched_recipes[recipeId] = user_recipes_preview[recipeId];
+  }
+  localStorage.setItem('watched_recipes', JSON.stringify(watched_recipes));
+  console.log('Added to watched:', watched_recipes);
+  eventBus.$emit('recipe-watched', recipeId); // Emit the event when a recipe is watched
+}
+
+export function mockIsRecipeWatched(recipeId) {
+  console.log('Checking if watched:', recipeId, recipeId in watched_recipes);
+  return { data: { watched: recipeId in watched_recipes } };
+}
+
+export function mockGetWatchedRecipes() {
+  const watchedRecipeIds = Object.values(watched_recipes);
+  console.log('Getting watched recipes:', watchedRecipeIds);
+  return { data: { recipes: watchedRecipeIds } };
+}
+
+export function mockClearWatchedRecipes() {
+  watched_recipes = {};
+  localStorage.removeItem('watched_recipes');
+  console.log('Cleared watched recipes');
+  eventBus.$emit('watched-recipes-cleared'); // Emit event to notify about clearing
+}
+export function mockUserLogout() {
+  // Clear user-specific data
+  mockClearWatchedRecipes();
+  // Any other logout operations...
+}
+// Other existing functions...
