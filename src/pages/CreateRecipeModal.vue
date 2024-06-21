@@ -28,10 +28,14 @@
             </div>
           </div>
 
-          <!-- Ready Time and Likes -->
+          <!-- Ready Time, Servings, and Likes -->
           <div class="form-group">
             <label for="readyInMinutes">Ready Time In Minutes</label>
             <input type="number" v-model="recipe.readyInMinutes" id="readyInMinutes" required />
+          </div>
+          <div class="form-group">
+            <label for="servings">Servings</label>
+            <input type="number" v-model="recipe.servings" id="servings" required />
           </div>
           <div class="form-group">
             <label for="aggregateLikes">Aggregate Likes</label>
@@ -214,9 +218,8 @@
     </div>
   </b-modal>
 </template>
-
 <script>
-import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList, mockAddRecipeFullViewToUserList } from "@/services/user";
+import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList } from "@/services/user";
 
 export default {
   name: 'CreateRecipeModal',
@@ -236,6 +239,7 @@ export default {
         title: '',
         readyInMinutes: 0,
         aggregateLikes: 0,
+        servings: 0, // Add servings property
         vegetarian: false,
         vegan: false,
         glutenFree: false,
@@ -342,6 +346,99 @@ export default {
       }
       this.recipe.id = random;
     },
+    async submitRecipe() {
+      await this.getRandomId();
+      const newRecipe = {
+        ...this.recipe,
+        vegetarian: this.recipe.vegetarian || false,
+        vegan: this.recipe.vegan || false,
+        glutenFree: this.recipe.glutenFree || false,
+        dairyFree: this.recipe.dairyFree || false,
+        veryHealthy: this.recipe.veryHealthy || false,
+        cheap: this.recipe.cheap || false,
+        veryPopular: this.recipe.veryPopular || false,
+        sustainable: this.recipe.sustainable || false,
+        lowFodmap: this.recipe.lowFodmap || false,
+        aggregateLikes: this.recipe.aggregateLikes || 0,
+        healthScore: this.calculateHealthScore(),
+        creditsText: "User Generated",
+        license: "CC BY-SA 4.0",
+        sourceName: "User",
+        pricePerServing: this.calculatePricePerServing(),
+        cuisines: [],  // Add logic to handle this if needed
+        dishTypes: ["main course"],  // Add logic to handle this if needed
+        diets: this.getDiets(),
+        occasions: [],  // Add logic to handle this if needed
+        winePairing: {
+          pairedWines: [],
+          pairingText: "",
+          productMatches: []
+        },
+        extendedIngredients: this.recipe.extendedIngredients.map(ingredient => ({
+          id: ingredient.id || Math.floor(10000 + Math.random() * 90000), // Generate a random ID if not present
+          aisle: "",  // Set as needed
+          image: ingredient.image,
+          consistency: "SOLID",  // Set as needed
+          name: ingredient.name,
+          nameClean: ingredient.name.toLowerCase(),  // Simplified example
+          original: `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`,
+          originalName: ingredient.name,
+          amount: ingredient.amount,
+          unit: ingredient.unit,
+          meta: [],  // Add logic to handle this if needed
+          measures: {
+            us: {
+              amount: ingredient.amount,
+              unitShort: ingredient.unit,
+              unitLong: ingredient.unit
+            },
+            metric: {
+              amount: ingredient.amount,
+              unitShort: ingredient.unit,
+              unitLong: ingredient.unit
+            }
+          }
+        })),
+        analyzedInstructions: this.recipe.steps.map((step, index) => ({
+          name: "",
+          steps: [
+            {
+              number: index + 1,
+              step: step.description
+            }
+          ]
+        })),
+        originalId: null,
+        spoonacularScore: 0.0,  // You can calculate or adjust this if needed
+        instructions: this.recipe.instructions || ""
+      };
+
+      const viewResponse = mockAddRecipeViewToUserList(newRecipe);
+      this.resetForm(); // Reset the form after submission
+      this.submitted = true;
+    },
+    calculateHealthScore() {
+      // Implement a method to calculate health score if needed
+      return 0;
+    },
+    calculatePricePerServing() {
+      // Implement a method to calculate price per serving if needed
+      return 0;
+    },
+    getDiets() {
+      const diets = [];
+      if (this.recipe.vegetarian) diets.push("vegetarian");
+      if (this.recipe.vegan) diets.push("vegan");
+      if (this.recipe.glutenFree) diets.push("gluten free");
+      if (this.recipe.dairyFree) diets.push("dairy free");
+      return diets;
+    },
+    resetForm() {
+      this.recipe = this.getInitialRecipe();
+      this.imageOption = 'url';
+      this.submitted = false;
+      this.currentScreen = 1;
+    },
     nextScreen() {
       if (this.currentScreen < 3) {
         this.currentScreen++;
@@ -351,24 +448,10 @@ export default {
       if (this.currentScreen > 1) {
         this.currentScreen--;
       }
-    },
-    async submitRecipe() {
-      await this.getRandomId();
-      const viewResponse = mockAddRecipeViewToUserList(this.recipe);
-      const fullResponse = mockAddRecipeFullViewToUserList(this.recipe.id, this.recipe);
-      this.resetForm(); // Reset the form after submission
-      this.submitted = true;
-    },
-    resetForm() {
-      this.recipe = this.getInitialRecipe();
-      this.imageOption = 'url';
-      this.submitted = false;
-      this.currentScreen = 1;
     }
   }
 }
 </script>
-
 <style scoped>
 .wide-modal .modal-dialog {
   max-width: 90% !important;

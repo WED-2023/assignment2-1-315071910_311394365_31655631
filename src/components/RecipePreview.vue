@@ -97,11 +97,11 @@ export default {
     },
   },
   async mounted() {
-  await this.isRecipeMarkAsFavorite();
-  await this.loadRecipeImage();
-  await this.loadDietaryInfo();
-  await this.isRecipeWatched();
-},
+    await this.isRecipeMarkAsFavorite();
+    await this.loadRecipeImage();
+    await this.loadDietaryInfo();
+    await this.isRecipeWatched();
+  },
   methods: {
     async loadRecipeImage() {
       try {
@@ -130,7 +130,7 @@ export default {
     const response = await mockIsRecipeWatched(this.recipe.id);
     this.watched = response.data.watched;
     console.log('Is recipe watched:', this.recipe.id, this.watched);
-  },
+    },
     async loadDietaryInfo() {
       const glutenFreeResponse = await mockIsRecipeGlutenFree(this.recipe.id);
       const vegetarianResponse = await mockIsRecipeVegetarian(this.recipe.id);
@@ -294,6 +294,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* background-color: rgba(118, 75, 25, 0.588); */
   transition: transform 0.3s ease;
 }
 
@@ -302,19 +303,20 @@ body {
 }
 
 .dietary-icon-gluten {
-  width: 180%;
+  width: 180%; /* Adjust these values to control the size of the icon */
   height: 180%;
   object-fit: contain;
 }
 
 .dietary-icon-vegan {
-  width: 100%;
+  width: 100%; /* Adjust these values to control the size of the icon */
   height: 100%;
   object-fit: contain;
 }
 
+
 .dietary-icon-vegetarian {
-  width: 120%;
+  width: 120%; /* Adjust these values to control the size of the icon */
   height: 120%;
   object-fit: contain;
 }

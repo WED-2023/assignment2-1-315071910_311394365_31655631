@@ -92,7 +92,7 @@
 
 <script>
 import RecipePreview from "@/components/RecipePreview.vue"; 
-import recipe_preview from "@/assets/mocks/recipe_preview.json"; // TODO: replace it with a mock function.
+import recipe_preview from "@/assets/mocks/GetRecipeInformation.json"; // TODO: replace it with a mock function.
 
 export default {
   components: {

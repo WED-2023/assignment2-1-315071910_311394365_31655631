@@ -18,9 +18,9 @@
       <b-col
         v-for="r in recipes"
         :key="r.id"
-        cols="12"
-        md="6"
-        lg="4"
+        cols="12"    
+        md="6"       
+        lg="4"       
       >
         <!-- Recipe preview component for each recipe -->
         <RecipePreview class="recipePreview" :recipe="r" />
@@ -55,14 +55,14 @@ export default {
     };
   },
   mounted() {
-  this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
-  eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
-  eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
+    this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
+    eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
+    eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
 },
 beforeDestroy() {
   eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
   eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
-},
+  },
   methods: {
     async updateRecipes() {
       try {

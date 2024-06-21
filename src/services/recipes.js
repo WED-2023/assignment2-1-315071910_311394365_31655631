@@ -1,6 +1,6 @@
 // src/services/recipes.js
-import recipe_full_view from "../assets/mocks/recipe_full_view.json";
-import recipe_preview from "../assets/mocks/recipe_preview.json";
+// import recipe_full_view from "../assets/mocks/recipe_full_view.json";
+// import recipe_preview from "../assets/mocks/recipe_preview.json";
 import recipe_information from "../assets/mocks/GetRecipeInformation.json";
 import { mockGetUserFullRecipeView } from "@/services/user.js";
 
@@ -39,7 +39,7 @@ import { mockGetUserFullRecipeView } from "@/services/user.js";
 // }
 
 export function mockGetRecipesPreview(amount = 1) {
-  const recipeIds = Object.keys(recipe_preview);
+  const recipeIds = Object.keys(recipe_information);
   const totalRecipes = recipeIds.length;
 
   // Shuffle the array of recipe IDs
@@ -47,37 +47,44 @@ export function mockGetRecipesPreview(amount = 1) {
 
   // Generate the requested amount of recipes, repeating if necessary
   const selectedRecipes = Array.from({ length: amount }, (_, i) =>
-    recipe_preview[shuffledRecipeIds[i % totalRecipes]]
+    recipe_information[shuffledRecipeIds[i % totalRecipes]]
   );
 
   return { data: { recipes: selectedRecipes } };
 }
 
 
-export function mockGetRecipeFullDetails(recipeId) {
-    return { data: { recipe: recipe_full_view[recipeId] } } ;
-  }
+// export function mockGetRecipeFullDetails(recipeId) {
+//   const recipe = recipe_information[recipeId];
+//   if (recipe) {
+//     return { data: { recipe } };
+//   } else {
+//     recipe = mockGetUserFullRecipeView(recipeId).data.recipe;
+//     return recipe;
+//   }
+// }
+
   
 // Function to check if a recipe is vegan
 export function mockIsRecipeVegan(recipeId) {
-  if (recipe_preview[recipeId]) {
-    return { data: { vegan: recipe_preview[recipeId].vegan } };
+  if (recipe_information[recipeId]) {
+    return { data: { vegan: recipe_information[recipeId].vegan } };
   }
   return { data: { vegan: false } }; // Default to false if recipe not found
 }
 
 // Function to check if a recipe is gluten-free
 export function mockIsRecipeGlutenFree(recipeId) {
-  if (recipe_preview[recipeId]) {
-    return { data: { glutenFree: recipe_preview[recipeId].glutenFree } };
+  if (recipe_information[recipeId]) {
+    return { data: { glutenFree: recipe_information[recipeId].glutenFree } };
   }
   return { data: { glutenFree: false } }; // Default to false if recipe not found
 }
 
 // Function to check if a recipe is vegetarian
 export function mockIsRecipeVegetarian(recipeId) {
-  if (recipe_preview[recipeId]) {
-    return { data: { vegetarian: recipe_preview[recipeId].vegetarian } };
+  if (recipe_information[recipeId]) {
+    return { data: { vegetarian: recipe_information[recipeId].vegetarian } };
   }
   return { data: { vegetarian: false } }; // Default to false if recipe not found
 }
