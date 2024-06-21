@@ -80,6 +80,7 @@
 
 <script>
 import CreateRecipeModal from "./pages/CreateRecipeModal";
+import { mockClearWatchedRecipes } from "./services/user";
 
 export default {
   name: "App",
@@ -90,6 +91,8 @@ export default {
     logout() {
       // Call the logout method on the root store
       this.$root.store.logout();
+      // Clear watched recipes
+      mockClearWatchedRecipes();
       // Show a toast notification for successful logout
       this.$root.toast("Logout", "User logged out successfully", "success");
       // Navigate to the home page
