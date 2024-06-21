@@ -204,11 +204,6 @@
             <p>Now you can close this window.</p>
           </div>
 
-          <!-- Display JSON -->
-          <div v-if="submitted" class="json-display">
-            <pre>{{ recipeJson }}</pre>
-          </div>
-
           <!-- Navigation Buttons -->
           <div class="form-actions">
             <button @click="prevScreen" type="button" class="prev-btn">Previous</button>
@@ -230,8 +225,7 @@ export default {
       recipe: this.getInitialRecipe(),
       imageOption: 'url',
       submitted: false,
-      currentScreen: 1,
-      recipeJson: ''
+      currentScreen: 1
     }
   },
   methods: {
@@ -344,7 +338,7 @@ export default {
       let random;
       random = Math.floor(10000 + Math.random() * 90000);
       while(mockCheckIfIdNumberExist(random)){
-          random = Math.floor(10000 + Math.random() * 90000);
+          random = Math.floor(10000 + Math.random * 90000);
       }
       this.recipe.id = random;
     },
@@ -362,7 +356,7 @@ export default {
       await this.getRandomId();
       const viewResponse = mockAddRecipeViewToUserList(this.recipe);
       const fullResponse = mockAddRecipeFullViewToUserList(this.recipe.id, this.recipe);
-      this.recipeJson = JSON.stringify(this.recipe, null, 2); // Save the recipe as JSON
+      this.resetForm(); // Reset the form after submission
       this.submitted = true;
     },
     resetForm() {
@@ -370,7 +364,6 @@ export default {
       this.imageOption = 'url';
       this.submitted = false;
       this.currentScreen = 1;
-      this.recipeJson = '';
     }
   }
 }
@@ -623,15 +616,6 @@ export default {
 
 .success-message h2 {
   margin: 0 0 10px;
-}
-
-.json-display {
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 4px;
-  margin-top: 20px;
-  white-space: pre-wrap;
 }
 
 ::v-deep .modal-title-custom {

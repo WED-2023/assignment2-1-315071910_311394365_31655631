@@ -2,6 +2,7 @@
 import recipe_full_view from "../assets/mocks/recipe_full_view.json";
 import recipe_preview from "../assets/mocks/recipe_preview.json";
 import recipe_information from "../assets/mocks/GetRecipeInformation.json";
+import { mockGetUserFullRecipeView } from "@/services/user.js";
 
 
 // export function mockGetRecipesPreview(amount = 1) {
@@ -86,5 +87,19 @@ export function mockGetFamilyRecipes() {
 }
 
 export function mockGetRecipeInformation(recipeId) {
-  return { data: { recipe: recipe_information[recipeId] } };
+  const recipeInfo = recipe_information[recipeId] || {};
+  const userRecipeInfo = mockGetUserFullRecipeView().data.dict[recipeId] || {};
+
+  // Merge only non-empty recipe information objects
+  const mergedRecipeInfo = {
+    ...(isEmpty(recipeInfo) ? {} : recipeInfo),
+    ...(isEmpty(userRecipeInfo) ? {} : userRecipeInfo),
+  };
+
+  return { data: { recipe: mergedRecipeInfo } };
+}
+
+// Helper function to check if an object is empty
+function isEmpty(obj) {
+  return Object.keys(obj).length === 0 && obj.constructor === Object;
 }

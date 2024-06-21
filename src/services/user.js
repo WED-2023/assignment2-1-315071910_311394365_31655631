@@ -150,4 +150,12 @@ export function mockGetAllRecipies() {
   export function mockIsRecipeInMyMeal(recipeId) {
     return { data: { meal: recipeId in user_meal_recipes}}
   }
+
+  export function mockGetUserRecipeFullDetails(recipeId){
+    return { data: { recipe: user_full_recipes_view[recipeId] } } ;
+  }
+
+  export function mockGetUserFullRecipeView(){
+    return { data : { dict: user_full_recipes_view} };
+  }
   
