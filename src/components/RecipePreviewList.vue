@@ -18,9 +18,9 @@
       <b-col
         v-for="r in recipes"
         :key="r.id"
-        cols="12"    
-        md="6"       
-        lg="4"       
+        cols="12"
+        md="6"
+        lg="4"
       >
         <!-- Recipe preview component for each recipe -->
         <RecipePreview class="recipePreview" :recipe="r" />
@@ -32,6 +32,7 @@
 <script>
 import RecipePreview from "./RecipePreview.vue";
 import { mockGetRecipesPreview } from "../services/recipes.js";
+import { eventBus } from "../services/user.js";
 
 export default {
   name: "RecipePreviewList",
@@ -54,13 +55,19 @@ export default {
     };
   },
   mounted() {
-    this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
-  },
+  this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
+  eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
+  eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
+},
+beforeDestroy() {
+  eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
+  eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
+},
   methods: {
     async updateRecipes() {
       try {
         const amountToFetch = 3; // Set this to the number of recipes to fetch
-        const response = mockGetRecipesPreview(amountToFetch); // Mock API call to fetch recipes
+        const response = await mockGetRecipesPreview(amountToFetch); // Mock API call to fetch recipes
         console.log(response);
         const recipes = response.data.recipes; // Extract recipes from the response
         console.log(recipes);
