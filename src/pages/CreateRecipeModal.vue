@@ -218,6 +218,7 @@
     </div>
   </b-modal>
 </template>
+
 <script>
 import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList } from "@/services/user";
 
@@ -239,7 +240,7 @@ export default {
         title: '',
         readyInMinutes: 0,
         aggregateLikes: 0,
-        servings: 0, // Add servings property
+        servings: 0,
         vegetarian: false,
         vegan: false,
         glutenFree: false,
@@ -287,12 +288,6 @@ export default {
     },
     removeStep(index) {
       this.recipe.steps.splice(index, 1);
-      this.updateStepNumbers();
-    },
-    updateStepNumbers() {
-      this.recipe.steps.forEach((step, index) => {
-        step.number = index + 1;
-      });
     },
     addEquipment() {
       this.recipe.equipment.push({ name: '', image: '', imageOption: 'none' });
@@ -350,6 +345,13 @@ export default {
       await this.getRandomId();
       const newRecipe = {
         ...this.recipe,
+        id: this.recipe.id,
+        title: this.recipe.title,
+        readyInMinutes: this.recipe.readyInMinutes,
+        aggregateLikes: this.recipe.aggregateLikes,
+        servings: this.recipe.servings,
+        image: this.recipe.image,
+        summary: this.recipe.summary,
         vegetarian: this.recipe.vegetarian || false,
         vegan: this.recipe.vegan || false,
         glutenFree: this.recipe.glutenFree || false,
@@ -359,33 +361,18 @@ export default {
         veryPopular: this.recipe.veryPopular || false,
         sustainable: this.recipe.sustainable || false,
         lowFodmap: this.recipe.lowFodmap || false,
-        aggregateLikes: this.recipe.aggregateLikes || 0,
-        healthScore: this.calculateHealthScore(),
-        creditsText: "User Generated",
-        license: "CC BY-SA 4.0",
-        sourceName: "User",
-        pricePerServing: this.calculatePricePerServing(),
-        cuisines: [],  // Add logic to handle this if needed
-        dishTypes: ["main course"],  // Add logic to handle this if needed
-        diets: this.getDiets(),
-        occasions: [],  // Add logic to handle this if needed
-        winePairing: {
-          pairedWines: [],
-          pairingText: "",
-          productMatches: []
-        },
         extendedIngredients: this.recipe.extendedIngredients.map(ingredient => ({
-          id: ingredient.id || Math.floor(10000 + Math.random() * 90000), // Generate a random ID if not present
-          aisle: "",  // Set as needed
+          id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
+          aisle: "",
           image: ingredient.image,
-          consistency: "SOLID",  // Set as needed
+          consistency: "SOLID",
           name: ingredient.name,
-          nameClean: ingredient.name.toLowerCase(),  // Simplified example
+          nameClean: ingredient.name.toLowerCase(),
           original: `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`,
           originalName: ingredient.name,
           amount: ingredient.amount,
           unit: ingredient.unit,
-          meta: [],  // Add logic to handle this if needed
+          meta: [],
           measures: {
             us: {
               amount: ingredient.amount,
@@ -399,31 +386,44 @@ export default {
             }
           }
         })),
-        analyzedInstructions: this.recipe.steps.map((step, index) => ({
-          name: "",
-          steps: [
-            {
+        instructions: this.recipe.instructions || "",
+        analyzedInstructions: [
+          {
+            name: "",
+            steps: this.recipe.steps.map((step, index) => ({
               number: index + 1,
-              step: step.description
-            }
-          ]
-        })),
+              step: step.description,
+              ingredients: step.ingredients.map(name => {
+                const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
+                return ingredient ? { id: ingredient.id, name: ingredient.name, image: ingredient.image } : {};
+              }),
+              equipment: step.equipment.map(name => {
+                const equip = this.recipe.equipment.find(e => e.name === name);
+                return equip ? { id: equip.id, name: equip.name, image: equip.image } : {};
+              })
+            }))
+          }
+        ],
+        cuisines: [],
+        dishTypes: ["main course"],
+        diets: this.getDiets(),
+        occasions: [],
+        winePairing: {
+          pairedWines: [],
+          pairingText: "",
+          productMatches: []
+        },
         originalId: null,
-        spoonacularScore: 0.0,  // You can calculate or adjust this if needed
-        instructions: this.recipe.instructions || ""
+        spoonacularScore: 0.0,
+        creditsText: "User Generated",
+        license: "CC BY-SA 4.0",
+        sourceName: "User",
+        pricePerServing: 0 // Add logic to calculate price if needed
       };
 
-      const viewResponse = mockAddRecipeViewToUserList(newRecipe);
+      mockAddRecipeViewToUserList(newRecipe);
       this.resetForm(); // Reset the form after submission
       this.submitted = true;
-    },
-    calculateHealthScore() {
-      // Implement a method to calculate health score if needed
-      return 0;
-    },
-    calculatePricePerServing() {
-      // Implement a method to calculate price per serving if needed
-      return 0;
     },
     getDiets() {
       const diets = [];
@@ -452,6 +452,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 .wide-modal .modal-dialog {
   max-width: 90% !important;

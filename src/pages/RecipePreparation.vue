@@ -3,6 +3,8 @@
     <br />
     <div class="preparation-container" v-if="recipe.title">
       <h1>{{ recipe.title }}</h1>
+      <img :src="recipe.image" alt="Recipe Image" class="recipe-image" />
+      <p v-html="recipe.summary"></p>
       <br />
       <div class="progress-bar-container">
         <ul class="steps-progress">
@@ -29,20 +31,20 @@
       </div>
       <div class="content-container">
         <div class="ingredients-equipment">
-          <div class="ingredients" v-if="currentStep.ingredients.length">
+          <div class="ingredients" v-if="currentStep.ingredients && currentStep.ingredients.length">
             <h3>Ingredients:</h3>
             <ul>
-              <li v-for="ingredient in currentStep.ingredients" :key="ingredient.id">
-                <img :src="`https://spoonacular.com/cdn/ingredients_100x100/${ingredient.image}`" alt="Ingredient Image" class="item-image" />
+              <li v-for="ingredient in mappedIngredients" :key="ingredient.id">
+                <img :src="`${ingredient.image}`" alt="Ingredient Image" class="item-image" />
                 <span>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.name }}</span>
               </li>
             </ul>
           </div>
-          <div class="equipment" v-if="currentStep.equipment.length">
+          <div class="equipment" v-if="currentStep.equipment && currentStep.equipment.length">
             <h3>Equipment:</h3>
             <ul>
               <li v-for="equipment in currentStep.equipment" :key="equipment.id">
-                <img :src="`https://spoonacular.com/cdn/equipment_100x100/${equipment.image}`" alt="Equipment Image" class="item-image" />
+                <img :src="`${equipment.image}`" alt="Equipment Image" class="item-image" />
                 <span>{{ equipment.name }}</span>
               </li>
             </ul>
@@ -62,12 +64,11 @@
     <div v-else>
       <p>Loading...</p>
     </div>
+    <br>
   </div>
 </template>
-
 <script>
-import { mockGetRecipeFullDetails, mockGetRecipeInformation } from "../services/recipes.js";
-import { mockSetStepInRecipe, mockRecipePreparationComplete, mockGetCurrentStep } from "../services/user.js";
+import { mockSetStepInRecipe, mockRecipePreparationComplete, mockGetCurrentStep, mockGetUserFullRecipeView } from "../services/user.js";
 
 export default {
   data() {
@@ -95,12 +96,16 @@ export default {
   methods: {
     async fetchRecipe(recipeId) {
       try {
-        const response = await mockGetRecipeInformation(recipeId);
+        const response = await mockGetUserFullRecipeView(recipeId);
         this.recipe = response.data.recipe;
         this.servings = this.recipe.servings;
+        // Save the original amounts for adjustment
+        this.recipe.extendedIngredients.forEach(ingredient => {
+          ingredient.originalAmount = ingredient.amount;
+        });
         this.updateIngredients();
         // Retrieve the current step index when loading the recipe
-        this.currentStepIndex = mockGetCurrentStep(recipeId);
+        this.currentStepIndex = await mockGetCurrentStep(recipeId);
         this.updateProgress();
       } catch (error) {
         console.log(error);
@@ -126,10 +131,10 @@ export default {
       this.updateProgress();
     },
     updateIngredients() {
-      this.recipe.extendedIngredients = this.adjustedIngredients.map(
+      const factor = this.servings / this.recipe.servings;
+      this.recipe.extendedIngredients = this.recipe.extendedIngredients.map(
         (ingredient) => {
-          const adjustedAmount =
-            (ingredient.amount / this.recipe.servings) * this.servings;
+          const adjustedAmount = ingredient.originalAmount * factor;
           return {
             ...ingredient,
             amount: adjustedAmount.toFixed(2),
@@ -159,19 +164,23 @@ export default {
     progress() {
       return ((this.currentStepIndex + 1) / this.steps.length) * 100;
     },
-    adjustedIngredients() {
-      return this.recipe.extendedIngredients.map((ingredient) => {
-        const adjustedAmount =
-          (ingredient.amount / this.recipe.servings) * this.servings;
+    mappedIngredients() {
+      if (!this.currentStep.ingredients) return [];
+
+      return this.currentStep.ingredients.map(stepIngredient => {
+        const ingredient = this.recipe.extendedIngredients.find(ing => ing.id === stepIngredient.id);
         return {
-          ...ingredient,
-          amount: adjustedAmount.toFixed(2),
+          ...stepIngredient,
+          amount: ingredient ? ingredient.amount : '',
+          unit: ingredient ? ingredient.unit : ''
         };
       });
-    },
+    }
   },
 };
 </script>
+
+
 
 
 

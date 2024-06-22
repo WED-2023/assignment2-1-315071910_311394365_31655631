@@ -22,7 +22,7 @@
         {
             "id": 1001,
             "aisle": "Milk, Eggs, Other Dairy",
-            "image": "butter-sliced.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/butter-sliced.jpg",
             "consistency": "SOLID",
             "name": "butter",
             "nameClean": "butter",
@@ -47,7 +47,7 @@
         {
             "id": 10011135,
             "aisle": "Produce",
-            "image": "cauliflower.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/cauliflower.jpg",
             "consistency": "SOLID",
             "name": "cauliflower florets",
             "nameClean": "cauliflower florets",
@@ -76,7 +76,7 @@
         {
             "id": 1038,
             "aisle": "Cheese",
-            "image": "parmesan.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/parmesan.jpg",
             "consistency": "SOLID",
             "name": "cheese",
             "nameClean": "pecorino romano",
@@ -104,7 +104,7 @@
         {
             "id": 1034053,
             "aisle": "Oil, Vinegar, Salad Dressing",
-            "image": "olive-oil.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/olive-oil.jpg",
             "consistency": "LIQUID",
             "name": "extra virgin olive oil",
             "nameClean": "extra virgin olive oil",
@@ -129,7 +129,7 @@
         {
             "id": 11215,
             "aisle": "Produce",
-            "image": "garlic.png",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/garlic.png",
             "consistency": "SOLID",
             "name": "garlic",
             "nameClean": "garlic",
@@ -154,7 +154,7 @@
         {
             "id": 10720420,
             "aisle": "Pasta and Rice",
-            "image": "spaghetti.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/spaghetti.jpg",
             "consistency": "SOLID",
             "name": "pasta",
             "nameClean": "linguine",
@@ -181,7 +181,7 @@
         {
             "id": 1032009,
             "aisle": "Spices and Seasonings",
-            "image": "red-pepper-flakes.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/red-pepper-flakes.jpg",
             "consistency": "SOLID",
             "name": "couple of pepper flakes",
             "nameClean": "red pepper flakes",
@@ -208,7 +208,7 @@
         {
             "id": 1102047,
             "aisle": "Spices and Seasonings",
-            "image": "salt-and-pepper.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/salt-and-pepper.jpg",
             "consistency": "SOLID",
             "name": "salt and pepper",
             "nameClean": "salt and pepper",
@@ -235,7 +235,7 @@
         {
             "id": 11291,
             "aisle": "Produce",
-            "image": "spring-onions.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/spring-onions.jpg",
             "consistency": "SOLID",
             "name": "scallions",
             "nameClean": "spring onions",
@@ -265,7 +265,7 @@
         {
             "id": 14106,
             "aisle": "Alcoholic Beverages",
-            "image": "white-wine.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/white-wine.jpg",
             "consistency": "LIQUID",
             "name": "white wine",
             "nameClean": "dry white wine",
@@ -290,7 +290,7 @@
         {
             "id": 99025,
             "aisle": "Pasta and Rice",
-            "image": "breadcrumbs.jpg",
+            "image": "https://spoonacular.com/cdn/equipment_100x100/breadcrumbs.jpg",
             "consistency": "SOLID",
             "name": "bread crumbs",
             "nameClean": "whole wheat breadcrumbs",
@@ -357,7 +357,7 @@
                     "equipment": [
                         {
                             "id": 404784,
-                            "image": "oven.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/oven.jpg",
                             "name": "oven",
                             "temperature": {
                                 "number": 200.0,
@@ -373,49 +373,49 @@
                     "equipment": [
                         {
                             "id": 404661,
-                            "image": "whisk.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/whisk.png",
                             "name": "whisk"
                         },
                         {
                             "id": 404783,
-                            "image": "bowl.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/bowl.jpg",
                             "name": "bowl"
                         }
                     ],
                     "ingredients": [
                         {
                             "id": 19334,
-                            "image": "light-brown-sugar.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/light-brown-sugar.jpg",
                             "name": "light brown sugar"
                         },
                         {
                             "id": 19335,
-                            "image": "sugar-in-bowl.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/sugar-in-bowl.png",
                             "name": "granulated sugar"
                         },
                         {
                             "id": 18371,
-                            "image": "white-powder.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/white-powder.jpg",
                             "name": "baking powder"
                         },
                         {
                             "id": 18372,
-                            "image": "white-powder.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/white-powder.jpg",
                             "name": "baking soda"
                         },
                         {
                             "id": 12142,
-                            "image": "pecans.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/pecans.jpg",
                             "name": "pecans"
                         },
                         {
                             "id": 20081,
-                            "image": "flour.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/flour.png",
                             "name": "all purpose flour"
                         },
                         {
                             "id": 2047,
-                            "image": "salt.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/salt.jpg",
                             "name": "salt"
                         }
                     ],
@@ -426,34 +426,34 @@
                     "equipment": [
                         {
                             "id": 404661,
-                            "image": "whisk.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/whisk.png",
                             "name": "whisk"
                         },
                         {
                             "id": 404783,
-                            "image": "bowl.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/bowl.jpg",
                             "name": "bowl"
                         }
                     ],
                     "ingredients": [
                         {
                             "id": 2050,
-                            "image": "vanilla-extract.jpg",
+                            "image": "vhttps://spoonacular.com/cdn/equipment_100x100/anilla-extract.jpg",
                             "name": "vanilla extract"
                         },
                         {
                             "id": 93622,
-                            "image": "vanilla.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/vanilla.jpg",
                             "name": "vanilla bean"
                         },
                         {
                             "id": 1230,
-                            "image": "buttermilk.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/buttermilk.jpg",
                             "name": "buttermilk"
                         },
                         {
                             "id": 1123,
-                            "image": "egg.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/egg.png",
                             "name": "egg"
                         }
                     ],
@@ -465,7 +465,7 @@
                     "ingredients": [
                         {
                             "id": 1123,
-                            "image": "egg.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/egg.png",
                             "name": "egg"
                         }
                     ],
@@ -486,12 +486,12 @@
                     "equipment": [
                         {
                             "id": 404779,
-                            "image": "griddle.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/griddle.jpg",
                             "name": "griddle"
                         },
                         {
                             "id": 404645,
-                            "image": "pan.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/pan.png",
                             "name": "frying pan"
                         }
                     ],
@@ -507,7 +507,7 @@
                     "equipment": [
                         {
                             "id": 404784,
-                            "image": "oven.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/oven.jpg",
                             "name": "oven",
                             "temperature": {
                                 "number": 200.0,
@@ -524,7 +524,7 @@
                     "ingredients": [
                         {
                             "id": 10014037,
-                            "image": "bourbon.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/bourbon.png",
                             "name": "bourbon"
                         }
                     ],
@@ -536,12 +536,12 @@
                     "ingredients": [
                         {
                             "id": 19336,
-                            "image": "powdered-sugar.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/powdered-sugar.jpg",
                             "name": "powdered sugar"
                         },
                         {
                             "id": 19911,
-                            "image": "maple-syrup.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/maple-syrup.png",
                             "name": "maple syrup"
                         }
                     ],
@@ -553,7 +553,7 @@
                     "ingredients": [
                         {
                             "id": 12142,
-                            "image": "pecans.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/pecans.jpg",
                             "name": "pecans"
                         }
                     ],
@@ -569,19 +569,19 @@
                     "equipment": [
                         {
                             "id": 404669,
-                            "image": "sauce-pan.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/sauce-pan.jpg",
                             "name": "sauce pan"
                         }
                     ],
                     "ingredients": [
                         {
                             "id": 10014037,
-                            "image": "bourbon.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/bourbon.png",
                             "name": "bourbon"
                         },
                         {
                             "id": 19335,
-                            "image": "sugar-in-bowl.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/sugar-in-bowl.png",
                             "name": "sugar"
                         }
                     ],
@@ -592,24 +592,24 @@
                     "equipment": [
                         {
                             "id": 404771,
-                            "image": "food-processor.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/food-processor.png",
                             "name": "food processor"
                         }
                     ],
                     "ingredients": [
                         {
                             "id": 19304,
-                            "image": "molasses.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/molasses.jpg",
                             "name": "molasses"
                         },
                         {
                             "id": 10014037,
-                            "image": "bourbon.png",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/bourbon.png",
                             "name": "bourbon"
                         },
                         {
                             "id": 2047,
-                            "image": "salt.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/salt.jpg",
                             "name": "salt"
                         }
                     ],
@@ -620,12 +620,12 @@
                     "equipment": [
                         {
                             "id": 404730,
-                            "image": "plastic-wrap.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/plastic-wrap.jpg",
                             "name": "plastic wrap"
                         },
                         {
                             "id": 404783,
-                            "image": "bowl.jpg",
+                            "image": "https://spoonacular.com/cdn/equipment_100x100/bowl.jpg",
                             "name": "bowl"
                         }
                     ],
@@ -674,7 +674,7 @@
       {
         "id": 10120420,
         "aisle": "Bakery",
-        "image": "pizza-dough.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/pizza-dough.jpg",
         "consistency": "SOLID",
         "name": "pizza dough",
         "nameClean": "pizza dough",
@@ -699,7 +699,7 @@
       {
         "id": 11549,
         "aisle": "Canned and Jarred",
-        "image": "tomato-sauce.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/tomato-sauce.jpg",
         "consistency": "LIQUID",
         "name": "tomato sauce",
         "nameClean": "tomato sauce",
@@ -724,7 +724,7 @@
       {
         "id": 93610,
         "aisle": "Cheese",
-        "image": "mozzarella.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/mozzarella.jpg",
         "consistency": "SOLID",
         "name": "mozzarella cheese",
         "nameClean": "mozzarella cheese",
@@ -751,7 +751,7 @@
       {
         "id": 2044,
         "aisle": "Produce",
-        "image": "basil.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/basil.jpg",
         "consistency": "SOLID",
         "name": "fresh basil leaves",
         "nameClean": "fresh basil",
@@ -778,7 +778,7 @@
       {
         "id": 1034053,
         "aisle": "Oil, Vinegar, Salad Dressing",
-        "image": "olive-oil.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/olive-oil.jpg",
         "consistency": "LIQUID",
         "name": "extra-virgin olive oil",
         "nameClean": "extra virgin olive oil",
@@ -803,7 +803,7 @@
       {
         "id": 2047,
         "aisle": "Spices and Seasonings",
-        "image": "salt.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/salt.jpg",
         "consistency": "SOLID",
         "name": "salt",
         "nameClean": "salt",
@@ -875,7 +875,7 @@
             "equipment": [
               {
                 "id": 404784,
-                "image": "oven.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/oven.jpg",
                 "name": "oven",
                 "temperature": {
                   "number": 245,
@@ -891,7 +891,7 @@
             "equipment": [
               {
                 "id": 404749,
-                "image": "rolling-pin.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/rolling-pin.jpg",
                 "name": "rolling pin"
               }
             ],
@@ -903,14 +903,14 @@
             "equipment": [
               {
                 "id": 404783,
-                "image": "spoon.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/spoon.jpg",
                 "name": "spoon"
               }
             ],
             "ingredients": [
               {
                 "id": 11549,
-                "image": "tomato-sauce.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/tomato-sauce.jpg",
                 "name": "tomato sauce"
               }
             ],
@@ -922,12 +922,12 @@
             "ingredients": [
               {
                 "id": 93610,
-                "image": "mozzarella.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/mozzarella.jpg",
                 "name": "mozzarella cheese"
               },
               {
                 "id": 2044,
-                "image": "basil.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/basil.jpg",
                 "name": "fresh basil leaves"
               }
             ],
@@ -939,12 +939,12 @@
             "ingredients": [
               {
                 "id": 1034053,
-                "image": "olive-oil.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/olive-oil.jpg",
                 "name": "extra-virgin olive oil"
               },
               {
                 "id": 2047,
-                "image": "salt.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/salt.jpg",
                 "name": "salt"
               }
             ],
@@ -955,7 +955,7 @@
             "equipment": [
               {
                 "id": 404784,
-                "image": "oven.jpg",
+                "image": "https://spoonacular.com/cdn/equipment_100x100/oven.jpg",
                 "name": "oven",
                 "temperature": {
                   "number": 245,
@@ -1008,7 +1008,7 @@
       {
         "id": 10023572,
         "aisle": "Meat",
-        "image": "ground-beef.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/ground-beef.jpg",
         "consistency": "SOLID",
         "name": "beef patties",
         "nameClean": "ground beef",
@@ -1033,7 +1033,7 @@
       {
         "id": 1041009,
         "aisle": "Cheese",
-        "image": "cheddar-cheese.png",
+        "image": "chttps://spoonacular.com/cdn/equipment_100x100/heddar-cheese.png",
         "consistency": "SOLID",
         "name": "cheddar cheese",
         "nameClean": "cheddar cheese",
@@ -1058,7 +1058,7 @@
       {
         "id": 11252,
         "aisle": "Produce",
-        "image": "iceberg-lettuce.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/iceberg-lettuce.jpg",
         "consistency": "SOLID",
         "name": "lettuce",
         "nameClean": "lettuce",
@@ -1083,7 +1083,7 @@
       {
         "id": 11529,
         "aisle": "Produce",
-        "image": "tomato.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/tomato.jpg",
         "consistency": "SOLID",
         "name": "tomato",
         "nameClean": "tomato",
@@ -1110,7 +1110,7 @@
       {
         "id": 10018029,
         "aisle": "Bakery/Bread",
-        "image": "hamburger-bun.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/hamburger-bun.jpg",
         "consistency": "SOLID",
         "name": "burger buns",
         "nameClean": "hamburger buns",
@@ -1135,7 +1135,7 @@
       {
         "id": 1034053,
         "aisle": "Oil, Vinegar, Salad Dressing",
-        "image": "olive-oil.jpg",
+        "image": "https://spoonacular.com/cdn/equipment_100x100/olive-oil.jpg",
         "consistency": "LIQUID",
         "name": "olive oil",
         "nameClean": "olive oil",
@@ -4954,5 +4954,4 @@
       }
     ]
   }
-
 }
