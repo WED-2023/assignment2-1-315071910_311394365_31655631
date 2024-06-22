@@ -80,23 +80,34 @@ export default {
         const response = await mockGetMealRecipes();
         this.mealRecipes = response.data.meals.map(recipe => ({
           ...recipe,
-          time: recipe.time || 0, // Add time if not provided
-          status: this.getRecipeStatusText(mockGetRecipeStatus(recipe.id)), // Get status
-          progress: mockGetProgressInRecipe(recipe.id) || 0, // Get progress
+          time: recipe.time || 0,
+          status: this.getRecipeStatusText(mockGetRecipeStatus(recipe.id)),
+          progress: mockGetProgressInRecipe(recipe.id) || 0,
         }));
+        
+        // Restore the saved order if it exists
+        const savedOrder = JSON.parse(localStorage.getItem('mealRecipesOrder'));
+        if (savedOrder) {
+          this.mealRecipes = this.mealRecipes.sort((a, b) => savedOrder.indexOf(a.id) - savedOrder.indexOf(b.id));
+        }
       } catch (error) {
         console.error("Error fetching meal recipes:", error);
       }
     },
     removeRecipeFromMeal(recipeId) {
       this.mealRecipes = this.mealRecipes.filter(recipe => recipe.id !== recipeId);
-      mockRemoveRecipeFromMeal(recipeId); // Call the service to update backend
+      mockRemoveRecipeFromMeal(recipeId);
+      
+      // Save the new order to localStorage
+      const order = this.mealRecipes.map(recipe => recipe.id);
+      localStorage.setItem('mealRecipesOrder', JSON.stringify(order));
     },
     clearMeal() {
-      const recipesToRemove = [...this.mealRecipes]; // Create a copy of the current meal recipes
+      const recipesToRemove = [...this.mealRecipes];
       for (let i = 0; i < recipesToRemove.length; i++) {
         this.removeRecipeFromMeal(recipesToRemove[i].id);
       }
+      localStorage.removeItem('mealRecipesOrder'); // Clear the saved order
     },
     showClearMealModal() {
       this.$bvModal.show('clear-meal-modal');
@@ -114,6 +125,10 @@ export default {
         this.mealRecipes.splice(this.draggingIndex, 1);
         this.mealRecipes.splice(index, 0, draggedItem);
         this.draggingIndex = null;
+
+        // Save the new order to localStorage
+        const order = this.mealRecipes.map(recipe => recipe.id);
+        localStorage.setItem('mealRecipesOrder', JSON.stringify(order));
       }
     },
     onDragEnd() {
@@ -158,6 +173,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .meal-planning-container {
