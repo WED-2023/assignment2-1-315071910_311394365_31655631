@@ -5,6 +5,8 @@
 import recipe_information from "../assets/mocks/GetRecipeInformation.json";
 import Vue from 'vue';
 export const eventBus = new Vue();
+export const eventBus2 = new Vue();
+
 
 let favorite_recipes = {};
 let user_recipes_preview = {
@@ -641,25 +643,25 @@ export function mockGetAllRecipies() {
   //   console.log(user_recipes_preview);
   // }
 
-  export function mockAddRecipeToMealList(recipeId) {
-    if(recipe_information[recipeId]) {
-      user_meal_recipes[recipeId] = recipe_information[recipeId];
-    } else if(user_recipes_preview[recipeId]) {
-      user_meal_recipes[recipeId] = user_recipes_preview[recipeId];
-    }
-    return { status: 200, message: "Recipe view successfully added" };
-  }
+//   export function mockAddRecipeToMealList(recipeId) {
+//     if(recipe_information[recipeId]) {
+//       user_meal_recipes[recipeId] = recipe_information[recipeId];
+//     } else if(user_recipes_preview[recipeId]) {
+//       user_meal_recipes[recipeId] = user_recipes_preview[recipeId];
+//     }
+//     return { status: 200, message: "Recipe view successfully added" };
+//   }
 
   export function mockGetMealRecipes() {
     const mealRecipeIds = Object.values(user_meal_recipes);
     return { data: { meals: mealRecipeIds } };
   }
   
-  export function mockRemoveRecipeFromMeal(recipeId) {
-    if(user_meal_recipes[recipeId]){
-      delete user_meal_recipes[recipeId];
-    }
-  }
+//   export function mockRemoveRecipeFromMeal(recipeId) {
+//     if(user_meal_recipes[recipeId]){
+//       delete user_meal_recipes[recipeId];
+//     }
+//   }
 
   export function mockIsRecipeInMyMeal(recipeId) {
     return { data: { meal: recipeId in user_meal_recipes}}
@@ -714,5 +716,26 @@ export function mockUserLogout() {
   mockClearWatchedRecipes();
   // Any other logout operations...
 }
+
+export function mockAddRecipeToMealList(recipeId) {
+    if(recipe_information[recipeId]) {
+      user_meal_recipes[recipeId] = recipe_information[recipeId];
+    } else if(user_recipes_preview[recipeId]) {
+      user_meal_recipes[recipeId] = user_recipes_preview[recipeId];
+    }
+    eventBus2.$emit('update-meal-count');
+    return { status: 200, message: "Recipe view successfully added" };
+  }
+  
+  export function mockRemoveRecipeFromMeal(recipeId) {
+    if(user_meal_recipes[recipeId]){
+      delete user_meal_recipes[recipeId];
+      eventBus2.$emit('update-meal-count');
+    }
+  }
+  
+  export function mockGetNumOfRecipesInMeal() {
+    return Object.keys(user_meal_recipes).length;
+  }
 
   

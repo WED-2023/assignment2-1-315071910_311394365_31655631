@@ -16,6 +16,11 @@
           <b-nav-item :to="{ name: 'search' }" exact>
             <i class="fas fa-search mr-2"></i> Search
           </b-nav-item>
+          <!-- Number of Recipes in Meal Plan -->
+          <b-nav-item v-if="$root.store.username" disabled>
+            | Recipe in Meal plan:
+            <b-badge variant="light">{{ numOfRecipesInMeal }}</b-badge>
+          </b-nav-item>
         </b-navbar-nav>
         <!-- Navbar Links on the Right -->
         <b-navbar-nav class="ml-auto">
@@ -80,12 +85,18 @@
 
 <script>
 import CreateRecipeModal from "./pages/CreateRecipeModal";
-import { mockClearWatchedRecipes } from "./services/user";
+import { mockClearWatchedRecipes, mockGetNumOfRecipesInMeal } from "./services/user";
+import { eventBus2 } from '@/services/user';
 
 export default {
   name: "App",
   components: {
     CreateRecipeModal
+  },
+  data() {
+    return {
+      numOfRecipesInMeal: 0
+    };
   },
   methods: {
     logout() {
@@ -99,10 +110,21 @@ export default {
       this.$router.push("/").catch(() => {
         this.$forceUpdate();
       });
+    },
+    updateMealCount() {
+      this.numOfRecipesInMeal = mockGetNumOfRecipesInMeal();
     }
+  },
+  created() {
+    this.updateMealCount();
+    eventBus2.$on('update-meal-count', this.updateMealCount);
+  },
+  beforeDestroy() {
+    eventBus2.$off('update-meal-count', this.updateMealCount);
   }
 };
 </script>
+
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); // Import Roboto font

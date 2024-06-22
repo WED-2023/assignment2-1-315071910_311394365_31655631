@@ -35,7 +35,7 @@
                 {{ recipe.servings }} servings
               </div>
             </div>
-            <button @click.stop.prevent="toggleFavorite" class="favorite-btn" aria-label="Toggle favorite">
+            <button v-if="$root.store.username" @click.stop.prevent="toggleFavorite" class="favorite-btn" aria-label="Toggle favorite">
               <i :class="favorite ? 'fas fa-heart active' : 'far fa-heart'"></i>
               {{ favorite ? 'Remove from My Favorite' : 'Add to My Favorite' }}
             </button>
@@ -65,11 +65,11 @@
         </div>
       </div>
       <div class="recipe-actions">
-        <button :class="['add-to-meal', { 'added': addedToMeal }]" @click="addToMeal">
+        <button v-if="$root.store.username" :class="['add-to-meal', { 'added': addedToMeal }]" @click="addToMeal">
           <i :class="[addedToMeal ? 'fas fa-check' : 'fas fa-plus-circle']"></i>
           {{ addedToMeal ? 'Added to Meal Plan' : 'Add to Meal Plan' }}
         </button>
-        <button @click="startPreparation" class="start-preparation">
+        <button v-if="$root.store.username" @click="startPreparation" class="start-preparation">
           <i class="fas fa-play-circle"></i> Start Preparation
         </button>
       </div>
