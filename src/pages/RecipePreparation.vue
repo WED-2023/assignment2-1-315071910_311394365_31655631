@@ -3,7 +3,7 @@
     <br />
     <div class="preparation-container" v-if="recipe.title">
       <h1>{{ recipe.title }}</h1>
-      <img :src="recipe.image" alt="Recipe Image" class="recipe-image" />
+      <img :src="recipe.image || defaultImage" alt="Recipe Image" class="recipe-image" />
       <p v-html="recipe.summary"></p>
       <br />
       <div class="progress-bar-container">
@@ -35,7 +35,7 @@
             <h3>Ingredients:</h3>
             <ul>
               <li v-for="ingredient in mappedIngredients" :key="ingredient.id">
-                <img :src="`${ingredient.image}`" alt="Ingredient Image" class="item-image" />
+                <img :src="ingredient.image || defaultImage" alt="Ingredient Image" class="item-image" />
                 <span>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.name }}</span>
               </li>
             </ul>
@@ -44,7 +44,7 @@
             <h3>Equipment:</h3>
             <ul>
               <li v-for="equipment in currentStep.equipment" :key="equipment.id">
-                <img :src="`${equipment.image}`" alt="Equipment Image" class="item-image" />
+                <img :src="equipment.image || defaultImage" alt="Equipment Image" class="item-image" />
                 <span>{{ equipment.name }}</span>
               </li>
             </ul>
@@ -67,6 +67,7 @@
     <br>
   </div>
 </template>
+
 <script>
 import { mockSetStepInRecipe, mockRecipePreparationComplete, mockGetCurrentStep, mockGetUserFullRecipeView } from "../services/user.js";
 
@@ -83,6 +84,7 @@ export default {
       servings: 1,
       currentStepIndex: 0,
       currentStepCompleted: false,
+      defaultImage: "https://cdn.icon-icons.com/icons2/2436/PNG/512/recipe_cutlery_spoon_fork_icon_147447.png",
     };
   },
   async created() {
@@ -179,10 +181,6 @@ export default {
   },
 };
 </script>
-
-
-
-
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
@@ -377,5 +375,4 @@ button:hover:not(:disabled) {
   background-color: #2980b9;
   transform: scale(1.05);
 }
-
 </style>

@@ -1,4 +1,5 @@
 // src/services/auth.js
+  let existed_user_name = ['bbb'];
 
 
   export function mockLogin(credentials, success = true) {
@@ -26,6 +27,11 @@
   export function mockLogout() {
     return { status: 200, response: { data: { message: "logout succeeded", success: true}} };
 
+  }
+
+  export function mockCheckIfUserNameExist(username) {
+    const isExist = existed_user_name.includes(username);
+    return { status: 200, response: { data: { isExist } } };
   }
   
 
