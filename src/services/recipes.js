@@ -2,7 +2,7 @@
 // import recipe_full_view from "../assets/mocks/recipe_full_view.json";
 // import recipe_preview from "../assets/mocks/recipe_preview.json";
 import recipe_information from "../assets/mocks/GetRecipeInformation.json";
-import { mockGetUserFullRecipeView } from "@/services/user.js";
+import { mockGetUserFullRecipeView, mockIsUserRecipeVegan, mockIsUserRecipeGlutenFree, mockIsUserRecipeVegetarian } from "@/services/user.js";
 
 
 // export function mockGetRecipesPreview(amount = 1) {
@@ -70,6 +70,9 @@ export function mockIsRecipeVegan(recipeId) {
   if (recipe_information[recipeId]) {
     return { data: { vegan: recipe_information[recipeId].vegan } };
   }
+  else{
+    return mockIsUserRecipeVegan(recipeId);
+  }
   return { data: { vegan: false } }; // Default to false if recipe not found
 }
 
@@ -78,6 +81,9 @@ export function mockIsRecipeGlutenFree(recipeId) {
   if (recipe_information[recipeId]) {
     return { data: { glutenFree: recipe_information[recipeId].glutenFree } };
   }
+  else{
+    return mockIsUserRecipeGlutenFree(recipeId);
+  }
   return { data: { glutenFree: false } }; // Default to false if recipe not found
 }
 
@@ -85,6 +91,9 @@ export function mockIsRecipeGlutenFree(recipeId) {
 export function mockIsRecipeVegetarian(recipeId) {
   if (recipe_information[recipeId]) {
     return { data: { vegetarian: recipe_information[recipeId].vegetarian } };
+  }
+  else{
+    return mockIsUserRecipeVegetarian(recipeId);
   }
   return { data: { vegetarian: false } }; // Default to false if recipe not found
 }

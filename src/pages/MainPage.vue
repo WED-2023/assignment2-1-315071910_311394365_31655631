@@ -8,12 +8,12 @@
     <!-- Recipe Lists and Auth Section -->
     <div class="recipes-section">
       <!-- RecipePreviewList with refresh button shown -->
-      <RecipePreviewList title="Random Recipes" class="recipe-card" />
+      <RecipePreviewList title="Explore this Recipes" class="recipe-card" />
       
       <!-- Blurred Section with Login and Register buttons for unauthenticated users -->
       <div class="blur-container">
         <RecipePreviewList
-          title="Last Viewed Recipes"
+          title="Last watched recipes"
           :class="{ 'recipe-card': true, blur: !isAuthenticated }"
           :refreshButton="false"
           disabled

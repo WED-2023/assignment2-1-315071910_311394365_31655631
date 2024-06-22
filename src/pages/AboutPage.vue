@@ -1,6 +1,7 @@
 <template>
   <div class="about">
     <br>
+    <h1 class="title">About</h1>
     <b-container class="narrow-container">
       <b-row class="my-4">
         <b-col>
@@ -38,6 +39,7 @@
         </b-col>
       </b-row>
     </b-container>
+    <br>
   </div>
 </template>
 
@@ -119,5 +121,16 @@ p.lead, p {
 
 .team-member a:hover {
   text-decoration: underline;
+}
+
+.title {
+  font-size: 72px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  color: #868f4e; /* dark Brown */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(154, 154, 26, 0.7); /* Shadow and red glow */
+  margin-bottom: 30px;
+  text-align: center;
 }
 </style>

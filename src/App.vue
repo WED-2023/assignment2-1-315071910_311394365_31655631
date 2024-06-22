@@ -17,9 +17,10 @@
             <i class="fas fa-search mr-2"></i> Search
           </b-nav-item>
           <!-- Number of Recipes in Meal Plan -->
-          <b-nav-item v-if="$root.store.username" disabled>
-            | Recipe in Meal plan:
-            <b-badge variant="light">{{ numOfRecipesInMeal }}</b-badge>
+          <div v-if="$root.store.username" class="separator">|</div>
+          <b-nav-item :to="{ name: 'meal-plan' }" class="meal-plan-info" v-if="$root.store.username">
+            Recipes in Meal Plan<i class="fas fa-utensils ml-2"></i> :
+            <b-badge :class="badgeClass">{{ numOfRecipesInMeal }}</b-badge>
           </b-nav-item>
         </b-navbar-nav>
         <!-- Navbar Links on the Right -->
@@ -85,7 +86,7 @@
 
 <script>
 import CreateRecipeModal from "./pages/CreateRecipeModal";
-import { mockClearWatchedRecipes, mockGetNumOfRecipesInMeal } from "./services/user";
+import { mockClearWatchedRecipes, mockGetNumOfRecipesInMeal, mockClearProccessRecipesInMealPlan } from "./services/user";
 import { eventBus2 } from '@/services/user';
 
 export default {
@@ -98,12 +99,19 @@ export default {
       numOfRecipesInMeal: 0
     };
   },
+  computed: {
+    badgeClass() {
+      return this.numOfRecipesInMeal > 0 ? 'badge-red' : 'badge-light';
+    }
+  },
   methods: {
     logout() {
       // Call the logout method on the root store
       this.$root.store.logout();
       // Clear watched recipes
       mockClearWatchedRecipes();
+      // Clear process recipes in My Meal plan
+      mockClearProccessRecipesInMealPlan();
       // Show a toast notification for successful logout
       this.$root.toast("Logout", "User logged out successfully", "success");
       // Navigate to the home page
@@ -124,7 +132,6 @@ export default {
   }
 };
 </script>
-
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); // Import Roboto font
@@ -223,6 +230,38 @@ body {
   left: 0;
 }
 
+/* Separator Styles */
+.separator {
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin: 0 10px;
+  align-self: center;
+}
+
+/* Hover Effect Styles */
+.meal-plan-info {
+  position: relative;
+  cursor: pointer;
+}
+
+.meal-plan-info::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.meal-plan-info:hover::after,
+.meal-plan-info:focus::after {
+  width: 100%;
+  left: 0;
+}
+
 /* Dropdown Item Styles */
 .b-dropdown-item {
   color: #ffffff !important; /* Set the dropdown item color to white */
@@ -232,6 +271,17 @@ body {
 .b-dropdown-item:hover {
   background-color: #f8cdda !important; /* Change background color on hover */
   transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+/* Badge Styles */
+.badge-light {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.badge-red {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
 }
 
 /* Button Styles */

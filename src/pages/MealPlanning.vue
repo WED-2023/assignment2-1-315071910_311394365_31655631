@@ -38,10 +38,16 @@
             </div>
           </div>
         </div>
-        <button class="clear-meal-btn" @click="clearMeal">Clear Meal</button>
+        <button class="clear-meal-btn" @click="showClearMealModal">Clear All Recipes From Meal Plan</button>
       </div>
       <div v-else class="no-recipes">No recipes added to the meal plan yet.</div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <b-modal id="clear-meal-modal" @ok="clearMeal">
+      <template #modal-title>Clear Meal Plan</template>
+      Are you sure you want to clear all recipes from the meal plan?
+    </b-modal>
   </div>
 </template>
 
@@ -91,6 +97,9 @@ export default {
       for (let i = 0; i < recipesToRemove.length; i++) {
         this.removeRecipeFromMeal(recipesToRemove[i].id);
       }
+    },
+    showClearMealModal() {
+      this.$bvModal.show('clear-meal-modal');
     },
     onDragStart(index, event) {
       this.draggingIndex = index;
@@ -304,7 +313,7 @@ export default {
 .clear-meal-btn {
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: #3498db;
+  background-color: #be0505;
   color: white;
   border: none;
   border-radius: 8px;
