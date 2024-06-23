@@ -8,7 +8,7 @@
     <!-- Recipe Lists and Auth Section -->
     <div class="recipes-section">
       <!-- RecipePreviewList with refresh button shown -->
-      <RecipePreviewList title="Explore this Recipes" class="recipe-card" />
+      <RecipePreviewList title="Explore this Recipes" class="recipe-card" source="explore" />
       
       <!-- Blurred Section with Login and Register buttons for unauthenticated users -->
       <div class="blur-container">
@@ -16,7 +16,7 @@
           title="Last watched recipes"
           :class="{ 'recipe-card': true, blur: !isAuthenticated }"
           :refreshButton="false"
-          disabled
+          source="watched"
         />
         <div v-if="!isAuthenticated" class="auth-message">
           <p>You need to Login to view this:</p>
@@ -31,18 +31,15 @@
         </div>
       </div>
     </div>
-    <!-- <CreateRecipeModal class="recipe-modal"/> -->
   </div>
 </template>
 
 <script>
 import RecipePreviewList from "../components/RecipePreviewList";
-// import CreateRecipeModal from "../pages/CreateRecipeModal";
 
 export default {
   components: {
-    RecipePreviewList,
-    // CreateRecipeModal
+    RecipePreviewList
   },
   computed: {
     isAuthenticated() {
@@ -194,7 +191,6 @@ a {
   transform: translateY(-3px);
   box-shadow: 0 8px 12px rgba(40, 167, 69, 0.1);
 }
-
 
 ::v-deep .blur .recipe-preview {
   pointer-events: none;
