@@ -32,6 +32,7 @@
 <script>
 import RecipePreview from "./RecipePreview.vue";
 import { mockGetRecipesPreview } from "../services/recipes.js";
+import { mockGetWatchedRecipes } from "../services/user.js";
 import { eventBus } from "../services/user.js";
 
 export default {
@@ -47,6 +48,10 @@ export default {
     refreshButton: {
       type: Boolean,
       default: true
+    },
+    source: {
+      type: String,
+      required: true
     }
   },
   data() {
@@ -58,25 +63,31 @@ export default {
     this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
     eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
     eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
-},
-beforeDestroy() {
-  eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
-  eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
+  },
+  beforeDestroy() {
+    eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
+    eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
   },
   methods: {
-    async updateRecipes() {
-      try {
-        const amountToFetch = 3; // Set this to the number of recipes to fetch
-        const response = await mockGetRecipesPreview(amountToFetch); // Mock API call to fetch recipes
-        console.log(response);
-        const recipes = response.data.recipes; // Extract recipes from the response
+  async updateRecipes() {
+    try {
+      let response;
+      if (this.source === 'watched') {
+        response = await mockGetWatchedRecipes(); // Fetch watched recipes
+        let recipes = response.data.recipes; // Extract recipes from the response
         console.log(recipes);
+        recipes = recipes.slice(-3); // Only take the last 3 recipes
         this.recipes = recipes; // Assign fetched recipes to the data property
-      } catch (error) {
-        console.log(error); // Log any errors that occur during the fetch
+      } else {
+        const amountToFetch = 3; // Set this to the number of recipes to fetch
+        response = await mockGetRecipesPreview(amountToFetch); // Fetch explore recipes
+        this.recipes = response.data.recipes; // Assign fetched recipes to the data property
       }
+    } catch (error) {
+      console.log(error); // Log any errors that occur during the fetch
     }
   }
+}
 };
 </script>
 
