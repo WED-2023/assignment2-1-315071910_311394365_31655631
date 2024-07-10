@@ -79,9 +79,15 @@ export default {
         recipes = recipes.slice(-3); // Only take the last 3 recipes
         this.recipes = recipes; // Assign fetched recipes to the data property
       } else {
-        const amountToFetch = 3; // Set this to the number of recipes to fetch
-        response = await mockGetRecipesPreview(amountToFetch); // Fetch explore recipes
-        this.recipes = response.data.recipes; // Assign fetched recipes to the data property
+        // const amountToFetch = 3; // Set this to the number of recipes to fetch
+        // response = await mockGetRecipesPreview(amountToFetch); // Fetch explore recipes
+        // response = await mockGetWatchedRecipes();
+        // this.recipes = response.data.recipes; // Assign fetched recipes to the data property
+        // Fetch explore recipes from server
+        response = await fetch( this.$root.store.server_domain + '/recipes/random');
+        const recipes = await response.json();
+        this.recipes = recipes; // Assign fetched recipes to the data property
+        // this.recipes = response.data.recipes; // Assign fetched recipes to the data property
       }
     } catch (error) {
       console.log(error); // Log any errors that occur during the fetch

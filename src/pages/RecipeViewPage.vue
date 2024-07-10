@@ -8,15 +8,15 @@
           <hr class="title-divider" />
           <div class="recipe-meta">
             <div class="dietary-buttons">
-              <div v-if="glutenFree" class="dietary-item">
+              <div v-if="recipe.glutenFree" class="dietary-item">
                 <img src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/gluten-free2.png?raw=true" alt="Gluten-Free" class="dietary-icon" />
                 <span>Gluten-Free</span>
               </div>
-              <div v-if="vegetarian" class="dietary-item">
+              <div v-if="recipe.vegetarian" class="dietary-item">
                 <img src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/vegetable.png?raw=true" alt="Vegetarian" class="dietary-icon" />
                 <span>Vegetarian</span>
               </div>
-              <div v-if="vegan" class="dietary-item">
+              <div v-if="recipe.vegan" class="dietary-item">
                 <img src="https://github.com/WED-2023/assignment2-1-315071910_311394365_31655631/blob/main/photos/vegan.png?raw=true" alt="Vegan" class="dietary-icon" />
                 <span>Vegan</span>
               </div>
@@ -28,7 +28,7 @@
               </div>
               <div class="item likes">
                 <i class="fas fa-thumbs-up"></i>
-                {{ recipe.aggregateLikes }} likes
+                {{ recipe.popularity }} likes
               </div>
               <div class="item servings">
                 <i class="fas fa-utensils"></i>
@@ -36,7 +36,7 @@
               </div>
             </div>
             <button v-if="$root.store.username" @click.stop.prevent="toggleFavorite" class="favorite-btn" aria-label="Toggle favorite">
-              <i :class="favorite ? 'fas fa-heart active' : 'far fa-heart'"></i>
+              <i :class="this.favorite ? 'fas fa-heart active' : 'far fa-heart'"></i>
               {{ favorite ? 'Remove from My Favorite' : 'Add to My Favorite' }}
             </button>
           </div>
@@ -48,8 +48,8 @@
             <h3>Ingredients</h3>
             <hr class="title-divider" />
             <ul>
-              <li v-for="(ingredient, index) in recipe.extendedIngredients" :key="index + '_' + ingredient.id">
-                {{ ingredient.original }}
+              <li v-for="(ingredient, index) in recipe.ingredients" :key="index">
+                {{ ingredient.amount }} {{ ingredient.name }}
               </li>
             </ul>
           </div>
@@ -57,7 +57,7 @@
             <h3>Instructions</h3>
             <hr class="title-divider" />
             <ol>
-              <li v-for="step in recipe._instructions" :key="step.number">
+              <li v-for="(step, index) in recipe.instructions" :key="index">
                 {{ step.step }}
               </li>
             </ol>
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import {
   mockIsRecipeMarkAsFavorite,
   mockAddFavorite,
@@ -85,105 +86,95 @@ import {
   mockAddRecipeToMealList,
   mockRemoveRecipeFromMeal,
   mockIsRecipeInMyMeal,
-  mockGetUserFullRecipeView,
   mockAddWatchedRecipe
 } from "../services/user.js";
-
-import {
-  mockGetRecipeFullDetails,
-  mockIsRecipeGlutenFree,
-  mockIsRecipeVegetarian,
-  mockIsRecipeVegan,
-} from "../services/recipes.js";
 
 export default {
   data() {
     return {
       recipe: null,
       favorite: false,
-      glutenFree: false,
-      vegetarian: false,
-      vegan: false,
-      addedToMeal: false // New state variable
+      addedToMeal: false
     };
   },
   async created() {
     try {
-      const response = await mockGetUserFullRecipeView(this.$route.params.recipeId);
+      let response;
+      let id = this.$route.params.recipeId;
 
-      const {
-        analyzedInstructions,
-        instructions,
-        extendedIngredients,
-        aggregateLikes,
-        readyInMinutes,
-        servings,
-        image,
-        title,
-        id
-      } = response.data.recipe;
+      try {
+        response = await axios.get( this.$root.store.server_domain + `/recipes/${id}`);
+        if (response.status !== 200) this.$router.replace("/NotFound");
+      } catch (error) {
+        this.$router.replace("/NotFound");
+        return;
+      }
 
-      const _instructions = analyzedInstructions
-        .map((fstep) => {
-          fstep.steps[0].step = fstep.name + fstep.steps[0].step;
-          return fstep.steps;
-        })
-        .reduce((a, b) => [...a, ...b], []);
+      const { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions, servings, isFavorite } = response.data;
+      
+      const formattedInstructions = instructions[0].steps.map(step => ({
+        number: step.number,
+        step: step.step
+      }));
 
-      const _recipe = {
-        instructions,
-        _instructions,
-        analyzedInstructions,
-        extendedIngredients,
-        aggregateLikes,
-        readyInMinutes,
-        servings,
-        image,
-        title,
-        id
-      };
+      this.recipe = { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions: formattedInstructions, servings, isFavorite, id };
 
-      this.recipe = _recipe;
-      await this.loadDietaryInfo();
-      await this.isRecipeMarkAsFavorite();
+      this.favorite = isFavorite;
+
+      // await this.isRecipeMarkAsFavorite();
       await this.checkIfRecipeInMeal();
       
-      // Mark the recipe as watched
       mockAddWatchedRecipe(this.recipe.id);
     } catch (error) {
       console.log(error);
     }
   },
   methods: {
-    async loadDietaryInfo() {
-      const [glutenFreeResponse, vegetarianResponse, veganResponse] = await Promise.all([
-        mockIsRecipeGlutenFree(this.recipe.id),
-        mockIsRecipeVegetarian(this.recipe.id),
-        mockIsRecipeVegan(this.recipe.id)
-      ]);
-
-      this.glutenFree = glutenFreeResponse.data.glutenFree;
-      this.vegetarian = vegetarianResponse.data.vegetarian;
-      this.vegan = veganResponse.data.vegan;
-    },
-    async isRecipeMarkAsFavorite() {
-      const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
-      this.favorite = response.data.favorite;
-    },
+    // async isRecipeMarkAsFavorite() {
+    //   // const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
+    //   // this.favorite = response.data.favorite;
+    //   this.favorite = isFavorite;
+    // },
     async checkIfRecipeInMeal() {
       const response = await mockIsRecipeInMyMeal(this.recipe.id);
       this.addedToMeal = response.data.meal;
     },
-    toggleFavorite() {
+    // toggleFavorite() {
+    //   this.favorite = !this.favorite;
+    //   if (this.favorite) {
+    //     mockAddFavorite(this.recipe.id);
+    //   } else {
+    //     mockRemoveFavorite(this.recipe.id);
+    //   }
+    // },
+    async toggleFavorite() {
+      this.axios.defaults.withCredentials = true;
       this.favorite = !this.favorite;
-      if (this.favorite) {
-        mockAddFavorite(this.recipe.id);
-      } else {
-        mockRemoveFavorite(this.recipe.id);
+      const url =  this.$root.store.server_domain + '/users/favorites';
+      try {
+        if (this.favorite) {
+          await axios.post(
+            url, 
+            { 
+              recipeId: this.recipe.id 
+            }
+          );
+        } else {
+          await axios.delete(
+            url, 
+            { 
+              data: { recipeId: this.recipe.id }
+            }
+          );
+        }
+      this.axios.defaults.withCredentials = false;
+      } catch (error) {
+        this.favorite = !this.favorite;
+        console.error("Error toggling favorite:", error);
       }
-    },
+  },
     addToMeal() {
-      this.addedToMeal = !this.addedToMeal; // Toggle addedToMeal state
+      this.addedToMeal = !this.addedToMeal;
       if (this.addedToMeal) {
         mockAddRecipeToMealList(this.recipe.id);
       } else {

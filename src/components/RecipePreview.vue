@@ -69,7 +69,7 @@
             alt="Likes"
             class="icon_like"
           />
-          {{ recipe.aggregateLikes }} likes
+          {{ recipe.popularity }} likes
         </li>
       </ul>
     </div>
@@ -136,6 +136,7 @@ export default {
     async isRecipeMarkAsFavorite() {
       const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
       this.favorite = response.data.favorite;
+      // this.favorite = this.recipe.favorite;
     },
     async isRecipeWatched() {
       const response = await mockIsRecipeWatched(this.recipe.id);
@@ -143,13 +144,9 @@ export default {
       console.log("Is recipe watched:", this.recipe.id, this.watched);
     },
     async loadDietaryInfo() {
-      const glutenFreeResponse = await mockIsRecipeGlutenFree(this.recipe.id);
-      const vegetarianResponse = await mockIsRecipeVegetarian(this.recipe.id);
-      const veganResponse = await mockIsRecipeVegan(this.recipe.id);
-
-      this.glutenFree = glutenFreeResponse.data.glutenFree;
-      this.vegetarian = vegetarianResponse.data.vegetarian;
-      this.vegan = veganResponse.data.vegan;
+      this.glutenFree = this.recipe.glutenFree;
+      this.vegetarian = this.recipe.vegetarian;
+      this.vegan = this.recipe.vegan;
     },
     onImageLoad() {
       this.image_load = true;
@@ -158,12 +155,38 @@ export default {
       console.error("Image failed to load: " + this.recipe.image);
       this.image_load = false;
     },
-    toggleFavorite() {
-      this.favorite = !this.favorite;
+    // toggleFavorite() {
+    //   this.favorite = !this.favorite;
+    //   if (this.favorite) {
+    //     mockAddFavorite(this.recipe.id);
+    //   } else {
+    //     mockRemoveFavorite(this.recipe.id);
+    //   }
+    // },
+    async toggleFavorite() {
+    // this.axios.defaults.withCredentials = true;
+    this.favorite = !this.favorite;
+    const url =  this.$root.store.server_domain + '/users/favorites';
+    try {
       if (this.favorite) {
-        mockAddFavorite(this.recipe.id);
+        await axios.post(
+          url, 
+          { 
+            recipeId: this.recipe.id 
+          }
+        );
       } else {
-        mockRemoveFavorite(this.recipe.id);
+        await axios.delete(
+          url, 
+          { 
+            data: { recipeId: this.recipe.id }
+          }
+        );
+      }
+      // this.axios.defaults.withCredentials = false;
+      } catch (error) {
+        this.favorite = !this.favorite;
+        console.error("Error toggling favorite:", error);
       }
     },
     markAsWatched() {

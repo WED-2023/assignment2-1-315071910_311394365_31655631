@@ -78,7 +78,15 @@ export default {
     },
     async Login() {
       try {
-        const response = await mockLogin(this.form.username, this.form.password);
+        // const response = await mockLogin(this.form.username, this.form.password);
+          const response = await this.axios.post(
+          this.$root.store.server_domain+"/Login", 
+          {
+            username: this.form.username,
+            password: this.form.password
+          },
+          {withCredentials: true}
+        );
         this.$root.store.login(this.form.username);
         this.$router.push("/");
       } catch (err) {

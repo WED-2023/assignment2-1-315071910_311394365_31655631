@@ -154,6 +154,7 @@
     <br>
   </div>
 </template>
+
 <script>
 import countries from "../assets/countries";
 import {
@@ -242,16 +243,18 @@ export default {
         return;
       }
       try {
-        const userDetails = {
-          username: this.form.username,
-          firstName: this.form.firstName,
-          lastName: this.form.lastName,
-          country: this.form.country,
-          email: this.form.email,
-          password: this.form.password
-        };
-        const response = await mockRegister(userDetails);
-        this.$router.push("/login");
+        const response = await this.axios.post(
+          "http://localhost:80/Register",
+          {
+            username: this.form.username,
+            password: this.form.password,
+            firstname: this.form.firstName,
+            lastname: this.form.lastName,
+            country: this.form.country,
+            email: this.form.email
+          }
+        );
+        this.$router.push("/login"); // move to login page i guess
       } catch (err) {
         this.form.submitError = err.response ? err.response.data.message : "Unknown error";
       }

@@ -105,20 +105,42 @@ export default {
     }
   },
   methods: {
-    logout() {
-      // Call the logout method on the root store
-      this.$root.store.logout();
-      // Clear watched recipes
-      mockClearWatchedRecipes();
-      // Clear process recipes in My Meal plan
-      mockClearProccessRecipesInMealPlan();
-      // Show a toast notification for successful logout
-      this.$root.toast("Logout", "User logged out successfully", "success");
-      // Navigate to the home page
-      this.$router.push("/").catch(() => {
-        this.$forceUpdate();
-      });
-    },
+    async logout() {
+    try {
+      const response = await this.axios.post(
+         this.$root.store.server_domain+"/Logout"
+      );
+      // handle the response if needed
+    } catch (err) {
+      // handle the error if needed
+    }
+    // Call the logout method on the root store
+    this.$root.store.logout();
+    // Clear watched recipes
+    mockClearWatchedRecipes();
+    // Clear process recipes in My Meal plan
+    mockClearProccessRecipesInMealPlan();
+    // Show a toast notification for successful logout
+    this.$root.toast("Logout", "User logged out successfully", "success");
+    // Navigate to the home page
+    this.$router.push("/").catch(() => {
+      this.$forceUpdate();
+    });
+  },
+    // logout() {
+    //   // Call the logout method on the root store
+    //   this.$root.store.logout();
+    //   // Clear watched recipes
+    //   mockClearWatchedRecipes();
+    //   // Clear process recipes in My Meal plan
+    //   mockClearProccessRecipesInMealPlan();
+    //   // Show a toast notification for successful logout
+    //   this.$root.toast("Logout", "User logged out successfully", "success");
+    //   // Navigate to the home page
+    //   this.$router.push("/").catch(() => {
+    //     this.$forceUpdate();
+    //   });
+    // },
     updateMealCount() {
       this.numOfRecipesInMeal = mockGetNumOfRecipesInMeal();
     }
