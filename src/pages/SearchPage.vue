@@ -68,7 +68,7 @@
           <select id="sortBy" v-model="sortBy" @change="handleSort" class="dropdown sort-dropdown">
             <option value="">None</option>
             <option value="readyInMinutes">Ready In Minutes</option>
-            <option value="aggregateLikes">Likes</option>
+            <option value="popularity">Likes</option>
           </select>
         </div>
       </div>
@@ -86,13 +86,25 @@
           <p>No recipes found.</p>
         </div>
       </div>
+
+      <!-- Section to display last search results -->
+      <div class="results" v-if="search_results.length">
+        <h2>Last Search Results</h2>
+        <div class="recipe-list">
+          <RecipePreview 
+            v-for="recipe in search_results" 
+            :key="recipe.id" 
+            :recipe="recipe"
+            class="recipe-preview"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import RecipePreview from "@/components/RecipePreview.vue"; 
-import recipe_preview from "@/assets/mocks/GetRecipeInformation.json"; // TODO: replace it with a mock function.
+import RecipePreview from "@/components/RecipePreview.vue";  // Import your RecipePreview component
 
 export default {
   components: {
@@ -101,7 +113,6 @@ export default {
   data() {
     return {
       searchQuery: '',
-      recipes: Object.values(recipe_preview),
       filteredRecipes: [], // Initial state set to empty
       resultLimit: '5', // Default result limit
       diets: [
@@ -125,43 +136,75 @@ export default {
       selectedDiet: '',
       selectedCuisine: '',
       selectedIntolerance: '',
-      sortBy: ''
+      sortBy: '',
+      LastSearchcalled: false, // Track if the last search has been called
+      search_results: [], // Store the search results
+      hasSearched: false, // Track if a search has been performed
     };
   },
+  mounted() {
+    this.fetchLastSearch(); // Call fetchLastSearch on component mount
+  },
   methods: {
-    handleSearch() {
+    async fetchLastSearch() {
+      try {
+        this.axios.defaults.withCredentials = true;
+        const response = await this.axios.get(
+          this.$root.store.server_domain + "/users/lastSearch"
+        );
+        this.search_results = response.data;
+        this.LastSearchcalled = true;
+        this.axios.defaults.withCredentials = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async handleSearch() {
       if (this.searchQuery.trim() === '') {
         this.filteredRecipes = [];
         return;
       }
       
-      this.filteredRecipes = this.recipes.filter(recipe => {
-        const matchesQuery = recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase());
-        const matchesDiet = this.selectedDiet ? recipe.vegetarian === (this.selectedDiet === "Vegetarian") : true;
-        const matchesCuisine = this.selectedCuisine ? recipe.cuisine === this.selectedCuisine : true;
-        const matchesIntolerance = this.selectedIntolerance 
-          ? !recipe.extendedIngredients.some(ingredient => ingredient.original.includes(this.selectedIntolerance))
-          : true;
-        
-        return matchesQuery && matchesDiet && matchesCuisine && matchesIntolerance;
-      });
-
-      this.filteredRecipes = this.filteredRecipes.slice(0, Number(this.resultLimit));
-      this.handleSort();
+      try {
+        this.axios.defaults.withCredentials = true;
+        const response = await this.axios.get(
+          this.$root.store.server_domain + "/recipes/search",
+          {
+            params: {
+              query: this.searchQuery,
+              number: this.resultLimit,
+              cuisine: this.selectedCuisine,
+              diet: this.selectedDiet,
+              intolerance: this.selectedIntolerance,
+            },
+          }
+        );
+        this.filteredRecipes = response.data;
+        if (this.filteredRecipes.length === 0) {
+          this.noResults = true;
+        } else {
+          this.noResults = false;
+        }
+        this.handleSort();
+        this.axios.defaults.withCredentials = false;
+        this.hasSearched = true; // Mark that a search has been performed
+      } catch (err) {
+        console.log(err);
+      }
     },
     handleSort() {
       if (this.filteredRecipes.length && this.sortBy) {
         this.filteredRecipes.sort((a, b) => {
           if (this.sortBy === 'readyInMinutes') {
             return a.readyInMinutes - b.readyInMinutes;
-          } else if (this.sortBy === 'aggregateLikes') {
-            return b.aggregateLikes - a.aggregateLikes;
+          } else if (this.sortBy === 'popularity') {
+            return b.popularity - a.popularity;
           }
           return 0;
         });
       }
     },
-    resetSearch() {
+    async resetSearch() {
       this.searchQuery = '';
       this.filteredRecipes = [];
       this.selectedDiet = '';
@@ -169,6 +212,8 @@ export default {
       this.selectedIntolerance = '';
       this.sortBy = '';
       this.resultLimit = '5';
+      this.hasSearched = false; // Reset the search flag
+      await this.fetchLastSearch(); // Call fetchLastSearch to display last search results
     }
   }
 };
