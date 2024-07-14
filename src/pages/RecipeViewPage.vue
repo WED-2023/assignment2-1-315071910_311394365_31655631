@@ -170,12 +170,21 @@ export default {
         axios.defaults.withCredentials = false;
       }
     },
-    addToMeal() {
+    async addToMeal() {
       this.addedToMeal = !this.addedToMeal;
-      if (this.addedToMeal) {
-        mockAddRecipeToMealList(this.recipe.id);
-      } else {
-        mockRemoveRecipeFromMeal(this.recipe.id);
+      const url = `${this.$root.store.server_domain}/users/meal_plan`;
+      axios.defaults.withCredentials = true;
+      try {
+        if (this.addedToMeal) {
+          await axios.post(url, { recipeId: this.recipe.id });
+        } else {
+          await axios.delete(url, { data: { recipeId: this.recipe.id } });
+        }
+      } catch (error) {
+        this.addedToMeal = !this.addedToMeal;
+        console.error("Error updating meal plan:", error);
+      } finally {
+        axios.defaults.withCredentials = false;
       }
     },
     startPreparation() {

@@ -3,44 +3,50 @@
     <br>
     <h1 class="title">Meal Planning</h1>
     <div class="meal-planning-container">
-      <div v-if="mealRecipes.length" class="meal-recipes">
-        <div
-          v-for="(recipe, index) in mealRecipes"
-          :key="recipe.id"
-          class="meal-recipe"
-          :class="{ 'dragging': draggingIndex === index }"
-          draggable="true"
-          @dragstart="onDragStart(index, $event)"
-          @dragover="onDragOver($event)"
-          @drop="onDrop(index)"
-          @dragend="onDragEnd"
-        >
-          <div class="meal-recipe-content">
-            <div class="meal-recipe-image-container">
-              <img :src="recipe.image" alt="Recipe Photo" class="meal-recipe-photo" />
-            </div>
-            <div class="meal-recipe-details">
-              <div class="meal-recipe-header">
-                <span class="meal-recipe-number">{{ index + 1 }}. {{ recipe.title }}</span>
-                <button class="remove-btn" @click="removeRecipeFromMeal(recipe.id)">&times;</button>
+      <div v-if="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+      </div>
+      <div v-else>
+        <div v-if="mealRecipes.length" class="meal-recipes">
+          <div
+            v-for="(recipe, index) in mealRecipes"
+            :key="recipe.id"
+            class="meal-recipe"
+            :class="{ 'dragging': draggingIndex === index }"
+            draggable="true"
+            @dragstart="onDragStart(index, $event)"
+            @dragover="onDragOver($event)"
+            @drop="onDrop(index)"
+            @dragend="onDragEnd"
+          >
+            <div class="meal-recipe-content">
+              <div class="meal-recipe-image-container">
+                <img :src="recipe.image" alt="Recipe Photo" class="meal-recipe-photo" />
               </div>
-              <span class="meal-recipe-time"><i class="fas fa-clock"></i> {{ recipe.readyInMinutes }} Minutes</span>
-              <div class="meal-recipe-status" :class="getStatusClass(recipe.status)">
-                <span>{{ recipe.status }}</span>
-                <i :class="getStatusIcon(recipe.status)"></i>
+              <div class="meal-recipe-details">
+                <div class="meal-recipe-header">
+                  <span class="meal-recipe-number">{{ index + 1 }}. {{ recipe.title }}</span>
+                  <button class="remove-btn" @click="removeRecipeFromMeal(recipe.id)">&times;</button>
+                </div>
+                <span class="meal-recipe-time"><i class="fas fa-clock"></i> {{ recipe.readyInMinutes }} Minutes</span>
+                <div class="meal-recipe-status" :class="getStatusClass(recipe.status)">
+                  <span>{{ recipe.status }}</span>
+                  <i :class="getStatusIcon(recipe.status)"></i>
+                </div>
+                <div class="progress-bar-container">
+                  <progress-bar :progress="Math.floor(recipe.progress)" />
+                </div>
+                <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
+                  <i class="fas fa-play-circle"></i> Start Preparation
+                </router-link>
               </div>
-              <div class="progress-bar-container">
-                <progress-bar :progress="Math.floor(recipe.progress)" />
-              </div>
-              <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
-                <i class="fas fa-play-circle"></i> Start Preparation
-              </router-link>
             </div>
           </div>
+          <button class="clear-meal-btn" @click="showClearMealModal">Clear All Recipes From Meal Plan</button>
         </div>
-        <button class="clear-meal-btn" @click="showClearMealModal">Clear All Recipes From Meal Plan</button>
+        <div v-else class="no-recipes">No recipes added to the meal plan yet.</div>
       </div>
-      <div v-else class="no-recipes">No recipes added to the meal plan yet.</div>
     </div>
 
     <!-- Confirmation Modal -->
@@ -52,13 +58,8 @@
 </template>
 
 <script>
+import axios from 'axios';
 import ProgressBar from "../components/ProgressBar";
-import {
-  mockGetMealRecipes,
-  mockRemoveRecipeFromMeal,
-  mockGetRecipeStatus,
-  mockGetProgressInRecipe,
-} from "../services/user.js";
 
 export default {
   name: "MealPlanning",
@@ -69,6 +70,7 @@ export default {
     return {
       mealRecipes: [],
       draggingIndex: null,
+      isLoading: true, // Add isLoading data property
     };
   },
   async mounted() {
@@ -77,12 +79,19 @@ export default {
   methods: {
     async getRecipes() {
       try {
-        const response = await mockGetMealRecipes();
-        this.mealRecipes = response.data.meals.map(recipe => ({
+        const response = await axios.get(`${this.$root.store.server_domain}/users/meal_plan`, {
+          withCredentials: true,
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        this.mealRecipes = response.data.map(recipe => ({
           ...recipe,
           time: recipe.time || 0,
-          status: this.getRecipeStatusText(mockGetRecipeStatus(recipe.id)),
-          progress: mockGetProgressInRecipe(recipe.id) || 0,
+          status: this.getRecipeStatusText(recipe.status),
+          progress: recipe.progress || 0,
         }));
         
         // Restore the saved order if it exists
@@ -92,22 +101,35 @@ export default {
         }
       } catch (error) {
         console.error("Error fetching meal recipes:", error);
+      } finally {
+        this.isLoading = false; // Set isLoading to false after data is fetched
       }
     },
-    removeRecipeFromMeal(recipeId) {
+    async removeRecipeFromMeal(recipeId) {
       this.mealRecipes = this.mealRecipes.filter(recipe => recipe.id !== recipeId);
-      mockRemoveRecipeFromMeal(recipeId);
+      try {
+        await axios.delete(`${this.$root.store.server_domain}/users/meal_plan`, {
+          data: { recipeId: String(recipeId) },
+          withCredentials: true
+        });
+      } catch (error) {
+        console.error("Error removing recipe from meal plan:", error);
+      }
       
       // Save the new order to localStorage
       const order = this.mealRecipes.map(recipe => recipe.id);
       localStorage.setItem('mealRecipesOrder', JSON.stringify(order));
     },
-    clearMeal() {
-      const recipesToRemove = [...this.mealRecipes];
-      for (let i = 0; i < recipesToRemove.length; i++) {
-        this.removeRecipeFromMeal(recipesToRemove[i].id);
+    async clearMeal() {
+      try {
+        await axios.delete(`${this.$root.store.server_domain}/users/meal_plan/all`, {
+          withCredentials: true
+        });
+        this.mealRecipes = [];
+        localStorage.removeItem('mealRecipesOrder'); // Clear the saved order
+      } catch (error) {
+        console.error("Error clearing meal plan:", error);
       }
-      localStorage.removeItem('mealRecipesOrder'); // Clear the saved order
     },
     showClearMealModal() {
       this.$bvModal.show('clear-meal-modal');
@@ -174,7 +196,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .meal-planning-container {
   padding: 20px;
@@ -190,6 +211,38 @@ export default {
   font-size: 36px;
   text-align: center;
   margin-bottom: 20px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full viewport height */
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-top: 10px;
+  font-size: 1.5em;
+  color: #555;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .meal-recipes {
