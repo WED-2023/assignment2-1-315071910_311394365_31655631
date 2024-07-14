@@ -2,9 +2,9 @@
   <div>
     <br />
     <div class="preparation-container" v-if="recipe.title">
-      <h1>{{ recipe.title }}</h1>
+      <h1 class="recipe-title">{{ recipe.title }}</h1>
       <img :src="recipe.image || defaultImage" alt="Recipe Image" class="recipe-image" />
-      <p v-html="recipe.summary"></p>
+      <div v-html="recipe.summary" class="recipe-summary"></div>
       <br />
       <div class="progress-bar-container">
         <ul class="steps-progress">
@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { mockSetStepInRecipe, mockRecipePreparationComplete, mockGetCurrentStep, mockGetUserFullRecipeView } from "../services/user.js";
+import axios from 'axios';
 
 export default {
   data() {
@@ -77,9 +77,14 @@ export default {
       recipe: {
         title: "",
         image: "",
-        summary: "",
-        analyzedInstructions: [{ steps: [] }],
-        extendedIngredients: [],
+        readyInMinutes: 0,
+        popularity: 0,
+        vegan: false,
+        vegetarian: false,
+        glutenFree: false,
+        ingredients: [],
+        instructions: [{ steps: [] }],
+        summary: ""
       },
       servings: 1,
       currentStepIndex: 0,
@@ -98,17 +103,16 @@ export default {
   methods: {
     async fetchRecipe(recipeId) {
       try {
-        const response = await mockGetUserFullRecipeView(recipeId);
-        this.recipe = response.data.recipe;
+        const response = await axios.get(`${this.$root.store.server_domain}/recipes/${recipeId}/formatted`);
+        this.recipe = response.data;
         this.servings = this.recipe.servings;
         // Save the original amounts for adjustment
-        this.recipe.extendedIngredients.forEach(ingredient => {
+        this.recipe.ingredients.forEach(ingredient => {
           ingredient.originalAmount = ingredient.amount;
         });
         this.updateIngredients();
         // Retrieve the current step index when loading the recipe
-        this.currentStepIndex = await mockGetCurrentStep(recipeId);
-        this.updateProgress();
+        this.currentStepIndex = 0; // Assuming you start from the beginning, update if needed
       } catch (error) {
         console.log(error);
       }
@@ -117,24 +121,21 @@ export default {
       if (this.currentStepIndex < this.steps.length - 1) {
         this.currentStepIndex += 1;
         this.currentStepCompleted = false;
-        this.updateProgress();
       }
     },
     prevStep() {
       if (this.currentStepIndex > 0) {
         this.currentStepIndex -= 1;
         this.currentStepCompleted = false;
-        this.updateProgress();
       }
     },
     goToStep(index) {
       this.currentStepIndex = index;
       this.currentStepCompleted = false;
-      this.updateProgress();
     },
     updateIngredients() {
       const factor = this.servings / this.recipe.servings;
-      this.recipe.extendedIngredients = this.recipe.extendedIngredients.map(
+      this.recipe.ingredients = this.recipe.ingredients.map(
         (ingredient) => {
           const adjustedAmount = ingredient.originalAmount * factor;
           return {
@@ -145,32 +146,22 @@ export default {
       );
     },
     completePreparation() {
-      mockRecipePreparationComplete(this.recipe.id);
-      this.currentStepIndex += 1;
-      this.currentStepCompleted = true;
-      this.updateProgress();
       alert("Preparation complete!");
       this.$router.push({ name: 'meal-plan' }); // Navigate to the meal plan page
-    },
-    updateProgress() {
-      mockSetStepInRecipe(this.recipe.id, this.currentStepIndex, this.steps.length);
-    },
+    }
   },
   computed: {
     steps() {
-      return this.recipe.analyzedInstructions[0]?.steps || [];
+      return this.recipe.instructions[0]?.steps || [];
     },
     currentStep() {
       return this.steps[this.currentStepIndex] || {};
-    },
-    progress() {
-      return ((this.currentStepIndex + 1) / this.steps.length) * 100;
     },
     mappedIngredients() {
       if (!this.currentStep.ingredients) return [];
 
       return this.currentStep.ingredients.map(stepIngredient => {
-        const ingredient = this.recipe.extendedIngredients.find(ing => ing.id === stepIngredient.id);
+        const ingredient = this.recipe.ingredients.find(ing => ing.name === stepIngredient.name);
         return {
           ...stepIngredient,
           amount: ingredient ? ingredient.amount : '',
@@ -206,10 +197,25 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+.recipe-title {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 .recipe-image {
   width: 100%;
   height: auto;
   border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.recipe-summary {
+  font-size: 1em; /* Reduced font size */
+  color: #555;
+  line-height: 1.6;
   margin-bottom: 20px;
 }
 

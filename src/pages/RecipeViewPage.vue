@@ -187,16 +187,15 @@ export default {
         axios.defaults.withCredentials = false;
       }
     },
-    startPreparation() {
+    async startPreparation() {
       if (!this.addedToMeal) {
-        this.addToMeal();
+        await this.addToMeal();
       }
       this.$router.push({ name: 'RecipePreparation', params: { recipeId: this.recipe.id } });
     }
   }
 };
 </script>
-
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap");
