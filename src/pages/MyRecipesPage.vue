@@ -3,8 +3,16 @@
     <br>
     <h1 class="title">My Recipes</h1>
     <div class="recipes-container">
+      <!-- If loading, display the loading spinner -->
+      <div v-if="loading" class="loading-spinner">
+        Loading
+        <div class="spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+      </div>
       <!-- If there are recipes, display them in a grid -->
-      <div v-if="recipes.length" class="recipes-grid">
+      <div v-else-if="recipes.length" class="recipes-grid">
         <RecipePreview v-for="r in recipes" :key="r.id" :recipe="r" />
       </div>
       <!-- If there are no recipes, display a message -->
@@ -12,9 +20,10 @@
     </div>
   </div>
 </template>
+
 <script>
 import RecipePreview from "../components/RecipePreview"; // Import the RecipePreview component
-import { mockGetUserRecipes } from "../services/user"; // Import the mock service to get user recipes
+import axios from "axios"; // Import axios for making HTTP requests
 
 export default {
   name: "RecipePreviewList",
@@ -24,6 +33,7 @@ export default {
   data() {
     return {
       recipes: [], // Initialize an empty array for storing user recipes
+      loading: true, // Add a loading state
     };
   },
   mounted() {
@@ -32,16 +42,22 @@ export default {
   methods: {
     // Method to fetch user recipes and update the recipes array
     async updateRecipes() {
+      this.loading = true; // Set loading to true when fetching starts
       try {
-        const response = await mockGetUserRecipes(); // Fetch the user recipes
-        this.recipes = response.data.recipes; // Update the recipes array with the fetched data
+        const response = await axios.get(
+          this.$root.store.server_domain + '/users/my_recipes', { withCredentials: true }
+        ); // Fetch the user recipes
+        this.recipes = response.data;
       } catch (error) {
         console.error("Error fetching user recipes:", error); // Log any errors to the console
+      } finally {
+        this.loading = false; // Set loading to false when fetching ends
       }
     },
   },
 };
 </script>
+
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&display=swap');
@@ -139,6 +155,46 @@ export default {
   color: #888;
   text-align: center;
   margin-top: 20px;
+}
+
+/* Loading spinner styling */
+.loading-spinner {
+  font-size: 1.5em;
+  color: #4caf50; /* Green color for the text */
+  text-align: center;
+  margin-top: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #4caf50; /* Green color for the spinner */
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  animation-delay: -1s;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+  }
 }
 
 /* Responsive styling for smaller screens */

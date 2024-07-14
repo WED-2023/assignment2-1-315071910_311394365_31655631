@@ -80,11 +80,6 @@
 <script>
 import axios from 'axios';
 import {
-  mockIsRecipeMarkAsFavorite,
-  mockAddFavorite,
-  mockRemoveFavorite,
-  mockAddRecipeToMealList,
-  mockRemoveRecipeFromMeal,
   mockIsRecipeInMyMeal,
   mockAddWatchedRecipe
 } from "../services/user.js";
@@ -100,79 +95,81 @@ export default {
   async created() {
     try {
       let response;
-      let id = this.$route.params.recipeId;
+      const id = this.$route.params.recipeId;
 
-      try {
-        response = await axios.get( this.$root.store.server_domain + `/recipes/${id}`);
-        if (response.status !== 200) this.$router.replace("/NotFound");
-      } catch (error) {
+      console.log("Fetching recipe with ID:", id);  // Debugging line
+
+      // Ensure credentials are included with requests
+      axios.defaults.withCredentials = true;
+
+      // Set no-cache headers to bypass cache
+      const config = {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      };
+
+      // Check if id is an integer
+      if (Number.isInteger(parseInt(id))) {
+        response = await axios.get(`${this.$root.store.server_domain}/recipes/${id}`, config);
+      } else {
+        response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${id}`, config);
+      }
+
+      console.log("Response status:", response.status);  // Debugging line
+
+      if (response.status !== 200 && response.status !== 304) {
         this.$router.replace("/NotFound");
         return;
       }
 
-      const { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions, servings, isFavorite } = response.data;
-      
-      const formattedInstructions = instructions[0].steps.map(step => ({
+      const recipeData = response.status === 304 ? this.recipe : response.data;
+      console.log("Fetched recipe data:", recipeData);  // Debugging line
+
+      const { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions, servings, isFavorite } = recipeData;
+
+      const formattedInstructions = instructions.length > 0 && instructions[0].steps ? instructions[0].steps.map(step => ({
         number: step.number,
         step: step.step
-      }));
+      })) : [];
 
       this.recipe = { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions: formattedInstructions, servings, isFavorite, id };
-
       this.favorite = isFavorite;
 
-      // await this.isRecipeMarkAsFavorite();
       await this.checkIfRecipeInMeal();
-      
       mockAddWatchedRecipe(this.recipe.id);
+
+      // Reset credentials after request
+      axios.defaults.withCredentials = false;
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching recipe:", error);  // Debugging line
+      this.$router.replace("/NotFound");
     }
   },
   methods: {
-    // async isRecipeMarkAsFavorite() {
-    //   // const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
-    //   // this.favorite = response.data.favorite;
-    //   this.favorite = isFavorite;
-    // },
     async checkIfRecipeInMeal() {
       const response = await mockIsRecipeInMyMeal(this.recipe.id);
       this.addedToMeal = response.data.meal;
     },
-    // toggleFavorite() {
-    //   this.favorite = !this.favorite;
-    //   if (this.favorite) {
-    //     mockAddFavorite(this.recipe.id);
-    //   } else {
-    //     mockRemoveFavorite(this.recipe.id);
-    //   }
-    // },
     async toggleFavorite() {
-      this.axios.defaults.withCredentials = true;
+      axios.defaults.withCredentials = true;
       this.favorite = !this.favorite;
-      const url =  this.$root.store.server_domain + '/users/favorites';
+      const url = `${this.$root.store.server_domain}/users/favorites`;
       try {
         if (this.favorite) {
-          await axios.post(
-            url, 
-            { 
-              recipeId: this.recipe.id 
-            }
-          );
+          await axios.post(url, { recipeId: this.recipe.id });
         } else {
-          await axios.delete(
-            url, 
-            { 
-              data: { recipeId: this.recipe.id }
-            }
-          );
+          await axios.delete(url, { data: { recipeId: this.recipe.id } });
         }
-      this.axios.defaults.withCredentials = false;
       } catch (error) {
         this.favorite = !this.favorite;
         console.error("Error toggling favorite:", error);
+      } finally {
+        axios.defaults.withCredentials = false;
       }
-  },
+    },
     addToMeal() {
       this.addedToMeal = !this.addedToMeal;
       if (this.addedToMeal) {
@@ -190,6 +187,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap");

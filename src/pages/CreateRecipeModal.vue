@@ -221,6 +221,7 @@
 
 <script>
 import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList } from "@/services/user";
+import axios from 'axios';
 
 export default {
   name: 'CreateRecipeModal',
@@ -341,90 +342,150 @@ export default {
       }
       this.recipe.id = random;
     },
+    // async submitRecipe() {
+    //   await this.getRandomId();
+    //   const newRecipe = {
+    //     ...this.recipe,
+    //     id: this.recipe.id,
+    //     title: this.recipe.title,
+    //     readyInMinutes: this.recipe.readyInMinutes,
+    //     aggregateLikes: this.recipe.aggregateLikes,
+    //     servings: this.recipe.servings,
+    //     image: this.recipe.image,
+    //     summary: this.recipe.summary,
+    //     vegetarian: this.recipe.vegetarian || false,
+    //     vegan: this.recipe.vegan || false,
+    //     glutenFree: this.recipe.glutenFree || false,
+    //     dairyFree: this.recipe.dairyFree || false,
+    //     veryHealthy: this.recipe.veryHealthy || false,
+    //     cheap: this.recipe.cheap || false,
+    //     veryPopular: this.recipe.veryPopular || false,
+    //     sustainable: this.recipe.sustainable || false,
+    //     lowFodmap: this.recipe.lowFodmap || false,
+    //     extendedIngredients: this.recipe.extendedIngredients.map(ingredient => ({
+    //       id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
+    //       aisle: "",
+    //       image: ingredient.image,
+    //       consistency: "SOLID",
+    //       name: ingredient.name,
+    //       nameClean: ingredient.name.toLowerCase(),
+    //       original: `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`,
+    //       originalName: ingredient.name,
+    //       amount: ingredient.amount,
+    //       unit: ingredient.unit,
+    //       meta: [],
+    //       measures: {
+    //         us: {
+    //           amount: ingredient.amount,
+    //           unitShort: ingredient.unit,
+    //           unitLong: ingredient.unit
+    //         },
+    //         metric: {
+    //           amount: ingredient.amount,
+    //           unitShort: ingredient.unit,
+    //           unitLong: ingredient.unit
+    //         }
+    //       }
+    //     })),
+    //     instructions: this.recipe.instructions || "",
+    //     analyzedInstructions: [
+    //       {
+    //         name: "",
+    //         steps: this.recipe.steps.map((step, index) => ({
+    //           number: index + 1,
+    //           step: step.description,
+    //           ingredients: step.ingredients.map(name => {
+    //             const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
+    //             return ingredient ? { id: ingredient.id, name: ingredient.name, image: ingredient.image } : {};
+    //           }),
+    //           equipment: step.equipment.map(name => {
+    //             const equip = this.recipe.equipment.find(e => e.name === name);
+    //             return equip ? { id: equip.id, name: equip.name, image: equip.image } : {};
+    //           })
+    //         }))
+    //       }
+    //     ],
+    //     cuisines: [],
+    //     dishTypes: ["main course"],
+    //     diets: this.getDiets(),
+    //     occasions: [],
+    //     winePairing: {
+    //       pairedWines: [],
+    //       pairingText: "",
+    //       productMatches: []
+    //     },
+    //     originalId: null,
+    //     spoonacularScore: 0.0,
+    //     creditsText: "User Generated",
+    //     license: "CC BY-SA 4.0",
+    //     sourceName: "User",
+    //     pricePerServing: 0 // Add logic to calculate price if needed
+    //   };
+
+    //   mockAddRecipeViewToUserList(newRecipe);
+    //   this.resetForm(); // Reset the form after submission
+    //   this.submitted = true;
+    // },
     async submitRecipe() {
-      await this.getRandomId();
-      const newRecipe = {
-        ...this.recipe,
-        id: this.recipe.id,
+    try {
+      this.axios.defaults.withCredentials = true;
+
+      const formattedIngredients = this.recipe.extendedIngredients.map(ingredient => ({
+        id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
+        name: ingredient.name,
+        localizedName: ingredient.name,
+        image: ingredient.image || ""
+      }));
+
+      const formattedSteps = this.recipe.steps.map((step, index) => ({
+        number: index + 1,
+        step: step.description,
+        ingredients: step.ingredients.map(name => {
+          const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
+          return ingredient ? {
+            id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
+            name: ingredient.name,
+            localizedName: ingredient.name,
+            image: ingredient.image || ""
+          } : {};
+        }),
+        equipment: step.equipment.map(name => {
+          const equip = this.recipe.equipment.find(e => e.name === name);
+          return equip ? {
+            id: equip.id || Math.floor(10000 + Math.random() * 90000),
+            name: equip.name,
+            localizedName: equip.name,
+            image: equip.image || ""
+          } : {};
+        })
+      }));
+
+      const response = await axios.post(this.$root.store.server_domain + '/users/my_recipes', {
+        user_id: this.recipe.id,
         title: this.recipe.title,
         readyInMinutes: this.recipe.readyInMinutes,
-        aggregateLikes: this.recipe.aggregateLikes,
-        servings: this.recipe.servings,
         image: this.recipe.image,
-        summary: this.recipe.summary,
-        vegetarian: this.recipe.vegetarian || false,
-        vegan: this.recipe.vegan || false,
-        glutenFree: this.recipe.glutenFree || false,
-        dairyFree: this.recipe.dairyFree || false,
-        veryHealthy: this.recipe.veryHealthy || false,
-        cheap: this.recipe.cheap || false,
-        veryPopular: this.recipe.veryPopular || false,
-        sustainable: this.recipe.sustainable || false,
-        lowFodmap: this.recipe.lowFodmap || false,
-        extendedIngredients: this.recipe.extendedIngredients.map(ingredient => ({
-          id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
-          aisle: "",
-          image: ingredient.image,
-          consistency: "SOLID",
-          name: ingredient.name,
-          nameClean: ingredient.name.toLowerCase(),
-          original: `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`,
-          originalName: ingredient.name,
-          amount: ingredient.amount,
-          unit: ingredient.unit,
-          meta: [],
-          measures: {
-            us: {
-              amount: ingredient.amount,
-              unitShort: ingredient.unit,
-              unitLong: ingredient.unit
-            },
-            metric: {
-              amount: ingredient.amount,
-              unitShort: ingredient.unit,
-              unitLong: ingredient.unit
-            }
-          }
-        })),
-        instructions: this.recipe.instructions || "",
-        analyzedInstructions: [
-          {
-            name: "",
-            steps: this.recipe.steps.map((step, index) => ({
-              number: index + 1,
-              step: step.description,
-              ingredients: step.ingredients.map(name => {
-                const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
-                return ingredient ? { id: ingredient.id, name: ingredient.name, image: ingredient.image } : {};
-              }),
-              equipment: step.equipment.map(name => {
-                const equip = this.recipe.equipment.find(e => e.name === name);
-                return equip ? { id: equip.id, name: equip.name, image: equip.image } : {};
-              })
-            }))
-          }
-        ],
-        cuisines: [],
-        dishTypes: ["main course"],
-        diets: this.getDiets(),
-        occasions: [],
-        winePairing: {
-          pairedWines: [],
-          pairingText: "",
-          productMatches: []
-        },
-        originalId: null,
-        spoonacularScore: 0.0,
-        creditsText: "User Generated",
-        license: "CC BY-SA 4.0",
-        sourceName: "User",
-        pricePerServing: 0 // Add logic to calculate price if needed
-      };
+        popularity: this.recipe.aggregateLikes,
+        vegetarian: this.recipe.vegetarian,
+        vegan: this.recipe.vegan,
+        glutenFree: this.recipe.glutenFree,
+        servings: this.recipe.servings,
+        ingredients: formattedIngredients,
+        instructions: [{
+          name: "",
+          steps: formattedSteps
+        }]
+      });
 
-      mockAddRecipeViewToUserList(newRecipe);
-      this.resetForm(); // Reset the form after submission
-      this.submitted = true;
-    },
+      if (response.status === 201) {
+        this.resetForm();
+        this.submitted = true;
+      }
+      this.axios.defaults.withCredentials = false;
+    } catch (error) {
+      console.error('Error creating recipe:', error);
+    }
+  },
     getDiets() {
       const diets = [];
       if (this.recipe.vegetarian) diets.push("vegetarian");
