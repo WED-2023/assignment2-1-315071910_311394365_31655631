@@ -128,14 +128,14 @@ export default {
       const recipeData = response.status === 304 ? this.recipe : response.data;
       console.log("Fetched recipe data:", recipeData);  // Debugging line
 
-      const { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions, servings, isFavorite } = recipeData;
+      const { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions, servings, isFavorite, inMyMeal } = recipeData;
 
       const formattedInstructions = instructions.length > 0 && instructions[0].steps ? instructions[0].steps.map(step => ({
         number: step.number,
         step: step.step
       })) : [];
 
-      this.recipe = { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions: formattedInstructions, servings, isFavorite, id };
+      this.recipe = { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions: formattedInstructions, servings, isFavorite, id, inMyMeal };
       this.favorite = isFavorite;
 
       await this.checkIfRecipeInMeal();
@@ -150,8 +150,8 @@ export default {
   },
   methods: {
     async checkIfRecipeInMeal() {
-      const response = await mockIsRecipeInMyMeal(this.recipe.id);
-      this.addedToMeal = response.data.meal;
+      // const response = await mockIsRecipeInMyMeal(this.recipe.id);
+      this.addedToMeal = this.recipe.inMyMeal;
     },
     async toggleFavorite() {
       axios.defaults.withCredentials = true;
@@ -178,7 +178,7 @@ export default {
         if (this.addedToMeal) {
           await axios.post(url, { recipeId: this.recipe.id });
         } else {
-          await axios.delete(url, { data: { recipeId: this.recipe.id } });
+          await axios.delete(url, { data: { recipeId: String(this.recipe.id) } });
         }
       } catch (error) {
         this.addedToMeal = !this.addedToMeal;

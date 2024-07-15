@@ -20,10 +20,9 @@
       <div v-else class="image-placeholder">
         <i class="fas fa-spinner fa-pulse placeholder-icon"></i>
       </div>
-      <div class="favorite-icon-container" v-if="$root.store.username">
+      <div class="favorite-icon-container" v-if="$root.store.username" @click.stop="toggleFavorite">
         <i
           :class="favorite ? 'fas fa-heart favorite-icon active' : 'far fa-heart favorite-icon'"
-          @click.stop.prevent="toggleFavorite"
         ></i>
       </div>
       <div class="dietary-tabs" v-if="glutenFree || vegetarian || vegan">
@@ -77,6 +76,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import {
   mockAddFavorite,
   mockRemoveFavorite,
@@ -134,9 +134,12 @@ export default {
       }
     },
     async isRecipeMarkAsFavorite() {
-      const response = await mockIsRecipeMarkAsFavorite(this.recipe.id);
-      this.favorite = response.data.favorite;
-      // this.favorite = this.recipe.favorite;
+      try {
+        const response = await axios.get(`${this.$root.store.server_domain}/recipes/${this.recipe.id}`);
+        this.favorite = response.data.isFavorite;
+      } catch (error) {
+        console.error("Error fetching favorite status:", error);
+      }
     },
     async isRecipeWatched() {
       const response = await mockIsRecipeWatched(this.recipe.id);
@@ -155,38 +158,21 @@ export default {
       console.error("Image failed to load: " + this.recipe.image);
       this.image_load = false;
     },
-    // toggleFavorite() {
-    //   this.favorite = !this.favorite;
-    //   if (this.favorite) {
-    //     mockAddFavorite(this.recipe.id);
-    //   } else {
-    //     mockRemoveFavorite(this.recipe.id);
-    //   }
-    // },
     async toggleFavorite() {
-    // this.axios.defaults.withCredentials = true;
-    this.favorite = !this.favorite;
-    const url =  this.$root.store.server_domain + '/users/favorites';
-    try {
-      if (this.favorite) {
-        await axios.post(
-          url, 
-          { 
-            recipeId: this.recipe.id 
-          }
-        );
-      } else {
-        await axios.delete(
-          url, 
-          { 
-            data: { recipeId: this.recipe.id }
-          }
-        );
-      }
-      // this.axios.defaults.withCredentials = false;
+      axios.defaults.withCredentials = true;
+      this.favorite = !this.favorite;
+      const url = `${this.$root.store.server_domain}/users/favorites`;
+      try {
+        if (this.favorite) {
+          await axios.post(url, { recipeId: this.recipe.id });
+        } else {
+          await axios.delete(url, { data: { recipeId: this.recipe.id } });
+        }
       } catch (error) {
         this.favorite = !this.favorite;
         console.error("Error toggling favorite:", error);
+      } finally {
+        axios.defaults.withCredentials = false;
       }
     },
     markAsWatched() {
@@ -265,6 +251,7 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
   transition: box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .favorite-icon-container:hover {
@@ -274,7 +261,6 @@ body {
 .favorite-icon {
   color: #e74c3c;
   font-size: 24px;
-  cursor: pointer;
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
@@ -335,7 +321,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* background-color: rgba(118, 75, 25, 0.588); */
   transition: transform 0.3s ease;
 }
 
@@ -344,19 +329,19 @@ body {
 }
 
 .dietary-icon-gluten {
-  width: 180%; /* Adjust these values to control the size of the icon */
+  width: 180%;
   height: 180%;
   object-fit: contain;
 }
 
 .dietary-icon-vegan {
-  width: 100%; /* Adjust these values to control the size of the icon */
+  width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
 .dietary-icon-vegetarian {
-  width: 120%; /* Adjust these values to control the size of the icon */
+  width: 120%;
   height: 120%;
   object-fit: contain;
 }
