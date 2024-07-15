@@ -103,7 +103,13 @@ export default {
   methods: {
     async fetchRecipe(recipeId) {
       try {
-        const response = await axios.get(`${this.$root.store.server_domain}/recipes/${recipeId}/formatted`);
+        this.axios.defaults.withCredentials = true;
+        let response;
+        if (typeof recipeId === 'number') {
+          response = await axios.get(`${this.$root.store.server_domain}/recipes/${recipeId}/formatted`);
+        } else {
+          response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${recipeId}`);
+        }
         this.recipe = response.data;
         this.servings = this.recipe.servings;
         // Save the original amounts for adjustment
@@ -113,6 +119,7 @@ export default {
         this.updateIngredients();
         // Retrieve the current step index when loading the recipe
         this.currentStepIndex = 0; // Assuming you start from the beginning, update if needed
+        this.axios.defaults.withCredentials =false;
       } catch (error) {
         console.log(error);
       }
@@ -206,11 +213,13 @@ body {
 }
 
 .recipe-image {
-  width: 100%;
-  height: auto;
+  width: 700px;
+  height: 400px;
   border-radius: 12px;
   margin-bottom: 20px;
+  margin-left: 30px;
 }
+
 
 .recipe-summary {
   font-size: 1em; /* Reduced font size */

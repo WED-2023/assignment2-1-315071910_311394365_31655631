@@ -13,22 +13,12 @@
           <!-- Recipe Image -->
           <div class="form-group">
             <label>Recipe Image</label>
-            <div class="toggle-switch">
-              <input type="radio" id="url" value="url" v-model="imageOption" class="toggle-input" />
-              <label for="url" class="toggle-label url">URL</label>
-              <input type="radio" id="upload" value="upload" v-model="imageOption" class="toggle-input" />
-              <label for="upload" class="toggle-label upload">Upload</label>
-              <span class="toggle-slider" :class="{'toggle-slider-right': imageOption === 'upload'}"></span>
-            </div>
-            <div v-if="imageOption === 'url'" class="image-input">
-              <input type="url" v-model="recipe.image" placeholder="Image URL" required />
-            </div>
-            <div v-if="imageOption === 'upload'" class="image-input">
-              <input type="file" @change="onImageUpload" accept="image/*" />
+            <div class="image-input">
+              <input type="url" v-model="recipe.image" placeholder="Image URL" required maxlength="300" />
             </div>
           </div>
 
-          <!-- Ready Time, Servings, and Likes -->
+          <!-- Ready Time, Servings -->
           <div class="form-group">
             <label for="readyInMinutes">Ready Time In Minutes</label>
             <input type="number" v-model="recipe.readyInMinutes" id="readyInMinutes" required />
@@ -36,10 +26,6 @@
           <div class="form-group">
             <label for="servings">Servings</label>
             <input type="number" v-model="recipe.servings" id="servings" required />
-          </div>
-          <div class="form-group">
-            <label for="aggregateLikes">Aggregate Likes</label>
-            <input type="number" v-model="recipe.aggregateLikes" id="aggregateLikes" required />
           </div>
 
           <!-- Dietary Options -->
@@ -49,19 +35,13 @@
               <label><input type="checkbox" v-model="recipe.vegetarian" /> Vegetarian</label>
               <label><input type="checkbox" v-model="recipe.vegan" /> Vegan</label>
               <label><input type="checkbox" v-model="recipe.glutenFree" /> Gluten Free</label>
-              <label><input type="checkbox" v-model="recipe.dairyFree" /> Dairy Free</label>
-              <label><input type="checkbox" v-model="recipe.veryHealthy" /> Very Healthy</label>
-              <label><input type="checkbox" v-model="recipe.cheap" /> Cheap</label>
-              <label><input type="checkbox" v-model="recipe.veryPopular" /> Very Popular</label>
-              <label><input type="checkbox" v-model="recipe.sustainable" /> Sustainable</label>
-              <label><input type="checkbox" v-model="recipe.lowFodmap" /> Low Fodmap</label>
             </div>
           </div>
 
           <!-- Ingredients -->
           <div class="form-group">
             <label for="ingredients">Ingredients</label>
-            <div v-for="(ingredient, index) in recipe.extendedIngredients" :key="index" class="ingredient">
+            <div v-for="(ingredient, index) in recipe.extendedIngredients" :key="index" class="ingredient framed">
               <div class="ingredient-details">
                 <input type="text" v-model="ingredient.name" placeholder="Ingredient Name" required />
                 <input type="number" v-model="ingredient.amount" placeholder="Amount" required />
@@ -75,17 +55,12 @@
                 <div class="toggle-switch">
                   <input type="radio" :id="'url-' + index" value="url" v-model="ingredient.imageOption" class="toggle-input" />
                   <label :for="'url-' + index" class="toggle-label url">URL</label>
-                  <input type="radio" :id="'upload-' + index" value="upload" v-model="ingredient.imageOption" class="toggle-input" />
-                  <label :for="'upload-' + index" class="toggle-label upload">Upload</label>
                   <input type="radio" :id="'none-' + index" value="none" v-model="ingredient.imageOption" class="toggle-input" />
                   <label :for="'none-' + index" class="toggle-label none">None</label>
-                  <span class="toggle-slider" :class="{'toggle-slider-right': ingredient.imageOption === 'upload', 'toggle-slider-none': ingredient.imageOption === 'none'}"></span>
+                  <span class="toggle-slider" :class="{'toggle-slider-none': ingredient.imageOption === 'none'}"></span>
                 </div>
                 <div v-if="ingredient.imageOption === 'url'" class="image-input">
-                  <input type="url" v-model="ingredient.image" placeholder="Image URL" />
-                </div>
-                <div v-if="ingredient.imageOption === 'upload'" class="image-input">
-                  <input type="file" @change="onIngredientImageUpload($event, index)" accept="image/*" />
+                  <input type="url" v-model="ingredient.image" placeholder="Image URL" maxlength="300" />
                 </div>
               </div>
             </div>
@@ -95,7 +70,7 @@
           <!-- Equipment -->
           <div class="form-group">
             <label for="equipment">Equipment</label>
-            <div v-for="(equip, index) in recipe.equipment" :key="index" class="equipment">
+            <div v-for="(equip, index) in recipe.equipment" :key="index" class="equipment framed">
               <div class="equipment-details">
                 <input type="text" v-model="equip.name" placeholder="Equipment Name" required />
                 <button @click="removeEquipment(index)" type="button" class="remove-btn">X</button>
@@ -107,17 +82,12 @@
                 <div class="toggle-switch">
                   <input type="radio" :id="'equip-url-' + index" value="url" v-model="equip.imageOption" class="toggle-input" />
                   <label :for="'equip-url-' + index" class="toggle-label url">URL</label>
-                  <input type="radio" :id="'equip-upload-' + index" value="upload" v-model="equip.imageOption" class="toggle-input" />
-                  <label :for="'equip-upload-' + index" class="toggle-label upload">Upload</label>
                   <input type="radio" :id="'equip-none-' + index" value="none" v-model="equip.imageOption" class="toggle-input" />
                   <label :for="'equip-none-' + index" class="toggle-label none">None</label>
-                  <span class="toggle-slider" :class="{'toggle-slider-right': equip.imageOption === 'upload', 'toggle-slider-none': equip.imageOption === 'none'}"></span>
+                  <span class="toggle-slider" :class="{'toggle-slider-none': equip.imageOption === 'none'}"></span>
                 </div>
                 <div v-if="equip.imageOption === 'url'" class="image-input">
-                  <input type="url" v-model="equip.image" placeholder="Image URL" />
-                </div>
-                <div v-if="equip.imageOption === 'upload'" class="image-input">
-                  <input type="file" @change="onEquipmentImageUpload($event, index)" accept="image/*" />
+                  <input type="url" v-model="equip.image" placeholder="Image URL" maxlength="300" />
                 </div>
               </div>
             </div>
@@ -131,7 +101,7 @@
         </div>
 
         <div v-if="currentScreen === 2">
-          <!-- Screen 2: Steps and Instructions -->
+          <!-- Screen 2: Steps and Summary -->
           <!-- Steps -->
           <div class="form-group">
             <label for="steps">Steps</label>
@@ -180,32 +150,10 @@
             <button @click="addStep" type="button" class="add-btn">Add Step</button>
           </div>
 
-          <!-- Instructions -->
-          <div class="form-group">
-            <label for="instructions">Instructions</label>
-            <textarea v-model="recipe.instructions" id="instructions" required></textarea>
-          </div>
-
-          <!-- Navigation Buttons -->
-          <div class="form-actions">
-            <button @click="prevScreen" type="button" class="prev-btn">Previous</button>
-            <button @click="nextScreen" type="button" class="next-btn">Next</button>
-          </div>
-        </div>
-
-        <div v-if="currentScreen === 3">
-          <!-- Screen 3: Summary and Submission -->
           <!-- Summary -->
           <div class="form-group">
             <label for="summary">Summary</label>
             <textarea v-model="recipe.summary" id="summary" required></textarea>
-          </div>
-
-          <!-- Submission Success Message -->
-          <div v-if="submitted" class="success-message">
-            <h2>Recipe Created Successfully!</h2>
-            <p>Your recipe has been created and saved successfully.</p>
-            <p>Now you can close this window.</p>
           </div>
 
           <!-- Navigation Buttons -->
@@ -220,11 +168,16 @@
 </template>
 
 <script>
+import { BModal, BToast } from 'bootstrap-vue';
 import { mockCheckIfIdNumberExist, mockAddRecipeViewToUserList } from "@/services/user";
 import axios from 'axios';
 
 export default {
   name: 'CreateRecipeModal',
+  components: {
+    BModal,
+    BToast
+  },
   data() {
     return {
       recipe: this.getInitialRecipe(),
@@ -245,12 +198,6 @@ export default {
         vegetarian: false,
         vegan: false,
         glutenFree: false,
-        dairyFree: false,
-        veryHealthy: false,
-        cheap: false,
-        veryPopular: false,
-        sustainable: false,
-        lowFodmap: false,
         extendedIngredients: [
           {
             name: '',
@@ -267,15 +214,14 @@ export default {
             equipment: []
           }
         ],
-        instructions: '',
+        summary: '',
         equipment: [
           {
             name: '',
             image: '',
             imageOption: 'none'
           }
-        ],
-        summary: ''
+        ]
       };
     },
     addIngredient() {
@@ -304,36 +250,6 @@ export default {
         list.push(item);
       }
     },
-    onImageUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          this.recipe.image = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    onIngredientImageUpload(event, index) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          this.recipe.extendedIngredients[index].image = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    onEquipmentImageUpload(event, index) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          this.recipe.equipment[index].image = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
     getRandomId() {
       let random;
       random = Math.floor(10000 + Math.random() * 90000);
@@ -342,156 +258,94 @@ export default {
       }
       this.recipe.id = random;
     },
-    // async submitRecipe() {
-    //   await this.getRandomId();
-    //   const newRecipe = {
-    //     ...this.recipe,
-    //     id: this.recipe.id,
-    //     title: this.recipe.title,
-    //     readyInMinutes: this.recipe.readyInMinutes,
-    //     aggregateLikes: this.recipe.aggregateLikes,
-    //     servings: this.recipe.servings,
-    //     image: this.recipe.image,
-    //     summary: this.recipe.summary,
-    //     vegetarian: this.recipe.vegetarian || false,
-    //     vegan: this.recipe.vegan || false,
-    //     glutenFree: this.recipe.glutenFree || false,
-    //     dairyFree: this.recipe.dairyFree || false,
-    //     veryHealthy: this.recipe.veryHealthy || false,
-    //     cheap: this.recipe.cheap || false,
-    //     veryPopular: this.recipe.veryPopular || false,
-    //     sustainable: this.recipe.sustainable || false,
-    //     lowFodmap: this.recipe.lowFodmap || false,
-    //     extendedIngredients: this.recipe.extendedIngredients.map(ingredient => ({
-    //       id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
-    //       aisle: "",
-    //       image: ingredient.image,
-    //       consistency: "SOLID",
-    //       name: ingredient.name,
-    //       nameClean: ingredient.name.toLowerCase(),
-    //       original: `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`,
-    //       originalName: ingredient.name,
-    //       amount: ingredient.amount,
-    //       unit: ingredient.unit,
-    //       meta: [],
-    //       measures: {
-    //         us: {
-    //           amount: ingredient.amount,
-    //           unitShort: ingredient.unit,
-    //           unitLong: ingredient.unit
-    //         },
-    //         metric: {
-    //           amount: ingredient.amount,
-    //           unitShort: ingredient.unit,
-    //           unitLong: ingredient.unit
-    //         }
-    //       }
-    //     })),
-    //     instructions: this.recipe.instructions || "",
-    //     analyzedInstructions: [
-    //       {
-    //         name: "",
-    //         steps: this.recipe.steps.map((step, index) => ({
-    //           number: index + 1,
-    //           step: step.description,
-    //           ingredients: step.ingredients.map(name => {
-    //             const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
-    //             return ingredient ? { id: ingredient.id, name: ingredient.name, image: ingredient.image } : {};
-    //           }),
-    //           equipment: step.equipment.map(name => {
-    //             const equip = this.recipe.equipment.find(e => e.name === name);
-    //             return equip ? { id: equip.id, name: equip.name, image: equip.image } : {};
-    //           })
-    //         }))
-    //       }
-    //     ],
-    //     cuisines: [],
-    //     dishTypes: ["main course"],
-    //     diets: this.getDiets(),
-    //     occasions: [],
-    //     winePairing: {
-    //       pairedWines: [],
-    //       pairingText: "",
-    //       productMatches: []
-    //     },
-    //     originalId: null,
-    //     spoonacularScore: 0.0,
-    //     creditsText: "User Generated",
-    //     license: "CC BY-SA 4.0",
-    //     sourceName: "User",
-    //     pricePerServing: 0 // Add logic to calculate price if needed
-    //   };
-
-    //   mockAddRecipeViewToUserList(newRecipe);
-    //   this.resetForm(); // Reset the form after submission
-    //   this.submitted = true;
-    // },
     async submitRecipe() {
-    try {
-      this.axios.defaults.withCredentials = true;
+      try {
+        axios.defaults.withCredentials = true;
 
-      const formattedIngredients = this.recipe.extendedIngredients.map(ingredient => ({
-        id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
-        name: ingredient.name,
-        localizedName: ingredient.name,
-        image: ingredient.image || ""
-      }));
+        const formattedIngredients = this.recipe.extendedIngredients.map(ingredient => ({
+          name: ingredient.name,
+          amount: ingredient.amount,
+          unit: ingredient.unit
+        }));
 
-      const formattedSteps = this.recipe.steps.map((step, index) => ({
-        number: index + 1,
-        step: step.description,
-        ingredients: step.ingredients.map(name => {
-          const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
-          return ingredient ? {
-            id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
-            name: ingredient.name,
-            localizedName: ingredient.name,
-            image: ingredient.image || ""
-          } : {};
-        }),
-        equipment: step.equipment.map(name => {
-          const equip = this.recipe.equipment.find(e => e.name === name);
-          return equip ? {
-            id: equip.id || Math.floor(10000 + Math.random() * 90000),
-            name: equip.name,
-            localizedName: equip.name,
-            image: equip.image || ""
-          } : {};
-        })
-      }));
+        const formattedSteps = this.recipe.steps.map((step, index) => ({
+          number: index + 1,
+          step: step.description,
+          ingredients: step.ingredients.map(name => {
+            const ingredient = this.recipe.extendedIngredients.find(ing => ing.name === name);
+            return ingredient ? {
+              id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
+              name: ingredient.name,
+              localizedName: ingredient.name,
+              image: ingredient.image || ""
+            } : {};
+          }),
+          equipment: step.equipment.map(name => {
+            const equip = this.recipe.equipment.find(e => e.name === name);
+            return equip ? {
+              id: equip.id || Math.floor(10000 + Math.random() * 90000),
+              name: equip.name,
+              localizedName: equip.name,
+              image: equip.image || ""
+            } : {};
+          })
+        }));
 
-      const response = await axios.post(this.$root.store.server_domain + '/users/my_recipes', {
-        user_id: this.recipe.id,
-        title: this.recipe.title,
-        readyInMinutes: this.recipe.readyInMinutes,
-        image: this.recipe.image,
-        popularity: this.recipe.aggregateLikes,
-        vegetarian: this.recipe.vegetarian,
-        vegan: this.recipe.vegan,
-        glutenFree: this.recipe.glutenFree,
-        servings: this.recipe.servings,
-        ingredients: formattedIngredients,
-        instructions: [{
-          name: "",
-          steps: formattedSteps
-        }]
-      });
+        const formattedTopIngredients = this.recipe.extendedIngredients.map(ingredient => ({
+          id: ingredient.id || Math.floor(10000 + Math.random() * 90000),
+          name: ingredient.name
+        }));
 
-      if (response.status === 201) {
-        this.resetForm();
-        this.submitted = true;
+        const formattedTopEquipment = this.recipe.equipment.map(equip => ({
+          id: equip.id || Math.floor(10000 + Math.random() * 90000),
+          name: equip.name
+        }));
+
+        const response = await axios.post(this.$root.store.server_domain + '/users/my_recipes', {
+          user_id: this.recipe.id,
+          title: this.recipe.title,
+          readyInMinutes: this.recipe.readyInMinutes,
+          image: this.recipe.image,
+          popularity: this.recipe.aggregateLikes,
+          vegan: this.recipe.vegan,
+          vegetarian: this.recipe.vegetarian,
+          glutenFree: this.recipe.glutenFree,
+          servings: this.recipe.servings,
+          ingredients: formattedIngredients,
+          instructions: [{
+            name: "",
+            steps: formattedSteps
+          }],
+          parsedInstructions: [{
+            name: "",
+            steps: formattedSteps
+          }],
+          topIngredients: formattedTopIngredients,
+          topEquipment: formattedTopEquipment,
+          summary: this.recipe.summary
+        });
+
+        if (response.status === 201) {
+          this.resetForm();
+          this.$bvToast.toast('Your recipe has been created successfully!', {
+            title: 'Success',
+            variant: 'success',
+            solid: true,
+            autoHideDelay: 5000,
+            toaster: 'b-toaster-top-center'
+          });
+          this.$bvModal.hide('create-recipe-modal');
+        }
+        axios.defaults.withCredentials = false;
+      } catch (error) {
+        console.error('Error creating recipe:', error);
       }
-      this.axios.defaults.withCredentials = false;
-    } catch (error) {
-      console.error('Error creating recipe:', error);
-    }
-  },
+    },
     getDiets() {
       const diets = [];
       if (this.recipe.vegetarian) diets.push("vegetarian");
       if (this.recipe.vegan) diets.push("vegan");
       if (this.recipe.glutenFree) diets.push("gluten free");
-      if (this.recipe.dairyFree) diets.push("dairy free");
       return diets;
     },
     resetForm() {
@@ -501,7 +355,7 @@ export default {
       this.currentScreen = 1;
     },
     nextScreen() {
-      if (this.currentScreen < 3) {
+      if (this.currentScreen < 2) {
         this.currentScreen++;
       }
     },
@@ -563,10 +417,21 @@ export default {
   height: 100px;
 }
 
+.image-input {
+  margin-top: 10px;
+}
+
+.framed {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
 .toggle-switch {
   display: flex;
   position: relative;
-  width: 210px;
+  width: 140px;
   height: 34px;
   background: #e0e0e0;
   border-radius: 17px;
@@ -600,16 +465,8 @@ export default {
   z-index: 1;
 }
 
-.toggle-slider-right {
-  left: 70px;
-}
-
 .toggle-slider-none {
-  left: 140px;
-}
-
-.image-input {
-  margin-top: 10px;
+  left: 70px;
 }
 
 .checkbox-group {
