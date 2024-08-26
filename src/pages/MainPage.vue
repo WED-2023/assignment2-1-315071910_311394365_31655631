@@ -8,9 +8,9 @@
     <!-- Recipe Lists and Auth Section -->
     <div class="recipes-section">
       <!-- RecipePreviewList with refresh button shown -->
-      <RecipePreviewList title="Explore this Recipes" class="recipe-card" source="explore" />
+      <RecipePreviewList title="Explore these Recipes" class="recipe-card" source="explore" />
       
-      <!-- Blurred Section with Login and Register buttons for unauthenticated users -->
+      <!-- Blurred Section with Login form for unauthenticated users -->
       <div class="blur-container">
         <RecipePreviewList
           title="Last watched recipes"
@@ -18,16 +18,56 @@
           :refreshButton="false"
           source="watched"
         />
-        <div v-if="!isAuthenticated" class="auth-message">
-          <p>You need to Login to view this:</p>
-          <div class="auth-buttons">
-            <router-link to="/login" tag="button" class="login-button">
-              Login
-            </router-link>
-            <router-link to="/register" tag="button" class="register-button">
-              Register
-            </router-link>
-          </div>
+
+        <!-- Show login form if user is not authenticated -->
+        <div v-if="!isAuthenticated" class="auth-form">
+          <b-card class="login-card shadow-sm p-4">
+            <h1 class="login-prompt text-center mb-4">You need to Login to view this:</h1>
+            <b-form @submit.prevent="onLogin">
+              <b-form-group label="Username:" label-for="Username" label-cols-sm="3">
+                <b-form-input
+                  id="Username"
+                  v-model="$v.form.username.$model"
+                  type="text"
+                  :state="validateState('username')"
+                  placeholder="Enter your username"
+                  class="rounded-pill"
+                  required
+                ></b-form-input>
+                <b-form-invalid-feedback v-if="!$v.form.username.required">
+                  Username is required
+                </b-form-invalid-feedback>
+              </b-form-group>
+
+              <b-form-group label="Password:" label-for="Password" label-cols-sm="3">
+                <b-form-input
+                  id="Password"
+                  type="password"
+                  v-model="$v.form.password.$model"
+                  :state="validateState('password')"
+                  placeholder="Enter your password"
+                  class="rounded-pill"
+                  required
+                ></b-form-input>
+                <b-form-invalid-feedback v-if="!$v.form.password.required">
+                  Password is required
+                </b-form-invalid-feedback>
+              </b-form-group>
+
+              <div class="d-flex justify-content-center">
+                <b-button type="submit" variant="primary" class="rounded-pill px-4">Login</b-button>
+              </div>
+
+              <div class="text-center mt-3">
+                Don't have an account yet?
+                <router-link to="/register" class="text-primary font-weight-bold">Register here</router-link>
+              </div>
+            </b-form>
+          </b-card>
+
+          <b-alert v-if="form.submitError" variant="danger" dismissible class="mt-3">
+            Login failed: {{ form.submitError }}
+          </b-alert>
         </div>
       </div>
     </div>
@@ -36,22 +76,70 @@
 
 <script>
 import RecipePreviewList from "../components/RecipePreviewList";
+import { required } from "vuelidate/lib/validators";
 
 export default {
   components: {
-    RecipePreviewList
+    RecipePreviewList,
+  },
+  data() {
+    return {
+      form: {
+        username: "",
+        password: "",
+        submitError: undefined,
+      },
+    };
+  },
+  validations: {
+    form: {
+      username: { required },
+      password: { required },
+    },
   },
   computed: {
     isAuthenticated() {
       return !!this.$root.store.username;
-    }
-  }
+    },
+  },
+  methods: {
+    validateState(param) {
+      const { $dirty, $error } = this.$v.form[param];
+      return $dirty ? !$error : null;
+    },
+    async Login() {
+      try {
+        const response = await this.axios.post(
+          `${this.$root.store.server_domain}/Login`,
+          {
+            username: this.form.username,
+            password: this.form.password,
+          },
+          { withCredentials: true }
+        );
+        this.$root.store.login(this.form.username);
+        this.$router.push("/");
+      } catch (err) {
+        this.form.submitError = err.response
+          ? err.response.data.message
+          : "Unknown error";
+      }
+    },
+    onLogin() {
+      this.form.submitError = undefined;
+      this.$v.form.$touch();
+      if (this.$v.form.$anyError) {
+        return;
+      }
+      this.Login();
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&display=swap");
 
 $avatar-size: 32px;
 $body-background: #f0f4f8;
@@ -62,7 +150,7 @@ body {
   height: 100vh;
   margin: 0;
   background-color: $body-background;
-  font-family: 'Open Sans', Arial, sans-serif;
+  font-family: "Open Sans", Arial, sans-serif;
   overflow-x: hidden;
   display: grid;
   place-items: center;
@@ -74,7 +162,7 @@ a {
 }
 
 .main-container {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   padding: 40px 20px;
   display: flex;
   flex-direction: column;
@@ -90,7 +178,7 @@ a {
   font-size: 72px;
   text-transform: uppercase;
   font-weight: 700;
-  font-family: 'Josefin Sans', sans-serif;
+  font-family: "Josefin Sans", sans-serif;
   color: #2c3e50; /* Dark blue */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 128, 255, 0.7); /* Shadow and glow */
 }
@@ -114,9 +202,13 @@ a {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.auth-section {
-  position: relative;
+.auth-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 100%;
+  max-width: 500px;
 }
 
 .blur-container {
@@ -129,72 +221,31 @@ a {
   pointer-events: none;
 }
 
-.auth-message {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
+.login-prompt {
+  font-size: 1.2rem; /* Smaller font size */
   color: #333;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.auth-message p {
-  font-size: 1.4rem;
   margin-bottom: 20px;
-  color: #fff;
+}
+
+.b-form-input {
+  border-radius: 50px;
+  padding: 10px 15px;
+}
+
+.b-button {
+  border-radius: 50px;
+}
+
+.text-primary {
+  color: #007bff !important;
+}
+
+.font-weight-bold {
   font-weight: bold;
 }
 
-.auth-buttons {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-}
-
-.login-button,
-.register-button {
-  padding: 12px 25px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-  font-weight: bold;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-}
-
-.login-button {
-  background: rgba(0, 123, 255, 0.4); /* Blue color with transparency */
-}
-
-.login-button:hover {
-  background: rgba(0, 123, 255, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 12px rgba(0, 123, 255, 0.1);
-}
-
-.register-button {
-  background: rgba(40, 167, 69, 0.4); /* Green color with transparency */
-}
-
-.register-button:hover {
-  background: rgba(40, 167, 69, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 12px rgba(40, 167, 69, 0.1);
-}
-
-::v-deep .blur .recipe-preview {
-  pointer-events: none;
-  cursor: default;
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
 @media (max-width: 768px) {
@@ -210,17 +261,9 @@ a {
     width: 95%;
   }
 
-  .login-button,
-  .register-button {
+  .b-form-input,
+  .b-button {
     font-size: 0.9rem;
-  }
-
-  .auth-message {
-    padding: 15px;
-  }
-
-  .auth-message p {
-    font-size: 1.2rem;
   }
 }
 
@@ -237,17 +280,9 @@ a {
     width: 100%;
   }
 
-  .login-button,
-  .register-button {
+  .b-form-input,
+  .b-button {
     font-size: 0.8rem;
-  }
-
-  .auth-message {
-    padding: 10px;
-  }
-
-  .auth-message p {
-    font-size: 1rem;
   }
 }
 </style>
