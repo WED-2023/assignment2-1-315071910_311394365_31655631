@@ -35,9 +35,13 @@
                   <i :class="getStatusIcon(recipe.status)"></i>
                 </div>
                 <div class="progress-bar-container">
-                  <progress-bar :progress="Math.floor(recipe.progress)" />
+                  <progress-bar :progress="Math.floor(recipe.progress * 100)" />
                 </div>
-                <router-link :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }" class="start-preparation">
+                <router-link
+                  :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }"
+                  class="start-preparation"
+                  @click.native="startPreparation(recipe)"
+                >
                   <i class="fas fa-play-circle"></i> Start Preparation
                 </router-link>
               </div>
@@ -70,7 +74,7 @@ export default {
     return {
       mealRecipes: [],
       draggingIndex: null,
-      isLoading: true, // Add isLoading data property
+      isLoading: true,
     };
   },
   async mounted() {
@@ -105,6 +109,22 @@ export default {
         this.isLoading = false; // Set isLoading to false after data is fetched
       }
     },
+    async startPreparation(recipe) {
+      axios.defaults.withCredentials = true;
+      if (recipe.status === "Wait For Processing") {
+        try {
+          await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${recipe.id}/1`, {}, {
+            withCredentials: true
+          });
+          recipe.status = this.getRecipeStatusText("1"); // Update status locally
+        } catch (error) {
+          console.error("Error updating recipe status:", error);
+        }
+        finally{
+          axios.defaults.withCredentials = false;
+        }
+      }
+    },
     async removeRecipeFromMeal(recipeId) {
       this.mealRecipes = this.mealRecipes.filter(recipe => recipe.id !== recipeId);
       try {
@@ -112,6 +132,8 @@ export default {
           data: { recipeId: String(recipeId) },
           withCredentials: true
         });
+        // Emit the event to update meal count
+        this.$root.$emit('update-meal-count');
       } catch (error) {
         console.error("Error removing recipe from meal plan:", error);
       }
@@ -127,6 +149,8 @@ export default {
         });
         this.mealRecipes = [];
         localStorage.removeItem('mealRecipesOrder'); // Clear the saved order
+        // Emit the event to update meal count
+        this.$root.$emit('update-meal-count');
       } catch (error) {
         console.error("Error clearing meal plan:", error);
       }

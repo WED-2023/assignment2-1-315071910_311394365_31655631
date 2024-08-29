@@ -36,7 +36,7 @@
               </div>
             </div>
             <button v-if="$root.store.username" @click.stop.prevent="toggleFavorite" class="favorite-btn" aria-label="Toggle favorite">
-              <i :class="this.favorite ? 'fas fa-heart active' : 'far fa-heart'"></i>
+              <i :class="favorite ? 'fas fa-heart active' : 'far fa-heart'"></i>
               {{ favorite ? 'Remove from My Favorite' : 'Add to My Favorite' }}
             </button>
           </div>
@@ -79,10 +79,7 @@
 
 <script>
 import axios from 'axios';
-import {
-  mockIsRecipeInMyMeal,
-  mockAddWatchedRecipe
-} from "../services/user.js";
+import { mockAddWatchedRecipe } from "../services/user.js";
 
 export default {
   data() {
@@ -94,10 +91,8 @@ export default {
   },
   async created() {
     try {
-      let response;
       const id = this.$route.params.recipeId;
-
-      console.log("Fetching recipe with ID:", id);  // Debugging line
+      console.log("Fetching recipe with ID:", id); // Debugging line
 
       // Ensure credentials are included with requests
       axios.defaults.withCredentials = true;
@@ -111,7 +106,7 @@ export default {
         }
       };
 
-      // Check if id is an integer
+      let response;
       if (Number.isInteger(parseInt(id))) {
         response = await axios.get(`${this.$root.store.server_domain}/recipes/${id}`, config);
       } else {
@@ -130,15 +125,14 @@ export default {
 
       const { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions, servings, isFavorite, inMyMeal } = recipeData;
 
-      const formattedInstructions = instructions.length > 0 && instructions[0].steps ? instructions[0].steps.map(step => ({
-        number: step.number,
-        step: step.step
-      })) : [];
+      const formattedInstructions = instructions.length > 0 && instructions[0].steps
+        ? instructions[0].steps.map(step => ({ number: step.number, step: step.step }))
+        : [];
 
       this.recipe = { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions: formattedInstructions, servings, isFavorite, id, inMyMeal };
       this.favorite = isFavorite;
 
-      await this.checkIfRecipeInMeal();
+      this.addedToMeal = this.recipe.inMyMeal;
       mockAddWatchedRecipe(this.recipe.id);
 
       // Reset credentials after request
@@ -149,10 +143,6 @@ export default {
     }
   },
   methods: {
-    async checkIfRecipeInMeal() {
-      // const response = await mockIsRecipeInMyMeal(this.recipe.id);
-      this.addedToMeal = this.recipe.inMyMeal;
-    },
     async toggleFavorite() {
       axios.defaults.withCredentials = true;
       this.favorite = !this.favorite;
@@ -180,6 +170,8 @@ export default {
         } else {
           await axios.delete(url, { data: { recipeId: String(this.recipe.id) } });
         }
+        // Emit the event to update meal count
+        this.$root.$emit('update-meal-count');
       } catch (error) {
         this.addedToMeal = !this.addedToMeal;
         console.error("Error updating meal plan:", error);
@@ -210,7 +202,6 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  font-family: 'Arial', sans-serif;
   padding: 40px;
   box-sizing: border-box;
 }
@@ -275,6 +266,15 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 5px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.dietary-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dietary-icon {
@@ -324,21 +324,6 @@ body {
   color: #fff;
 }
 
-.dietary-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.dietary-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
 .time-likes {
   display: flex;
   gap: 20px;
@@ -364,9 +349,6 @@ body {
 }
 
 .time-likes i {
-  background-color: #f1f1f1;
-  border-radius: 50%;
-  padding: 0px;
   font-size: 1.5rem;
   color: #555;
   transition: transform 0.3s ease;
@@ -420,9 +402,9 @@ body {
   border-top: 1px solid #eee;
 }
 
-.add-to-meal {
+.add-to-meal,
+.start-preparation {
   padding: 12px 24px;
-  background-color: #76c7c0; /* Teal */
   color: white;
   border: none;
   border-radius: 24px;
@@ -432,6 +414,10 @@ body {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
+}
+
+.add-to-meal {
+  background-color: #76c7c0; /* Teal */
 }
 
 .add-to-meal i {
@@ -457,18 +443,7 @@ body {
 }
 
 .start-preparation {
-  padding: 12px 24px;
   background-color: #0e9a5b; /* Green */
-  color: white;
-  border: none;
-  border-radius: 24px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-  text-decoration: none; /* Remove underline */
-  display: flex;
-  align-items: center;
 }
 
 .start-preparation i {

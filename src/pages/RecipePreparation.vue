@@ -95,6 +95,7 @@ export default {
   async created() {
     if (this.$route.params.recipeId) {
       await this.fetchRecipe(this.$route.params.recipeId);
+      await this.fetchCurrentStep(this.$route.params.recipeId);
     }
   },
   watch: {
@@ -112,33 +113,43 @@ export default {
         }
         this.recipe = response.data;
         this.servings = this.recipe.servings;
-        // Save the original amounts for adjustment
         this.recipe.ingredients.forEach(ingredient => {
           ingredient.originalAmount = ingredient.amount;
         });
         this.updateIngredients();
-        // Retrieve the current step index when loading the recipe
-        this.currentStepIndex = 0; // Assuming you start from the beginning, update if needed
         this.axios.defaults.withCredentials =false;
       } catch (error) {
         console.log(error);
+      }
+    },
+    async fetchCurrentStep(recipeId) {
+      try {
+        const response = await axios.get(`${this.$root.store.server_domain}/users/meal_plan/${recipeId}/step`, {
+          withCredentials: true
+        });
+        this.currentStepIndex = response.data.step || 0;
+      } catch (error) {
+        console.error("Error fetching current step:", error);
       }
     },
     nextStep() {
       if (this.currentStepIndex < this.steps.length - 1) {
         this.currentStepIndex += 1;
         this.currentStepCompleted = false;
+        this.saveCurrentStep();
       }
     },
     prevStep() {
       if (this.currentStepIndex > 0) {
         this.currentStepIndex -= 1;
         this.currentStepCompleted = false;
+        this.saveCurrentStep();
       }
     },
     goToStep(index) {
       this.currentStepIndex = index;
       this.currentStepCompleted = false;
+      this.saveCurrentStep();
     },
     updateIngredients() {
       const factor = this.servings / this.recipe.servings;
@@ -152,9 +163,42 @@ export default {
         }
       );
     },
-    completePreparation() {
+    async saveCurrentStep() {
+      const recipeId = this.$route.params.recipeId;
+      if (!recipeId) {
+        console.error("Recipe ID is undefined!");
+        return;
+      }
+
+      try {
+        await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${recipeId}/step/${this.currentStepIndex}`, {
+          withCredentials: true
+        });
+
+        await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${recipeId}/progress/${(this.currentStepIndex/this.steps.length)}`, {
+          withCredentials: true
+        });
+      } catch (error) {
+        console.error("Error saving current step and progress:", error);
+      }
+    },
+    async completePreparation() {
+      this.currentStepIndex = this.steps.length;
+      this.saveCurrentStep();
+
+      try {
+          await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${this.$route.params.recipeId}/2`, {}, {
+            withCredentials: true
+          });
+          recipe.status = this.getRecipeStatusText("1"); // Update status locally
+        } catch (error) {
+          console.error("Error updating recipe status:", error);
+      }
+
       alert("Preparation complete!");
-      this.$router.push({ name: 'meal-plan' }); // Navigate to the meal plan page
+
+      // Navigate to the meal plan page
+      this.$router.push({ name: 'meal-plan' });
     }
   },
   computed: {
