@@ -106,15 +106,21 @@ export default {
   methods: {
     async logout() {
       try {
-        const response = await this.axios.post(`${this.$root.store.server_domain}/Logout`);
+        await this.axios.post(`${this.$root.store.server_domain}/users/resetAllMealPlan`);
       } catch (err) {
-        console.error("Error during logout:", err);
+        console.error("Error during the first logout step:", err);
+      } finally {
+        try {
+          await this.axios.post(`${this.$root.store.server_domain}/Logout`);
+        } catch (err) {
+          console.error("Error during the second logout step:", err);
+        }
+        this.$root.store.logout();
+        this.$root.toast("Logout", "User logged out successfully", "success");
+        this.$router.push("/").catch(() => {
+          this.$forceUpdate();
+        });
       }
-      this.$root.store.logout();
-      this.$root.toast("Logout", "User logged out successfully", "success");
-      this.$router.push("/").catch(() => {
-        this.$forceUpdate();
-      });
     },
     async updateMealCount() {
       try {

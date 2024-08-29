@@ -1,70 +1,99 @@
 <template>
   <div>
     <br />
-    <div class="preparation-container" v-if="recipe.title">
-      <h1 class="recipe-title">{{ recipe.title }}</h1>
-      <img :src="recipe.image || defaultImage" alt="Recipe Image" class="recipe-image" />
-      <div v-html="recipe.summary" class="recipe-summary"></div>
-      <br />
-      <div class="progress-bar-container">
-        <ul class="steps-progress">
-          <li
-            v-for="(step, index) in steps"
-            :key="index"
-            :class="{
-              active: currentStepIndex === index,
-              completed: currentStepIndex > index
-            }"
-            @click="goToStep(index)"
-          >
-            <span>
-              <template v-if="currentStepIndex > index">✓</template>
-              <template v-else>{{ index + 1 }}</template>
-            </span>
-            <p :class="{ 'current-step': currentStepIndex === index }">Step {{ index + 1 }}</p>
-          </li>
-        </ul>
-      </div>
-      <div class="servings-selector">
-        <label for="servings">Serving:</label>
-        <input type="number" id="servings" v-model.number="servings" min="1" @change="updateIngredients" />
-      </div>
-      <div class="content-container">
-        <div class="ingredients-equipment">
-          <div class="ingredients" v-if="currentStep.ingredients && currentStep.ingredients.length">
-            <h3>Ingredients:</h3>
-            <ul>
-              <li v-for="ingredient in mappedIngredients" :key="ingredient.id">
-                <img :src="ingredient.image || defaultImage" alt="Ingredient Image" class="item-image" />
-                <span>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.name }}</span>
-              </li>
-            </ul>
-          </div>
-          <div class="equipment" v-if="currentStep.equipment && currentStep.equipment.length">
-            <h3>Equipment:</h3>
-            <ul>
-              <li v-for="equipment in currentStep.equipment" :key="equipment.id">
-                <img :src="equipment.image || defaultImage" alt="Equipment Image" class="item-image" />
-                <span>{{ equipment.name }}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="step-details">
-          <h3>Step {{ currentStep.number }}:</h3>
-          <p>{{ currentStep.step }}</p>
-        </div>
-        <div class="navigation-buttons">
-          <button @click="prevStep" :disabled="currentStepIndex === 0">Prev</button>
-          <button v-if="currentStepIndex < steps.length - 1" @click="nextStep">Next</button>
-          <button v-else @click="completePreparation">Done</button>
-        </div>
-      </div>
+    <!-- Loading Indicator -->
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p class="loading-text">Loading...</p>
     </div>
+    <!-- Recipe Preparation Content -->
     <div v-else>
-      <p>Loading...</p>
+      <div v-if="recipe.title" class="preparation-container">
+        <h1 class="recipe-title">{{ recipe.title }}</h1>
+        <img
+          :src="recipe.image || defaultImage"
+          alt="Recipe Image"
+          class="recipe-image"
+          @error="handleImageError"
+        />
+        <div v-html="recipe.summary" class="recipe-summary"></div>
+        <br />
+        <div class="progress-bar-container">
+          <ul class="steps-progress">
+            <li
+              v-for="(step, index) in steps"
+              :key="index"
+              :class="{
+                active: currentStepIndex === index,
+                completed: currentStepIndex > index
+              }"
+              @click="goToStep(index)"
+            >
+              <span>
+                <template v-if="currentStepIndex > index">✓</template>
+                <template v-else>{{ index + 1 }}</template>
+              </span>
+              <p :class="{ 'current-step': currentStepIndex === index }">Step {{ index + 1 }}</p>
+            </li>
+          </ul>
+        </div>
+        <div class="servings-selector">
+          <label for="servings">Serving:</label>
+          <input
+            type="number"
+            id="servings"
+            v-model.number="servings"
+            min="1"
+            @change="updateIngredients"
+          />
+        </div>
+        <div class="content-container">
+          <div class="ingredients-equipment">
+            <div class="ingredients" v-if="currentStep.ingredients && currentStep.ingredients.length">
+              <h3>Ingredients:</h3>
+              <ul>
+                <li v-for="ingredient in mappedIngredients" :key="ingredient.id">
+                  <img
+                    :src="getIngredientImageUrl(ingredient.image)"
+                    alt="Ingredient Image"
+                    class="item-image"
+                    @error="handleImageError"
+                  />
+                  <span>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.name }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="equipment" v-if="currentStep.equipment && currentStep.equipment.length">
+              <h3>Equipment:</h3>
+              <ul>
+                <li v-for="equipment in currentStep.equipment" :key="equipment.id">
+                  <img
+                    :src="equipment.image"
+                    alt="Equipment Image"
+                    class="item-image"
+                    @error="handleImageError"
+                  />
+                  <span>{{ equipment.name }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="step-details">
+            <h3>Step {{ currentStep.number }}:</h3>
+            <p>{{ currentStep.step }}</p>
+          </div>
+          <div class="navigation-buttons">
+            <button @click="prevStep" :disabled="currentStepIndex === 0">Prev</button>
+            <button v-if="currentStepIndex < steps.length - 1" @click="nextStep">Next</button>
+            <button v-else @click="completePreparation">Done</button>
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <p>No recipe found.</p>
+      </div>
     </div>
-    <br>
+    <br />
   </div>
 </template>
 
@@ -88,8 +117,8 @@ export default {
       },
       servings: 1,
       currentStepIndex: 0,
-      currentStepCompleted: false,
       defaultImage: "https://cdn.icon-icons.com/icons2/2436/PNG/512/recipe_cutlery_spoon_fork_icon_147447.png",
+      loading: true,
     };
   },
   async created() {
@@ -97,14 +126,11 @@ export default {
       await this.fetchRecipe(this.$route.params.recipeId);
       await this.fetchCurrentStep(this.$route.params.recipeId);
     }
-  },
-  watch: {
-    "$route.params.recipeId": "fetchRecipe",
+    this.loading = false;
   },
   methods: {
     async fetchRecipe(recipeId) {
       try {
-        this.axios.defaults.withCredentials = true;
         let response;
         if (typeof recipeId === 'number') {
           response = await axios.get(`${this.$root.store.server_domain}/recipes/${recipeId}/formatted`);
@@ -117,9 +143,8 @@ export default {
           ingredient.originalAmount = ingredient.amount;
         });
         this.updateIngredients();
-        this.axios.defaults.withCredentials =false;
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching recipe:", error);
       }
     },
     async fetchCurrentStep(recipeId) {
@@ -135,33 +160,28 @@ export default {
     nextStep() {
       if (this.currentStepIndex < this.steps.length - 1) {
         this.currentStepIndex += 1;
-        this.currentStepCompleted = false;
         this.saveCurrentStep();
       }
     },
     prevStep() {
       if (this.currentStepIndex > 0) {
         this.currentStepIndex -= 1;
-        this.currentStepCompleted = false;
         this.saveCurrentStep();
       }
     },
     goToStep(index) {
       this.currentStepIndex = index;
-      this.currentStepCompleted = false;
       this.saveCurrentStep();
     },
     updateIngredients() {
       const factor = this.servings / this.recipe.servings;
-      this.recipe.ingredients = this.recipe.ingredients.map(
-        (ingredient) => {
-          const adjustedAmount = ingredient.originalAmount * factor;
-          return {
-            ...ingredient,
-            amount: adjustedAmount.toFixed(2),
-          };
-        }
-      );
+      this.recipe.ingredients = this.recipe.ingredients.map((ingredient) => {
+        const adjustedAmount = ingredient.originalAmount * factor;
+        return {
+          ...ingredient,
+          amount: adjustedAmount.toFixed(2),
+        };
+      });
     },
     async saveCurrentStep() {
       const recipeId = this.$route.params.recipeId;
@@ -186,20 +206,26 @@ export default {
       this.currentStepIndex = this.steps.length;
       this.saveCurrentStep();
 
-      try {
-          await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${this.$route.params.recipeId}/2`, {}, {
-            withCredentials: true
-          });
-          recipe.status = this.getRecipeStatusText("1"); // Update status locally
-        } catch (error) {
-          console.error("Error updating recipe status:", error);
-      }
+      // try {
+      //   await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${this.$route.params.recipeId}/2`, {}, {
+      //     withCredentials: true
+      //   });
+      // } catch (error) {
+      //   console.error("Error updating recipe status:", error);
+      // }
 
       alert("Preparation complete!");
 
       // Navigate to the meal plan page
       this.$router.push({ name: 'meal-plan' });
-    }
+    },
+    handleImageError(event) {
+      event.target.src = this.defaultImage;
+    },
+    getIngredientImageUrl(image) {
+      const baseUrl = "https://spoonacular.com/cdn/ingredients_100x100/";
+      return `${baseUrl}${image}`;
+    },
   },
   computed: {
     steps() {
@@ -211,15 +237,15 @@ export default {
     mappedIngredients() {
       if (!this.currentStep.ingredients) return [];
 
-      return this.currentStep.ingredients.map(stepIngredient => {
-        const ingredient = this.recipe.ingredients.find(ing => ing.name === stepIngredient.name);
+      return this.currentStep.ingredients.map((stepIngredient) => {
+        const ingredient = this.recipe.ingredients.find((ing) => ing.name === stepIngredient.name);
         return {
           ...stepIngredient,
           amount: ingredient ? ingredient.amount : '',
           unit: ingredient ? ingredient.unit : ''
         };
       });
-    }
+    },
   },
 };
 </script>
@@ -236,6 +262,56 @@ export default {
 body {
   font-family: "Roboto", sans-serif;
   background-color: #f4f4f4;
+}
+
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top: 6px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #ffffff;
+  font-size: 1.5em;
+  font-weight: 500;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .preparation-container {
@@ -263,7 +339,6 @@ body {
   margin-bottom: 20px;
   margin-left: 30px;
 }
-
 
 .recipe-summary {
   font-size: 1em; /* Reduced font size */

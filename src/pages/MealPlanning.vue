@@ -30,17 +30,16 @@
                   <button class="remove-btn" @click="removeRecipeFromMeal(recipe.id)">&times;</button>
                 </div>
                 <span class="meal-recipe-time"><i class="fas fa-clock"></i> {{ recipe.readyInMinutes }} Minutes</span>
-                <div class="meal-recipe-status" :class="getStatusClass(recipe.status)">
-                  <span>{{ recipe.status }}</span>
-                  <i :class="getStatusIcon(recipe.status)"></i>
+                <div class="meal-recipe-status" :class="getStatusClass(recipe.progress)">
+                  <span>{{ getRecipeStatusText(recipe.progress) }}</span>
+                  <i :class="getStatusIcon(recipe.progress)"></i>
                 </div>
                 <div class="progress-bar-container">
                   <progress-bar :progress="Math.floor(recipe.progress * 100)" />
                 </div>
                 <router-link
                   :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }"
-                  class="start-preparation"
-                  @click.native="startPreparation(recipe)"
+                  class="start-preparation"                  
                 >
                   <i class="fas fa-play-circle"></i> Start Preparation
                 </router-link>
@@ -93,8 +92,6 @@ export default {
         });
         this.mealRecipes = response.data.map(recipe => ({
           ...recipe,
-          time: recipe.time || 0,
-          status: this.getRecipeStatusText(recipe.status),
           progress: recipe.progress || 0,
         }));
         
@@ -107,22 +104,6 @@ export default {
         console.error("Error fetching meal recipes:", error);
       } finally {
         this.isLoading = false; // Set isLoading to false after data is fetched
-      }
-    },
-    async startPreparation(recipe) {
-      axios.defaults.withCredentials = true;
-      if (recipe.status === "Wait For Processing") {
-        try {
-          await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${recipe.id}/1`, {}, {
-            withCredentials: true
-          });
-          recipe.status = this.getRecipeStatusText("1"); // Update status locally
-        } catch (error) {
-          console.error("Error updating recipe status:", error);
-        }
-        finally{
-          axios.defaults.withCredentials = false;
-        }
       }
     },
     async removeRecipeFromMeal(recipeId) {
@@ -180,41 +161,35 @@ export default {
     onDragEnd() {
       this.draggingIndex = null;
     },
-    getStatusClass(status) {
-      switch (status) {
-        case "Wait For Processing":
-          return "status-wait";
-        case "In Process":
-          return "status-process";
-        case "Complete!":
-          return "status-ready";
-        default:
-          return "";
+    getStatusClass(progress) {
+      if (progress === 0) {
+        return "status-wait";
+      } else if (progress > 0 && progress < 1) {
+        return "status-process";
+      } else if (progress === 1) {
+        return "status-ready";
       }
+      return "";
     },
-    getStatusIcon(status) {
-      switch (status) {
-        case "Wait For Processing":
-          return "fas fa-clock";
-        case "In Process":
-          return "fas fa-spinner";
-        case "Complete!":
-          return "fas fa-check-circle";
-        default:
-          return "";
+    getStatusIcon(progress) {
+      if (progress === 0) {
+        return "fas fa-clock";
+      } else if (progress > 0 && progress < 1) {
+        return "fas fa-spinner";
+      } else if (progress === 1) {
+        return "fas fa-check-circle";
       }
+      return "";
     },
-    getRecipeStatusText(status) {
-      switch (status) {
-        case "0":
-          return "Wait For Processing";
-        case "1":
-          return "In Process";
-        case "2":
-          return "Complete!";
-        default:
-          return "Wait For Processing";
+    getRecipeStatusText(progress) {
+      if (progress === 0) {
+        return "Wait For Processing";
+      } else if (progress > 0 && progress < 1) {
+        return "In Process";
+      } else if (progress === 1) {
+        return "Complete!";
       }
+      return "Wait For Processing";
     }
   },
 };

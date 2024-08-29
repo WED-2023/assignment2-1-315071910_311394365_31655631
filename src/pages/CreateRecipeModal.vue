@@ -176,7 +176,7 @@ export default {
   name: 'CreateRecipeModal',
   components: {
     BModal,
-    BToast
+    // BToast
   },
   data() {
     return {
