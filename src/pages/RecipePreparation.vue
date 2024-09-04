@@ -89,13 +89,21 @@
           </div>
         </div>
       </div>
+
+      <!-- No Recipe Found Content -->
       <div v-else>
-        <p>No recipe found.</p>
+        <div class="no-recipe-found-container">
+          <img class="no-recipe-icon" src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="No Recipe" />
+          <h2 class="no-recipe-title">Oops! Recipe Not Found</h2>
+          <p class="no-recipe-message">We couldn't find the recipe you're looking for. Try searching for another recipe or check back later.</p>
+          <router-link to="/" class="back-home-link">Go Back to Home</router-link>
+        </div>
       </div>
     </div>
     <br />
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -135,7 +143,11 @@ export default {
         if (typeof recipeId === 'number') {
           response = await axios.get(`${this.$root.store.server_domain}/recipes/${recipeId}/formatted`);
         } else {
-          response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${recipeId}`);
+          if (recipeId.substring(0, 6) === "FAMILY") {
+            response = await axios.get(`${this.$root.store.server_domain}/recipes/FAMILY/${recipeId}/formatted`);
+          } else {
+            response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${recipeId}`);
+          }
         }
         this.recipe = response.data;
         this.servings = this.recipe.servings;
@@ -195,7 +207,7 @@ export default {
           withCredentials: true
         });
 
-        await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${recipeId}/progress/${(this.currentStepIndex/this.steps.length)}`, {
+        await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${recipeId}/progress/${(this.currentStepIndex / this.steps.length)}`, {
           withCredentials: true
         });
       } catch (error) {
@@ -205,18 +217,7 @@ export default {
     async completePreparation() {
       this.currentStepIndex = this.steps.length;
       this.saveCurrentStep();
-
-      // try {
-      //   await axios.post(`${this.$root.store.server_domain}/users/meal_plan/${this.$route.params.recipeId}/2`, {}, {
-      //     withCredentials: true
-      //   });
-      // } catch (error) {
-      //   console.error("Error updating recipe status:", error);
-      // }
-
       alert("Preparation complete!");
-
-      // Navigate to the meal plan page
       this.$router.push({ name: 'meal-plan' });
     },
     handleImageError(event) {
@@ -236,7 +237,6 @@ export default {
     },
     mappedIngredients() {
       if (!this.currentStep.ingredients) return [];
-
       return this.currentStep.ingredients.map((stepIngredient) => {
         const ingredient = this.recipe.ingredients.find((ing) => ing.name === stepIngredient.name);
         return {
@@ -249,6 +249,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
@@ -270,7 +271,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -341,7 +342,7 @@ body {
 }
 
 .recipe-summary {
-  font-size: 1em; /* Reduced font size */
+  font-size: 1em;
   color: #555;
   line-height: 1.6;
   margin-bottom: 20px;
@@ -508,5 +509,50 @@ button:disabled {
 button:hover:not(:disabled) {
   background-color: #2980b9;
   transform: scale(1.05);
+}
+
+/* No Recipe Found Styles */
+.no-recipe-found-container {
+  text-align: center;
+  padding: 50px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 100px auto;
+}
+
+.no-recipe-icon {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.no-recipe-title {
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.no-recipe-message {
+  font-size: 1.2em;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.back-home-link {
+  font-size: 1em;
+  color: #3498db;
+  text-decoration: none;
+  padding: 10px 20px;
+  background-color: #ecf0f1;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.back-home-link:hover {
+  background-color: #bdc3c7;
 }
 </style>

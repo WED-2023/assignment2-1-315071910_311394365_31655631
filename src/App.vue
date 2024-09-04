@@ -106,7 +106,9 @@ export default {
   methods: {
     async logout() {
       try {
+        await this.axios.delete(`${this.$root.store.server_domain}/users/deleteWatchedRecipes`);
         await this.axios.post(`${this.$root.store.server_domain}/users/resetAllMealPlan`);
+        this.$root.$emit('clear-last-watched-recipes');
       } catch (err) {
         console.error("Error during the first logout step:", err);
       } finally {
@@ -115,6 +117,7 @@ export default {
         } catch (err) {
           console.error("Error during the second logout step:", err);
         }
+        this.numOfRecipesInMeal = 0; // Reset the meal count to 0
         this.$root.store.logout();
         this.$root.toast("Logout", "User logged out successfully", "success");
         this.$router.push("/").catch(() => {
@@ -124,7 +127,9 @@ export default {
     },
     async updateMealCount() {
       try {
-        const response = await this.axios.get(`${this.$root.store.server_domain}/users/meal_plan/count`);
+        const response = await this.axios.get(`${this.$root.store.server_domain}/users/meal_plan/count`, {
+          headers: { 'Cache-Control': 'no-cache' } // Prevent caching issues
+        });
         this.numOfRecipesInMeal = response.data.mealPlanCount;
       } catch (error) {
         console.error("Error fetching meal plan count:", error);
@@ -132,14 +137,16 @@ export default {
     }
   },
   created() {
-    this.updateMealCount();
-    this.$root.$on('update-meal-count', this.updateMealCount);
+    this.updateMealCount(); // Fetch meal count on initial load
+    this.$root.$on('update-meal-count', this.updateMealCount); // Update when event is emitted
+    this.$root.$on('user-logged-in', this.updateMealCount); // Update after login
   },
   beforeDestroy() {
     this.$root.$off('update-meal-count', this.updateMealCount);
   }
 };
 </script>
+
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); // Import Roboto font

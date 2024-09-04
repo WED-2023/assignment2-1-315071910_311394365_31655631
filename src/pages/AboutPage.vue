@@ -51,20 +51,20 @@ export default {
       teamMembers: [
         {
           name: "Oded Atias",
-          image: 'https://media.licdn.com/dms/image/C4D03AQFYmgayN6_G9w/profile-displayphoto-shrink_800_800/0/1664228380340?e=1723680000&v=beta&t=rnCZyuOw2QkPkLjAcGi6AsYjiBpoqhCjEi77NXvzq8I',
-          bio: "Oded is passionate about web development, focusing on front-end technologies. He enjoys creating interactive and user-friendly interfaces.",
+          image: 'https://raw.githubusercontent.com/WED-2023/assignment2-1-315071910_311394365_31655631/main/photos/oded_pic.jpeg',
+          // bio: "Oded is passionate about web development, focusing on front-end technologies. He enjoys creating interactive and user-friendly interfaces.",
           projectLink: "https://github.com/WED-2023/311394365"
         },
         {
           name: "Amit Avraham",
-          image: "https://media.licdn.com/dms/image/D4D03AQEPNB1CpHaK8g/profile-displayphoto-shrink_800_800/0/1695924838848?e=1723680000&v=beta&t=Z64WYFPm6qnnPS3ORkS5JwJllrWPxcr2kqF3MjiEzs4",
-          bio: "Amit specializes in full-stack development and loves creating seamless user experiences. He ensures the integration between front-end and back-end systems runs smoothly.",
+          image: "https://raw.githubusercontent.com/WED-2023/assignment2-1-315071910_311394365_31655631/main/photos/amit_pic.jpeg",
+          // bio: "Amit specializes in full-stack development and loves creating seamless user experiences. He ensures the integration between front-end and back-end systems runs smoothly.",
           projectLink: "https://github.com/WED-2023/315071910"
         },
         {
           name: "Barak Haziz",
-          image: 'https://media.licdn.com/dms/image/D5603AQFoSnq2sdVyoA/profile-displayphoto-shrink_800_800/0/1677411713067?e=1723680000&v=beta&t=n45ph1GBcG97yB8ThcUWJrddIi94XI0x-KrF4k5Y2p8',
-          bio: "Barak has a knack for backend systems and database management, ensuring smooth and efficient operations. He focuses on optimizing performance and reliability.",
+          image: 'https://raw.githubusercontent.com/WED-2023/assignment2-1-315071910_311394365_31655631/main/photos/barak_pic.jpeg',
+          // bio: "Barak has a knack for backend systems and database management, ensuring smooth and efficient operations. He focuses on optimizing performance and reliability.",
           projectLink: "https://github.com/BarakHaziz"
         }
       ]

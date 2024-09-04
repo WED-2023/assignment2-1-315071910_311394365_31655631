@@ -9,7 +9,7 @@
     <div class="recipes-section">
       <!-- RecipePreviewList with refresh button shown -->
       <RecipePreviewList title="Explore these Recipes" class="recipe-card" source="explore" />
-      
+
       <!-- Blurred Section with Login form for unauthenticated users -->
       <div class="blur-container">
         <RecipePreviewList
@@ -117,7 +117,14 @@ export default {
           },
           { withCredentials: true }
         );
+        // Update store with logged-in user
         this.$root.store.login(this.form.username);
+        
+        // Emit events to update the meal plan count and refresh data
+        this.$root.$emit('user-logged-in');
+        this.$root.$emit('update-meal-count');
+
+        // Redirect to the home page after successful login
         this.$router.push("/");
       } catch (err) {
         this.form.submitError = err.response

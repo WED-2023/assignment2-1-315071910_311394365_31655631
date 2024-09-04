@@ -82,9 +82,9 @@
             class="recipe-preview"
           />
         </div>
-        <div v-else class="no-results">
+        <!-- <div v-else class="no-results">
           <p>No recipes found.</p>
-        </div>
+        </div> -->
       </div>
 
       <!-- Section to display last search results -->
@@ -295,24 +295,24 @@ export default {
   background-color: #cc5a5a;
 }
 
-.filter-container {
+/* .filter-container {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
   justify-content: space-between;
-}
+} */
 
 .sort-container {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
 }
-
+/* 
 .filter-group {
   flex: 1;
   min-width: 150px;
-}
+} */
 
 .filter-group label {
   display: block;
@@ -321,15 +321,69 @@ export default {
   color: #f8f8ff; /* Light color for filter labels */
 }
 
+.filter-container {
+  display: flex;
+  flex-wrap: nowrap; /* Prevent wrapping of dropdowns */
+  gap: 0.5%; /* Remove gaps between filter groups */
+  margin-bottom: 15px;
+  justify-content: space-between;
+  margin-right: 0.8%;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 150px;
+  margin-right: 0.8%; /* Remove right margin */
+}
+
 .dropdown {
-  width: 100%;
+  width: 90%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 1em;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: border-color 0.3s, box-shadow 0.3s;
+  height: 45px;
+  margin: 0; /* Remove all margin */
 }
+
+
+
+.radio-item label {
+  background-color: #e0f0ff; /* Light blue background */
+  color: #007BFF; /* Blue text color */
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  display: block;
+  text-align: center;
+  width: 100%; /* Ensure the label width is consistent */
+  height: 45px; /* Set the same height as dropdown for consistency */
+  line-height: 30px; /* Center the text vertically within the label */
+}
+
+.radio-item input[type="radio"]:checked + label {
+  background-color: #007BFF; /* Darker blue when selected */
+  color: #fff; /* White text when selected */
+}
+
+/* .radio-item label {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  text-align: center;
+}
+
+.radio-item input[type="radio"]:checked + label {
+  background-color: #ccc;
+} */
+
 
 .sort-dropdown {
   padding: 5px 10px; /* Shrink the padding to make it smaller */
@@ -362,20 +416,7 @@ export default {
   display: none;
 }
 
-.radio-item label {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  display: block;
-  text-align: center;
-}
 
-.radio-item input[type="radio"]:checked + label {
-  background-color: #ccc;
-}
 
 .results {
   flex: 1;

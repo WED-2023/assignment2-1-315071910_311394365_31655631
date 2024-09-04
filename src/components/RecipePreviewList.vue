@@ -59,25 +59,50 @@ export default {
       recipes: [] // Data property to hold the list of recipes
     };
   },
+
   mounted() {
-    this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
-    eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
-    eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
-  },
-  beforeDestroy() {
-    eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
-    eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
-  },
+  this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
+  eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
+  eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
+
+  // Listen for the logout event to clear last watched recipes if source is "watched"
+  if (this.source === 'watched') {
+    this.$root.$on('clear-last-watched-recipes', this.clearRecipes);
+  }
+},
+beforeDestroy() {
+  eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
+  eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
+
+  // Remove the event listener when the component is destroyed, if source is "watched"
+  if (this.source === 'watched') {
+    this.$root.$off('clear-last-watched-recipes', this.clearRecipes);
+  }
+},
+
+  // mounted() {
+  //   this.updateRecipes(); // Fetch initial set of recipes when the component is mounted
+  //   eventBus.$on('recipe-watched', this.updateRecipes); // Listen for watched event
+  //   eventBus.$on('watched-recipes-cleared', this.updateRecipes); // Listen for clear event
+  // },
+  // beforeDestroy() {
+  //   eventBus.$off('recipe-watched', this.updateRecipes); // Clean up event listener
+  //   eventBus.$off('watched-recipes-cleared', this.updateRecipes); // Clean up event listener
+  // },
+
   methods: {
   async updateRecipes() {
     try {
       let response;
       if (this.source === 'watched') {
-        response = await mockGetWatchedRecipes(); // Fetch watched recipes
-        let recipes = response.data.recipes; // Extract recipes from the response
-        console.log(recipes);
-        recipes = recipes.slice(-3); // Only take the last 3 recipes
-        this.recipes = recipes; // Assign fetched recipes to the data property
+        response = await fetch(this.$root.store.server_domain + '/users/lastWatchedRecipes'); // Fetch last watched recipes from server
+        const data = await response.json();
+        this.recipes = data; // Assign fetched recipes to the data property
+        // response = await mockGetWatchedRecipes(); // Fetch watched recipes
+        // let recipes = response.data.recipes; // Extract recipes from the response
+        // console.log(recipes);
+        // recipes = recipes.slice(-3); // Only take the last 3 recipes
+        // this.recipes = recipes; // Assign fetched recipes to the data property
       } else {
         // const amountToFetch = 3; // Set this to the number of recipes to fetch
         // response = await mockGetRecipesPreview(amountToFetch); // Fetch explore recipes
@@ -92,6 +117,9 @@ export default {
     } catch (error) {
       console.log(error); // Log any errors that occur during the fetch
     }
+  }, 
+  clearRecipes() {
+    this.recipes = []; // Clear the recipes data
   }
 }
 };

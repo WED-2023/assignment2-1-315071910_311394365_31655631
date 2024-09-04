@@ -12,7 +12,7 @@
               v-model="$v.form.username.$model"
               @blur="checkUsername"
               type="text"
-              :state="validateState('username')"
+              :state="usernameTaken ? false : validateState('username')"
               placeholder="Enter your username"
               class="rounded-pill"
             ></b-form-input>
@@ -166,10 +166,10 @@ import {
   sameAs,
   helpers
 } from "vuelidate/lib/validators";
-import { mockRegister, mockCheckIfUserNameExist } from "../services/auth.js";
+import axios from "axios";
 
-const hasNumber = helpers.regex('hasNumber', /\d/);
-const hasSpecial = helpers.regex('hasSpecial', /[\W_]/);
+const hasNumber = helpers.regex("hasNumber", /\d/);
+const hasSpecial = helpers.regex("hasSpecial", /[\W_]/);
 
 export default {
   name: "Register",
@@ -183,10 +183,10 @@ export default {
         email: "",
         password: "",
         confirmedPassword: "",
-        submitError: undefined
+        submitError: undefined,
       },
       countries: [{ value: null, text: "Select your country", disabled: true }].concat(countries),
-      usernameTaken: false
+      usernameTaken: false,
     };
   },
   validations: {
@@ -194,34 +194,34 @@ export default {
       username: {
         required,
         length: (u) => minLength(3)(u) && maxLength(8)(u),
-        alpha
+        alpha,
       },
       firstName: {
         required,
-        alpha
+        alpha,
       },
       lastName: {
         required,
-        alpha
+        alpha,
       },
       country: {
-        required
+        required,
       },
       email: {
         required,
-        email
+        email,
       },
       password: {
         required,
         length: (p) => minLength(5)(p) && maxLength(10)(p),
         hasNumber,
-        hasSpecial
+        hasSpecial,
       },
       confirmedPassword: {
         required,
-        sameAsPassword: sameAs("password")
-      }
-    }
+        sameAsPassword: sameAs("password"),
+      },
+    },
   },
   methods: {
     validateState(param) {
@@ -229,12 +229,18 @@ export default {
       return $dirty ? !$error : null;
     },
     async checkUsername() {
+      if (!this.form.username) return;
+
       try {
-        const response = await mockCheckIfUserNameExist(this.form.username);
-        this.usernameTaken = response.response.data.isExist;
+        // Call the backend API to check if the username exists
+        await axios.get("/check-username", { params: { username: this.form.username } });
+        this.usernameTaken = false; // Username is available
       } catch (err) {
-        console.error(err); // Add logging for debugging
-        this.usernameTaken = false;
+        if (err.response && err.response.status === 409) {
+          this.usernameTaken = true; // Username is taken
+        } else {
+          console.error(err); // Handle other potential errors
+        }
       }
     },
     async Register() {
@@ -243,18 +249,15 @@ export default {
         return;
       }
       try {
-        const response = await this.axios.post(
-          "http://localhost:80/Register",
-          {
-            username: this.form.username,
-            password: this.form.password,
-            firstname: this.form.firstName,
-            lastname: this.form.lastName,
-            country: this.form.country,
-            email: this.form.email
-          }
-        );
-        this.$router.push("/login"); // move to login page i guess
+        const response = await axios.post("http://localhost:80/Register", {
+          username: this.form.username,
+          password: this.form.password,
+          firstname: this.form.firstName,
+          lastname: this.form.lastName,
+          country: this.form.country,
+          email: this.form.email,
+        });
+        this.$router.push("/login"); // Redirect to login page
       } catch (err) {
         this.form.submitError = err.response ? err.response.data.message : "Unknown error";
       }
@@ -275,14 +278,14 @@ export default {
         email: "",
         password: "",
         confirmedPassword: "",
-        submitError: undefined
+        submitError: undefined,
       };
       this.usernameTaken = false;
       this.$v.$reset();
-    }
+    },
   },
   watch: {
-    'form.username': 'checkUsername'
-  }
+    "form.username": "checkUsername", // Watch for changes in username and check availability
+  },
 };
 </script>

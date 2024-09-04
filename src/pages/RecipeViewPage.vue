@@ -49,7 +49,7 @@
             <hr class="title-divider" />
             <ul>
               <li v-for="(ingredient, index) in recipe.ingredients" :key="index">
-                {{ ingredient.amount }} {{ ingredient.name }}
+                {{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.name }}
               </li>
             </ul>
           </div>
@@ -108,9 +108,14 @@ export default {
 
       let response;
       if (Number.isInteger(parseInt(id))) {
-        response = await axios.get(`${this.$root.store.server_domain}/recipes/${id}`, config);
+        response = await axios.get(`${this.$root.store.server_domain}/recipes/markwatched/${id}`, config);
       } else {
-        response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${id}`, config);
+        if (id.substring(0, 6) === "FAMILY") {
+          response = await axios.get(`${this.$root.store.server_domain}/recipes/FAMILY/${id}`, config);
+        }
+        else {
+          response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${id}`, config);
+        }
       }
 
       console.log("Response status:", response.status);  // Debugging line

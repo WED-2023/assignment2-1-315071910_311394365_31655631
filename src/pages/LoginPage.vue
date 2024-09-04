@@ -78,28 +78,41 @@ export default {
     },
     async Login() {
       try {
-        // const response = await mockLogin(this.form.username, this.form.password);
-          const response = await this.axios.post(
-          this.$root.store.server_domain+"/Login", 
+        // Perform the login request to the backend
+        const response = await this.axios.post(
+          this.$root.store.server_domain + "/Login", 
           {
             username: this.form.username,
             password: this.form.password
           },
-          {withCredentials: true}
+          { withCredentials: true }
         );
+
+        // Update the root store with the logged-in user's username
         this.$root.store.login(this.form.username);
+
+        // Directly call updateMealCount after successful login
+        this.$root.$emit('user-logged-in'); // Trigger event if necessary
+        this.$root.$emit('update-meal-count'); // Emit event to update meal count
+
+        // Redirect to the home page after successful login
         this.$router.push("/");
       } catch (err) {
+        // Handle errors and set an error message to display
         this.form.submitError = err.response ? err.response.data.message : "Unknown error";
       }
     },
     onLogin() {
+      // Clear any previous error messages
       this.form.submitError = undefined;
+
+      // Trigger validation
       this.$v.form.$touch();
-      if (this.$v.form.$anyError) {
-        return;
+
+      // If validation passes, proceed with the login
+      if (!this.$v.form.$anyError) {
+        this.Login();
       }
-      this.Login();
     }
   }
 };
