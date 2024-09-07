@@ -79,14 +79,14 @@
 
 <script>
 import axios from 'axios';
-import { mockAddWatchedRecipe } from "../services/user.js";
 
 export default {
   data() {
     return {
       recipe: null,
       favorite: false,
-      addedToMeal: false
+      addedToMeal: false,
+      watched: false,  // State to track if the recipe is marked as watched
     };
   },
   async created() {
@@ -94,26 +94,23 @@ export default {
       const id = this.$route.params.recipeId;
       console.log("Fetching recipe with ID:", id); // Debugging line
 
-      // Ensure credentials are included with requests
       axios.defaults.withCredentials = true;
 
-      // Set no-cache headers to bypass cache
       const config = {
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache',
-          'Expires': '0'
-        }
+          'Expires': '0',
+        },
       };
 
       let response;
       if (Number.isInteger(parseInt(id))) {
-        response = await axios.get(`${this.$root.store.server_domain}/recipes/markwatched/${id}`, config);
+        response = await axios.get(`${this.$root.store.server_domain}/recipes/${id}`, config);
       } else {
         if (id.substring(0, 6) === "FAMILY") {
           response = await axios.get(`${this.$root.store.server_domain}/recipes/FAMILY/${id}`, config);
-        }
-        else {
+        } else {
           response = await axios.get(`${this.$root.store.server_domain}/users/my_recipes/${id}`, config);
         }
       }
@@ -136,11 +133,11 @@ export default {
 
       this.recipe = { title, readyInMinutes, image, popularity, vegan, vegetarian, glutenFree, ingredients, instructions: formattedInstructions, servings, isFavorite, id, inMyMeal };
       this.favorite = isFavorite;
-
       this.addedToMeal = this.recipe.inMyMeal;
-      mockAddWatchedRecipe(this.recipe.id);
 
-      // Reset credentials after request
+      // Replace mockAddWatchedRecipe with actual markAsWatched method
+      await this.markAsWatched();
+
       axios.defaults.withCredentials = false;
     } catch (error) {
       console.error("Error fetching recipe:", error);  // Debugging line
@@ -175,7 +172,6 @@ export default {
         } else {
           await axios.delete(url, { data: { recipeId: String(this.recipe.id) } });
         }
-        // Emit the event to update meal count
         this.$root.$emit('update-meal-count');
       } catch (error) {
         this.addedToMeal = !this.addedToMeal;
@@ -189,10 +185,32 @@ export default {
         await this.addToMeal();
       }
       this.$router.push({ name: 'RecipePreparation', params: { recipeId: this.recipe.id } });
+    },
+    // Mark the recipe as watched when the page is opened
+    async markAsWatched() {
+      if (!this.$root.store.username) {
+        console.log("User not logged in, cannot mark as watched");
+        return;
+      }
+      
+      try {
+        console.log(`Marking recipe ${this.recipe.id} as watched...`);  // Log the request
+        const response = await axios.post(`${this.$root.store.server_domain}/users/markwatched/${this.recipe.id}`);
+        
+        if (response.status === 200) {
+          this.watched = true;
+          console.log(`Recipe ${this.recipe.id} marked as watched`);
+        } else {
+          console.error(`Failed to mark recipe as watched: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error marking recipe as watched:", error);
+      }
     }
   }
 };
 </script>
+
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap");

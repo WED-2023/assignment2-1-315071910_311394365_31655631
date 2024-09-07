@@ -249,7 +249,7 @@ export default {
         return;
       }
       try {
-        const response = await axios.post("http://localhost:80/Register", {
+        const response = await axios.post(this.$root.store.server_domain + "/Register", {
           username: this.form.username,
           password: this.form.password,
           firstname: this.form.firstName,

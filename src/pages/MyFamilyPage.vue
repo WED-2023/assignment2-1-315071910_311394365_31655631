@@ -13,7 +13,8 @@
   <script>
   import RecipePreview from "../components/RecipePreview";
   import { mockGetFamilyRecipes } from "../services/recipes.js";
-  
+  import axios from "axios";
+
   export default {
     name: "RecipePreviewList",
     components: {
@@ -30,8 +31,8 @@
     methods: {
       async updateRecipes() {
         try {
-          const response = mockGetFamilyRecipes();
-          const recipes = response.data.recipes;
+          const response = await axios.get(`${this.$root.store.server_domain}/recipes/allFamily`);
+          const recipes = response.data;
           this.recipes = [];
           this.recipes.push(...recipes);
         } catch (error) {

@@ -1,102 +1,109 @@
 <template>
-  <div class="container">
+  <div>
+    <br>
     <h1 class="title">Search Recipes</h1>
-    <div class="content">
-      <div class="search-bar-container">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="Search for recipes..."
-          class="search-input"
-        />
-        <button @click="handleSearch" class="search-button">Search</button>
-        <button @click="resetSearch" class="reset-button">Reset</button>
-      </div>
-      
-      <div class="filter-container">
-        <!-- Number of Results Filter -->
-        <div class="filter-group">
-          <label>Number of Results</label>
-          <div class="radio-group">
-            <div class="radio-item">
-              <input type="radio" id="limit5" value="5" v-model="resultLimit">
-              <label for="limit5">5</label>
+    <div class="container">
+      <div class="content">
+        <div class="search-bar-container">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Search for recipes..."
+            class="search-input"
+            @keyup.enter="handleSearch" 
+          />
+          <button @click="handleSearch" class="search-button">Search</button>
+          <button @click="resetSearch" class="reset-button">Reset</button>
+        </div>
+
+        <div class="filter-container">
+          <!-- Number of Results Filter -->
+          <div class="filter-group">
+            <label>Number of Results</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" id="limit5" value="5" v-model="resultLimit">
+                <label for="limit5">5</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="limit10" value="10" v-model="resultLimit">
+                <label for="limit10">10</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="limit15" value="15" v-model="resultLimit">
+                <label for="limit15">15</label>
+              </div>
             </div>
-            <div class="radio-item">
-              <input type="radio" id="limit10" value="10" v-model="resultLimit">
-              <label for="limit10">10</label>
-            </div>
-            <div class="radio-item">
-              <input type="radio" id="limit15" value="15" v-model="resultLimit">
-              <label for="limit15">15</label>
-            </div>
+          </div>
+
+          <!-- Diet Filter Dropdown -->
+          <div class="filter-group">
+            <label for="diet" class="filter-label">Diet</label>
+            <select id="diet" v-model="selectedDiet" class="dropdown">
+              <option value="">All Diets</option>
+              <option v-for="diet in diets" :key="diet" :value="diet">{{ diet }}</option>
+            </select>
+          </div>
+
+          <!-- Cuisine Filter Dropdown -->
+          <div class="filter-group">
+            <label for="cuisine" class="filter-label">Cuisine</label>
+            <select id="cuisine" v-model="selectedCuisine" class="dropdown">
+              <option value="">All Cuisines</option>
+              <option v-for="cuisine in cuisines" :key="cuisine" :value="cuisine">{{ cuisine }}</option>
+            </select>
+          </div>
+
+          <!-- Intolerance Filter Dropdown -->
+          <div class="filter-group">
+            <label for="intolerance" class="filter-label">Intolerance</label>
+            <select id="intolerance" v-model="selectedIntolerance" class="dropdown">
+              <option value="">All Intolerances</option>
+              <option v-for="intolerance in intolerances" :key="intolerance" :value="intolerance">{{ intolerance }}</option>
+            </select>
           </div>
         </div>
 
-        <!-- Diet Filter Dropdown -->
-        <div class="filter-group">
-          <label for="diet" class="filter-label">Diet</label>
-          <select id="diet" v-model="selectedDiet" class="dropdown">
-            <option value="">All Diets</option>
-            <option v-for="diet in diets" :key="diet" :value="diet">{{ diet }}</option>
-          </select>
+        <div class="sort-container" v-if="filteredRecipes.length">
+          <!-- Sort By Dropdown -->
+          <div class="filter-group">
+            <label for="sortBy" class="filter-label">Sort By</label>
+            <select id="sortBy" v-model="sortBy" @change="handleSort" class="dropdown sort-dropdown">
+              <option value="">None</option>
+              <option value="readyInMinutes">Ready In Minutes</option>
+              <option value="popularity">Likes</option>
+            </select>
+          </div>
         </div>
 
-        <!-- Cuisine Filter Dropdown -->
-        <div class="filter-group">
-          <label for="cuisine" class="filter-label">Cuisine</label>
-          <select id="cuisine" v-model="selectedCuisine" class="dropdown">
-            <option value="">All Cuisines</option>
-            <option v-for="cuisine in cuisines" :key="cuisine" :value="cuisine">{{ cuisine }}</option>
-          </select>
+        <div class="results">
+          <!-- Recipe List -->
+          <div v-if="filteredRecipes.length" class="recipe-list">
+            <RecipePreview 
+              v-for="recipe in filteredRecipes" 
+              :key="recipe.id" 
+              :recipe="recipe"
+              class="recipe-preview"
+            />
+          </div>
+
+          <!-- No results message, shown only after search is performed -->
+          <div v-if="hasSearched && !filteredRecipes.length" class="no-results">
+            <p>No recipes found matching your search. Try adjusting the filters or search term.</p>
+          </div>
         </div>
 
-        <!-- Intolerance Filter Dropdown -->
-        <div class="filter-group">
-          <label for="intolerance" class="filter-label">Intolerance</label>
-          <select id="intolerance" v-model="selectedIntolerance" class="dropdown">
-            <option value="">All Intolerances</option>
-            <option v-for="intolerance in intolerances" :key="intolerance" :value="intolerance">{{ intolerance }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="sort-container" v-if="filteredRecipes.length">
-        <!-- Sort By Dropdown -->
-        <div class="filter-group">
-          <label for="sortBy" class="filter-label">Sort By</label>
-          <select id="sortBy" v-model="sortBy" @change="handleSort" class="dropdown sort-dropdown">
-            <option value="">None</option>
-            <option value="readyInMinutes">Ready In Minutes</option>
-            <option value="popularity">Likes</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="results">
-        <div v-if="filteredRecipes.length" class="recipe-list">
-          <RecipePreview 
-            v-for="recipe in filteredRecipes" 
-            :key="recipe.id" 
-            :recipe="recipe"
-            class="recipe-preview"
-          />
-        </div>
-        <!-- <div v-else class="no-results">
-          <p>No recipes found.</p>
-        </div> -->
-      </div>
-
-      <!-- Section to display last search results -->
-      <div class="results" v-if="search_results.length">
-        <h2>Last Search Results</h2>
-        <div class="recipe-list">
-          <RecipePreview 
-            v-for="recipe in search_results" 
-            :key="recipe.id" 
-            :recipe="recipe"
-            class="recipe-preview"
-          />
+        <!-- Section to display last search results -->
+        <div class="results" v-if="search_results.length">
+          <h2>Last Search Results</h2>
+          <div class="recipe-list">
+            <RecipePreview 
+              v-for="recipe in search_results" 
+              :key="recipe.id" 
+              :recipe="recipe"
+              class="recipe-preview"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -137,13 +144,12 @@ export default {
       selectedCuisine: '',
       selectedIntolerance: '',
       sortBy: '',
-      LastSearchcalled: false, // Track if the last search has been called
-      search_results: [], // Store the search results
-      hasSearched: false, // Track if a search has been performed
+      search_results: [], // Store the last search results
+      hasSearched: false, // New flag to track if search has been performed
     };
   },
   mounted() {
-    this.fetchLastSearch(); // Call fetchLastSearch on component mount
+    this.fetchLastSearch(); // Fetch the last search results when the component is mounted
   },
   methods: {
     async fetchLastSearch() {
@@ -152,14 +158,15 @@ export default {
         const response = await this.axios.get(
           this.$root.store.server_domain + "/users/lastSearch"
         );
-        this.search_results = response.data;
-        this.LastSearchcalled = true;
+        this.search_results = response.data; // Populate search_results with the last search data
         this.axios.defaults.withCredentials = false;
       } catch (error) {
         console.log(error);
       }
     },
     async handleSearch() {
+      this.hasSearched = true; // Set to true whenever search is initiated
+
       if (this.searchQuery.trim() === '') {
         this.filteredRecipes = [];
         return;
@@ -180,6 +187,7 @@ export default {
           }
         );
         this.filteredRecipes = response.data;
+
         if (this.filteredRecipes.length === 0) {
           this.noResults = true;
         } else {
@@ -187,7 +195,6 @@ export default {
         }
         this.handleSort();
         this.axios.defaults.withCredentials = false;
-        this.hasSearched = true; // Mark that a search has been performed
       } catch (err) {
         console.log(err);
       }
@@ -212,305 +219,15 @@ export default {
       this.selectedIntolerance = '';
       this.sortBy = '';
       this.resultLimit = '5';
-      this.hasSearched = false; // Reset the search flag
-      await this.fetchLastSearch(); // Call fetchLastSearch to display last search results
+      this.hasSearched = false; // Reset search flag on reset
+      await this.fetchLastSearch(); // Fetch the last search results again
     }
   }
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
-.container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  font-family: 'Roboto', sans-serif;
-}
-
-.title {
-  font-size: 2.5em;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
-  color: #333;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-}
-
-.search-bar-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.search-input {
-  padding: 15px;
-  width: 100%;
-  font-size: 1.2em;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: block;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  margin-right: 10px;
-}
-
-.search-input:focus {
-  border-color: #007BFF;
-  outline: none;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-.search-button,
-.reset-button {
-  padding: 10px 15px; /* Shrink the button */
-  font-size: 1.2em;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-left: 10px;
-}
-
-.search-button {
-  background-color: #007BFF;
-  color: white;
-}
-
-.search-button:hover {
-  background-color: #0056b3;
-}
-
-.reset-button {
-  background-color: #FF6B6B;
-  color: white;
-}
-
-.reset-button:hover {
-  background-color: #cc5a5a;
-}
-
-/* .filter-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-  justify-content: space-between;
-} */
-
-.sort-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-/* 
-.filter-group {
-  flex: 1;
-  min-width: 150px;
-} */
-
-.filter-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #f8f8ff; /* Light color for filter labels */
-}
-
-.filter-container {
-  display: flex;
-  flex-wrap: nowrap; /* Prevent wrapping of dropdowns */
-  gap: 0.5%; /* Remove gaps between filter groups */
-  margin-bottom: 15px;
-  justify-content: space-between;
-  margin-right: 0.8%;
-}
-
-.filter-group {
-  flex: 1;
-  min-width: 150px;
-  margin-right: 0.8%; /* Remove right margin */
-}
-
-.dropdown {
-  width: 90%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1em;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.3s, box-shadow 0.3s;
-  height: 45px;
-  margin: 0; /* Remove all margin */
-}
-
-
-
-.radio-item label {
-  background-color: #e0f0ff; /* Light blue background */
-  color: #007BFF; /* Blue text color */
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  display: block;
-  text-align: center;
-  width: 100%; /* Ensure the label width is consistent */
-  height: 45px; /* Set the same height as dropdown for consistency */
-  line-height: 30px; /* Center the text vertically within the label */
-}
-
-.radio-item input[type="radio"]:checked + label {
-  background-color: #007BFF; /* Darker blue when selected */
-  color: #fff; /* White text when selected */
-}
-
-/* .radio-item label {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  display: block;
-  text-align: center;
-}
-
-.radio-item input[type="radio"]:checked + label {
-  background-color: #ccc;
-} */
-
-
-.sort-dropdown {
-  padding: 5px 10px; /* Shrink the padding to make it smaller */
-  width: auto; /* Adjust the width to be smaller */
-  max-width: 150px; /* Set a smaller max-width */
-}
-
-.dropdown:focus {
-  border-color: #007BFF;
-  outline: none;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-.radio-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.radio-item {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.radio-item:last-child {
-  margin-right: 0;
-}
-
-.radio-item input[type="radio"] {
-  display: none;
-}
-
-
-
-.results {
-  flex: 1;
-}
-
-.recipe-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 0 20px;
-}
-
-.recipe-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  width: 100%;
-  height: auto;
-}
-
-.recipe-preview:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-.recipe-preview img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  border-bottom: 1px solid #eee;
-}
-
-.recipe-footer {
-  padding: 15px;
-  background-color: #fafafa;
-  border-top: 1px solid #eee;
-  text-align: center;
-}
-
-.recipe-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  white-space: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  height: 3rem;
-}
-
-.recipe-overview {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  color: #777;
-}
-
-.recipe-overview li {
-  text-align: center;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 5px;
-}
-
-.recipe-overview li .icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 5px;
-}
-
-.icon_like {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-}
-
-.no-results {
-  margin-top: 20px;
-  font-size: 1.2em;
-  color: #888;
-  text-align: center;
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
 
 .title {
   font-size: 72px;
@@ -519,5 +236,208 @@ export default {
   font-family: 'Josefin Sans', sans-serif;
   color: #374d37; /* Dark Grey-Green */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(50, 205, 50, 0.7); /* Shadow and green glow */
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: 0;
+}
+
+.container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f8f9fa;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 20px;
+  font-size: 1.2rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s;
+}
+
+.search-input:focus {
+  box-shadow: 0 4px 15px rgba(60, 90, 153, 0.2);
+  border-color: #3c5a99;
+}
+
+.search-button, .reset-button {
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.search-button {
+  background-color: #3c5a99;
+}
+
+.search-button:hover {
+  background-color: #2d3e73;
+}
+
+.reset-button {
+  background-color: #ef233c;
+}
+
+.reset-button:hover {
+  background-color: #b81d2e;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.filter-group {
+  flex: 1;
+}
+
+.filter-label {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: block;
+  color: #495057;
+}
+
+.dropdown, .sort-dropdown {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: box-shadow 0.3s;
+}
+
+.dropdown:focus, .sort-dropdown:focus {
+  border-color: #3c5a99;
+  box-shadow: 0 4px 15px rgba(60, 90, 153, 0.2);
+}
+
+.radio-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.radio-item {
+  flex: 1;
+  text-align: center;
+}
+
+.radio-item input[type="radio"] {
+  display: none;
+}
+
+.radio-item label {
+  display: block;
+  padding: 12px;
+  background-color: #edf2f4;
+  color: #2b2d42;
+  border-radius: 10px;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+}
+
+.radio-item input[type="radio"]:checked + label {
+  background-color: #3c5a99;
+  color: white;
+}
+
+.sort-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.recipe-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.recipe-preview {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.recipe-preview:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-preview img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.recipe-footer {
+  padding: 20px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+}
+
+.recipe-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.recipe-overview {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.recipe-overview li {
+  text-align: center;
+  flex: 1;
+}
+
+.no-results {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  color: #ef233c; /* Bright red to highlight no results */
+  text-align: center;
+  font-weight: 600;
+  padding: 20px;
+  background-color: #fff4f4; /* Light red background */
+  border-radius: 10px;
+  border: 1px solid #ef233c;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 </style>

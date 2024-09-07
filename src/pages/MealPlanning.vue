@@ -37,12 +37,18 @@
                 <div class="progress-bar-container">
                   <progress-bar :progress="Math.floor(recipe.progress * 100)" />
                 </div>
-                <router-link
-                  :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }"
-                  class="start-preparation"                  
-                >
-                  <i class="fas fa-play-circle"></i> Start Preparation
-                </router-link>
+
+                <!-- Conditionally render the button or a blank space -->
+                <div v-if="recipe.progress < 1">
+                  <router-link
+                    :to="{ name: 'RecipePreparation', params: { recipeId: recipe.id } }"
+                    class="start-preparation"
+                  >
+                    <i class="fas fa-play-circle"></i>
+                    {{ recipe.progress === 0 ? "Start Preparation" : "Continue Preparation" }}
+                  </router-link>
+                </div>
+                <br v-else /> <!-- Blank line when recipe is complete -->
               </div>
             </div>
           </div>
@@ -59,6 +65,7 @@
     </b-modal>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -194,6 +201,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .meal-planning-container {

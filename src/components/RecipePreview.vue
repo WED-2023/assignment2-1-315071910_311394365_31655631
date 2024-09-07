@@ -2,7 +2,6 @@
   <router-link
     :to="{ name: 'recipe', params: { recipeId: recipe.id } }"
     class="recipe-preview"
-    @click.native="markAsWatched"
   >
     <div class="recipe-body">
       <div class="watched-ribbon" v-if="watched">
@@ -20,7 +19,7 @@
       <div v-else class="image-placeholder">
         <i class="fas fa-spinner fa-pulse placeholder-icon"></i>
       </div>
-      <div class="favorite-icon-container" v-if="$root.store.username" @click.stop="toggleFavorite">
+      <div class="favorite-icon-container" v-if="$root.store.username" @click.stop.prevent="toggleFavorite">
         <i
           :class="favorite ? 'fas fa-heart favorite-icon active' : 'far fa-heart favorite-icon'"
         ></i>
@@ -77,18 +76,7 @@
 
 <script>
 import axios from 'axios';
-import {
-  mockAddFavorite,
-  mockRemoveFavorite,
-  mockIsRecipeMarkAsFavorite,
-  mockAddWatchedRecipe,
-  mockIsRecipeWatched,
-} from "@/services/user";
-import {
-  mockIsRecipeVegan,
-  mockIsRecipeGlutenFree,
-  mockIsRecipeVegetarian,
-} from "@/services/recipes.js";
+import { mockAddWatchedRecipe, mockIsRecipeWatched } from "@/services/user";
 
 export default {
   data() {
@@ -108,7 +96,11 @@ export default {
     },
   },
   async mounted() {
-    await this.isRecipeMarkAsFavorite();
+    if (Number.isInteger(Number(this.recipe.id)) || this.recipe.id.substring(0, 6) === "FAMILY"){
+      this.favorite = this.recipe.favorite;
+    } else {
+      this.favorite = this.recipe.isFavorite;  // Set favorite from the recipe prop
+    }
     await this.loadRecipeImage();
     await this.loadDietaryInfo();
     await this.isRecipeWatched();
@@ -133,17 +125,10 @@ export default {
         console.error("Error loading image:", error);
       }
     },
-    async isRecipeMarkAsFavorite() {
-      try {
-        const response = await axios.get(`${this.$root.store.server_domain}/recipes/${this.recipe.id}`);
-        this.favorite = response.data.isFavorite;
-      } catch (error) {
-        console.error("Error fetching favorite status:", error);
-      }
-    },
     async isRecipeWatched() {
-      const response = await mockIsRecipeWatched(this.recipe.id);
-      this.watched = response.data.watched;
+      // const response = await mockIsRecipeWatched(this.recipe.id);
+      // this.watched = response.data.watched;
+      this.watched = this.recipe.watched;
       console.log("Is recipe watched:", this.recipe.id, this.watched);
     },
     async loadDietaryInfo() {
@@ -175,11 +160,35 @@ export default {
         axios.defaults.withCredentials = false;
       }
     },
-    markAsWatched() {
-      mockAddWatchedRecipe(this.recipe.id);
-      this.watched = true;
-      console.log("Marked as watched:", this.recipe.id);
-    },
+    // async markAsWatched() {
+    //   axios.defaults.withCredentials = true;
+      
+    //   if (!this.$root.store.username) {
+    //     console.log("User not logged in, cannot mark as watched");
+    //     return;
+    //   }
+      
+    //   try {
+    //     console.log(`Marking recipe ${this.recipe.id} as watched...`);  // Log the request
+    //     const response = await axios.post(`/users/markwatched/${this.recipe.id}`);
+        
+    //     if (response.status === 200) {
+    //       this.watched = true;
+    //       console.log(`Recipe ${this.recipe.id} marked as watched`);
+    //     } else {
+    //       console.error(`Failed to mark recipe as watched: ${response.status}`);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error marking recipe as watched:", error);
+    //   } finally {
+    //     axios.defaults.withCredentials = false;
+    //   }
+    // },
+    // markAsWatched() {
+    //   mockAddWatchedRecipe(this.recipe.id);
+    //   this.watched = true;
+    //   console.log("Marked as watched:", this.recipe.id);
+    // },
   },
 };
 </script>
